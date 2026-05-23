@@ -1,0 +1,87 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+
+\definecolor{brandblue}{RGB}{30, 64, 175}
+\hypersetup{colorlinks=true, linkcolor=brandblue, urlcolor=brandblue}
+
+\title{\textbf{The SmartShop Bible: Git Workflow \& Site Map Guide}}
+\author{LUWI Mafuleti}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{The Golden Rules of Git}
+Whenever you make a change, follow this sequence. Never skip steps.
+
+\begin{enumerate}
+    \item \textbf{Status Check:} \texttt{git status} \\
+    Always see what you've touched before adding anything.
+    \item \textbf{Diff Review:} \texttt{git diff} \\
+    Read your changes. Did you leave a \texttt{dd()} or a console log?
+    \item \textbf{Surgical Add:} \texttt{git add <file\_path>} \\
+    Avoid \texttt{git add .} unless you are sure. Add files one by one to keep commits focused.
+    \item \textbf{Atomic Commit:} \texttt{git commit -m "type: short description"} \\
+    Use types: \texttt{feat} (new feature), \texttt{fix} (bug fix), \texttt{ui} (styling), \texttt{docs} (text changes).
+    \item \textbf{Push:} \texttt{git push origin main}
+\end{enumerate}
+
+\section{The SmartShop Site Map (The Developer's Compass)}
+Use this map to identify which files to edit when a specific part of the site needs a change.
+
+\subsection{1. The Public Face (Discovery \& Collection)}
+\begin{itemize}
+    \item \textbf{Homepage:} \texttt{resources/views/home.blade.php}
+    \item \textbf{Shop/Catalog:} \texttt{resources/views/shop.blade.php}
+    \item \textbf{Product Details:} \texttt{resources/views/products/show.blade.php}
+    \item \textbf{Logic:} \texttt{app/Http/Controllers/ViewController.php}
+\end{itemize}
+
+\subsection{2. The Transaction Engine (Cart \& Orders)}
+\begin{itemize}
+    \item \textbf{Cart View:} \texttt{resources/views/cart/index.blade.php}
+    \item \textbf{Cart Logic:} \texttt{app/Http/Controllers/CartController.php}
+    \item \textbf{Order Logic:} \texttt{app/Http/Controllers/OrderController.php}
+    \item \textbf{PayPal Logic:} \texttt{app/Http/Controllers/PaymentController.php}
+\end{itemize}
+
+\subsection{3. The Identity Layer (Auth \& Profiles)}
+\begin{itemize}
+    \item \textbf{Login/Signup:} \texttt{resources/views/auth/}
+    \item \textbf{User Profile:} \texttt{resources/views/users/show.blade.php}
+    \item \textbf{Auth Logic:} \texttt{app/Http/Controllers/AuthController.php}
+\end{itemize}
+
+\subsection{4. The Look \& Feel (Global Styles)}
+\begin{itemize}
+    \item \textbf{Layout Shell:} \texttt{resources/views/layouts/app.blade.php}
+    \item \textbf{Theme/CSS:} Edit the \texttt{:root} variables in \texttt{app.blade.php} or \texttt{resources/css/app.css}.
+\end{itemize}
+
+\section{Scenario-Based Guidance}
+
+\begin{description}
+    \item[Scenario A: "I want to change the price color"] \quad \\
+    1. Edit \texttt{resources/views/components/product-card.blade.php}. \\
+    2. \texttt{git add resources/views/components/product-card.blade.php} \\
+    3. \texttt{git commit -m "ui: update price typography color"}
+    
+    \item[Scenario B: "I want to add a new field to the Order"] \quad \\
+    1. Create migration: \texttt{php artisan make:migration add\_field\_to\_orders\_table}. \\
+    2. Update Model: \texttt{app/Models/Order.php} (add to \texttt{\$fillable}). \\
+    3. Update Controller: \texttt{app/Http/Controllers/OrderController.php}. \\
+    4. \texttt{git add database/migrations/ app/Models/Order.php app/Http/Controllers/OrderController.php} \\
+    5. \texttt{git commit -m "feat: add [field] to order tracking"}
+\end{description}
+
+\end{document}
