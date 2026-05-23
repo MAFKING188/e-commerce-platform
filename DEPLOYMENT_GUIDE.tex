@@ -1,0 +1,81 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{brandblue}{RGB}{30, 64, 175}
+\hypersetup{colorlinks=true, linkcolor=brandblue, urlcolor=brandblue}
+
+\title{\textbf{SmartShop Deployment: The Student Pack Strategy}}
+\author{LUWI Mafuleti}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Phase 1: Claiming My Infrastructure}
+My GitHub Student Developer Pack provides the fuel for this deployment.
+
+\begin{enumerate}
+    \item \textbf{Access My Pack:} I visit \href{https://education.github.com/pack}{education.github.com/pack}.
+    \item \textbf{Claim DigitalOcean:} I find the DigitalOcean offer and click "Get Code" or "Authorize." I will receive \$200 in credits.
+    \item \textbf{Claim My Domain:} I use the Namecheap or .TECH offer to register \texttt{smartshop-luwi.tech} (or similar).
+\end{enumerate}
+
+\section{Phase 2: Preparing My Server (DigitalOcean)}
+I will use the \textbf{App Platform} for the easiest "Git-to-Deploy" experience.
+
+\begin{enumerate}
+    \item \textbf{My New App:} In DigitalOcean, I click "Create" $\rightarrow$ "Apps."
+    \item \textbf{Connect My GitHub:} I select my \texttt{e-commerce-platform} repository.
+    \item \textbf{My Resource Configuration:} 
+    \begin{itemize}
+        \item I set the HTTP Port to \texttt{8080}.
+        \item I add a **Database** (MySQL) to my app resources.
+    \end{itemize}
+\end{enumerate}
+
+\section{Phase 3: My Environment Configuration (.env)}
+DigitalOcean needs the variables from my local \texttt{.env} to function. I add these in the "Settings" tab:
+
+\begin{lstlisting}[language=bash]
+APP_KEY=base64:... (Generate using php artisan key:generate)
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.tech
+
+# Database (DigitalOcean will provide these)
+DB_CONNECTION=mysql
+DB_HOST=${db.HOSTNAME}
+DB_DATABASE=${db.DATABASE}
+DB_USERNAME=${db.USERNAME}
+DB_PASSWORD=${db.PASSWORD}
+
+# PayPal (From your Developer Dashboard)
+PAYPAL_MODE=sandbox
+PAYPAL_SANDBOX_CLIENT_ID=your_id
+PAYPAL_SANDBOX_CLIENT_SECRET=your_secret
+\end{lstlisting}
+
+\section{Phase 4: My Post-Deployment Commands}
+Once my site is "Live," I must run the migrations. In the DigitalOcean console (or via their "Run Command" feature):
+
+\begin{lstlisting}[language=bash]
+php artisan migrate --force
+php artisan db:seed --force
+\end{lstlisting}
+
+\section{Phase 5: My SSL \& Domain}
+1. In my DigitalOcean App settings, I go to "Domains."
+2. I add my \texttt{.tech} domain.
+3. I update my Domain's DNS (at Namecheap/.TECH) to point to the DigitalOcean nameservers.
+4. DigitalOcean will automatically issue my **Let's Encrypt SSL certificate**.
+
+\end{document}

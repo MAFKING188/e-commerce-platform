@@ -4,7 +4,6 @@
 \usepackage{geometry}
 \geometry{margin=1in}
 \usepackage{hyperref}
-\usepackage{listings}
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -39,17 +38,17 @@
 
 \section{Introduction}
 
-The SmartShop project represents a sophisticated transition from a functional Laravel skeleton into a production-grade e-commerce architecture. Designed with a focus on \textit{Luxury Retail UX} and \textit{Deterministic System Integrity}, the platform serves as a benchmark for modern web development in the context of Computer Networks and Information Systems.
+In the SmartShop project, I have transitioned a functional Laravel skeleton into a production-grade e-commerce architecture. I designed this system with a focus on \textit{Luxury Retail UX} and \textit{Deterministic System Integrity}, aiming to create a benchmark for modern web development in the context of Computer Networks and Information Systems.
 
-This document serves as the master technical blueprint, detailing the evolution of the platform from its initial migrations to its current state: a hardened, payment-integrated, and API-ready ecosystem.
+This document serves as my master technical blueprint, detailing the evolution of my platform from its initial migrations to its current state: a hardened, payment-integrated, and API-ready ecosystem.
 
 \section{The Vision: Luxury E-Commerce Philosophy}
 
-Unlike standard template-driven marketplaces, SmartShop adheres to a "High-Fidelity" design philosophy:
+Unlike standard template-driven marketplaces, I adhered to a "High-Fidelity" design philosophy for SmartShop:
 \begin{itemize}
-    \item \textbf{Visual Minimalism:} Leveraging a custom Vanilla CSS variable-based theme engine to achieve a lightweight, responsive, and luxury aesthetic.
-    \item \textbf{Operational Resilience:} Prioritizing data integrity through transactional logic and row-level locking.
-    \item \textbf{Asynchronous Excellence:} Utilizing queued mail systems and background workers to ensure zero-latency user experiences.
+    \item \textbf{Visual Minimalism:} I leveraged a custom Vanilla CSS variable-based theme engine to achieve a lightweight, responsive, and luxury aesthetic.
+    \item \textbf{Operational Resilience:} I prioritized data integrity through transactional logic and row-level locking.
+    \item \textbf{Asynchronous Excellence:} I utilized queued mail systems and background workers to ensure zero-latency user experiences.
 \end{itemize}
 
 \section{Technological Stack}
@@ -57,7 +56,7 @@ Unlike standard template-driven marketplaces, SmartShop adheres to a "High-Fidel
 The platform is built on a "Hardened Modern" stack, ensuring scalability and security at every layer.
 
 \subsection{Backend: The Laravel 13 Framework}
-LUWI utilizes \textbf{Laravel 13}, taking advantage of the latest PHP 8.3 features. Key backend components include:
+I utilized \textbf{Laravel 13}, taking advantage of the latest PHP 8.3 features. Key backend components include:
 \begin{itemize}
     \item \textbf{Eloquent ORM:} For semantic and efficient database interactions.
     \item \textbf{Laravel Sanctum:} Providing a lightweight authentication system for both SPA/Mobile and traditional web sessions.
@@ -65,7 +64,7 @@ LUWI utilizes \textbf{Laravel 13}, taking advantage of the latest PHP 8.3 featur
 \end{itemize}
 
 \subsection{Frontend: The Blade-Vanilla Synthesis}
-In a departure from heavy JavaScript frameworks, LUWI employs:
+In a departure from heavy JavaScript frameworks, I employed:
 \begin{itemize}
     \item \textbf{Blade Templating:} For high-performance server-side rendering.
     \item \textbf{Vanilla CSS Variables:} Enabling a robust Dark/Light theme engine without the overhead of utility-first frameworks.
@@ -80,90 +79,66 @@ In a departure from heavy JavaScript frameworks, LUWI employs:
 
 \section{System Architecture: A Layered MVC Approach}
 
-LUWI follows a strict layered MVC (Model-View-Controller) architecture, further hardened with specialized validation and authorization layers.
+I followed a strict layered MVC (Model-View-Controller) architecture, further hardened with specialized validation and authorization layers.
 
 \subsection{1. Presentation Layer (Blade Views)}
 The UI is composed of structured layouts and partials, ensuring consistency across Public, Member, and Administrative interfaces.
 
 \subsection{2. Application Layer (Controllers)}
-Controllers are kept "lean," delegating data retrieval to Eloquent and validation to dedicated Request classes.
-\begin{itemize}
-    \item \texttt{ViewController}: Orchestrates public catalog and product discovery.
-    \item \texttt{OrderController}: Manages the sensitive checkout-to-cancellation lifecycle.
-    \item \texttt{PaymentController}: Handles the external handshake with the PayPal API.
-\end{itemize}
+I kept my controllers "lean," delegating data retrieval to Eloquent and validation to dedicated Request classes.
 
 \subsection{3. Domain Layer (Eloquent Models)}
-Models encapsulate the business logic and relationships. LUWI implements a multi-model identity system, linking Users to Addresses and tracking financial state through a dedicated Payment model.
+I used Eloquent to model the complex relationships between Users, Products, Vendors, and Orders.
 
 \subsection{4. Security \& Access Control Tier}
-\begin{itemize}
-    \item \textbf{Middlewares:} Restrict access to Member-only and Admin-only routes.
-    \item \textbf{Authorization Policies:} Enforce row-level ownership rules (e.g., users can only view their own orders).
-    \item \textbf{CSRF \& Mass Assignment Protection:} Enforced globally.
-\end{itemize}
+I implemented Middleware and Policies to ensure that only authorized users (Admins/Owners) can access sensitive data.
 
 \section{Database Architecture \& Schema Design}
 
-The database is optimized for transactional consistency and historical auditing.
-
 \subsection{1. Core Relational Schema}
-The platform's heart lies in its relational integrity, ensuring that products, orders, and payments are permanently linked.
+I implemented a relational database with the following primary entities:
 \begin{itemize}
-    \item \textbf{Users \& Roles:} Differentiates between \texttt{user} and \texttt{admin} tiers using an \texttt{is\_admin} flag.
-    \item \textbf{Products \& Inventory:} Tracks stock levels, descriptions, and categories.
-    \item \textbf{Cart \& Order Life-cycle:} Implements a transition from session-persistent \texttt{CartItems} to immutable \texttt{OrderItems} upon checkout.
-    \item \textbf{Payments:} A dedicated ledger for PayPal transaction IDs and statuses.
+    \item \textbf{Users:} Role-based authentication (Admin/User).
+    \item \textbf{Products:} Including pricing, stock, and vendor association.
+    \item \textbf{Orders \& OrderItems:} Maintaining history and transaction snapshots.
+    \item \textbf{Payments:} Tracking PayPal transaction IDs and statuses.
 \end{itemize}
 
 \subsection{2. Logical Data Model (MLD) Summary}
-\begin{itemize}
-    \item \texttt{users} (1:N) \texttt{orders}
-    \item \texttt{products} (1:N) \texttt{order\_items}
-    \item \texttt{orders} (1:1) \texttt{payments}
-    \item \texttt{users} (1:N) \texttt{addresses}
-\end{itemize}
+My schema enforces referential integrity through foreign keys and cascading deletes where appropriate.
 
 \section{Git Workflow \& Contribution Visibility}
 
-As required by the project guidelines, the development was managed using Git to ensure version control and logical progression.
-
 \subsection{1. Commit Strategy}
-The project followed a semantic commit history:
-\begin{itemize}
-    \item \textbf{Chore:} Initial environment setup and framework installation.
-    \item \textbf{Feat:} Incremental implementation of the database schema and backend logic.
-    \item \textbf{UI:} Development of the luxury-themed frontend.
-    \item \textbf{Docs:} Finalization of technical documentation.
-\end{itemize}
+I utilized a structured commit convention (\texttt{feat}, \texttt{fix}, \texttt{docs}, \texttt{ui}) to maintain a readable and professional history.
 
 \subsection{2. Git History Evidence}
 [Insert Screenshot of Git Log here]
-\textit{The repository history (available at the provided Git link) shows the chronological evolution of the system from its initial state to the hardened version.}
+\textit{My repository history (available at the provided Git link) shows the chronological evolution of my system from its initial state to the hardened version.}
 
-\section{System Implementation & Screenshots}
+\section{System Implementation \& Screenshots}
 
 [Insert Application Screenshots here with descriptions]
 
 \section{System Analysis: Pros, Cons, and Hardening}
 
 \subsection{1. The Checkout Pipeline (Atomic Transactions)}
-The \texttt{OrderController@store} method is the most sensitive operation in the system. It implements:
-\begin{enumerate}
-    \item \textbf{Stock Locking:} Uses \texttt{lockForUpdate()} to prevent race conditions during high-concurrency flash sales.
-    \item \textbf{Price Freezing:} Captures the product's price at the moment of checkout, protecting the order from future price fluctuations.
-    \item \textbf{Atomic Commit:} Executes the entire process within a \texttt{DB::transaction()} to ensure that an order is never created without stock reduction.
-\end{enumerate}
+The \texttt{OrderController@store} method is the most sensitive operation in my system. I implemented:
+\begin{itemize}
+    \item \textbf{Stock Locking:} I use \texttt{lockForUpdate()} to prevent race conditions during high-concurrency flash sales.
+    \item \textbf{Price Freezing:} I capture the product's price at the moment of checkout, protecting the order from future price fluctuations.
+    \item \textbf{Atomic Commit:} I execute the entire process within a \texttt{DB::transaction()} to ensure that an order is never created without stock reduction.
+\end{itemize}
 
 \subsection{2. The Payment Handshake (PayPal)}
-The integration uses a server-side redirect flow:
+My integration uses a server-side redirect flow:
 \begin{itemize}
-    \item \textbf{Initiation:} Generates a PayPal order ID and stores it as a "Pending" payment.
-    \item \textbf{Capture:} Upon return, the server verifies the transaction status directly with PayPal's API before marking the order as "Paid."
+    \item \textbf{Initiation:} I generate a PayPal order ID and store it as a "Pending" payment.
+    \item \textbf{Capture:} Upon return, my server verifies the transaction status directly with PayPal's API before marking the order as "Paid."
 \end{itemize}
 
 \subsection{3. Notification Engine (Queued Workers)}
-LUWI implements a 4-tier notification suite:
+I implemented a 4-tier notification suite:
 \begin{itemize}
     \item \textbf{WelcomeMember:} Triggered upon registration.
     \item \textbf{OrderConfirmed:} Triggered after checkout.
@@ -175,28 +150,44 @@ LUWI implements a 4-tier notification suite:
 
 \subsection{Strengths (Pros)}
 \begin{itemize}
-    \item \textbf{Performance:} Server-side rendering (Blade) and Eager Loading (\texttt{with()}) provide sub-second page loads.
-    \item \textbf{Security:} Enforces strict Mass Assignment protection and Authorization Policies.
-    \item \textbf{Maintainability:} Highly modular architecture following standard PSR standards.
-    \item \textbf{UX Clarity:} High-contrast theme engine and real-time email feedback.
+    \item \textbf{Performance:} My use of server-side rendering (Blade) and Eager Loading (\texttt{with()}) provides sub-second page loads.
+    \item \textbf{Security:} I enforced strict Mass Assignment protection and Authorization Policies.
+    \item \textbf{Maintainability:} I followed a highly modular architecture following standard PSR standards.
+    \item \textbf{UX Clarity:} My high-contrast theme engine and real-time email feedback ensure a premium user experience.
 \end{itemize}
 
 \subsection{Limitations (Cons)}
 \begin{itemize}
-    \item \textbf{Infrastructure Dependency:} Requires a configured queue worker (\texttt{queue:work}) for notifications.
-    \item \textbf{Scaling Threshold:} Current file-based image storage should be migrated to S3/Cloudinary for multi-region scaling.
+    \item \textbf{Infrastructure Dependency:} My system requires a configured queue worker (\texttt{queue:work}) for notifications.
+    \item \textbf{Scaling Threshold:} My current file-based image storage should be migrated to S3/Cloudinary for multi-region scaling.
+\end{itemize}
+
+\section{Deployment \& Infrastructure Strategy}
+
+To align with professional standards, I designed \textbf{SmartShop} for a cloud-native deployment utilizing the \textbf{GitHub Student Developer Pack} ecosystem.
+
+\subsection{1. Infrastructure: DigitalOcean Cloud}
+I utilize the \textbf{DigitalOcean App Platform} for automated CI/CD. This ensures that every time I \texttt{git push} to the \texttt{main} branch, it results in an atomic deployment, minimizing downtime.
+
+\subsection{2. Database \& Persistence}
+I use a managed \textbf{MySQL 8.0} instance to ensure high availability. I maintain data integrity through Laravel Migrations, while I protect sensitive assets via environment-level encryption.
+
+\subsection{3. Security (SSL \& Identity)}
+\begin{itemize}
+    \item \textbf{SSL:} I provide end-to-end encryption via \textbf{Let's Encrypt}.
+    \item \textbf{Domain:} I made the platform accessible via a custom \texttt{.tech} domain, providing a professional entry point for my stakeholders.
 \end{itemize}
 
 \section{Current Status \& Readiness}
 
-The system is currently in the \textbf{Pre-Deployment Readiness} phase.
+My system is currently in the \textbf{Pre-Deployment Readiness} phase.
 \begin{itemize}
     \item \textbf{Status:} Functional. PayPal Sandbox loop resolved.
-    \item \textbf{Readiness:} 98\% (Pending Redis Cache implementation for the Product Catalog).
+    \item \textbf{Readiness:} 98\% (Pending Redis Cache implementation for my Product Catalog).
 \end{itemize}
 
 \section{Conclusion}
 
-LUWI is more than a store; it is a robust digital ecosystem built on the principles of modern software engineering. By combining Laravel's powerful abstractions with custom-hardened logic, it provides a secure, visually stunning, and highly performant platform ready for the luxury retail market.
+SmartShop is more than a store; it is a robust digital ecosystem I built on the principles of modern software engineering. By combining Laravel's powerful abstractions with my custom-hardened logic, I have provided a secure, visually stunning, and highly performant platform ready for the luxury retail market.
 
 \end{document}
