@@ -276,7 +276,7 @@
 
 <nav>
     <div class="container">
-        <a href="{{ route('home') }}" class="logo">LUWI</a>
+        <a href="{{ route('home') }}" class="logo">SmartShop</a>
         
         <div class="nav-links">
             <a href="{{ route('home') }}">Discovery</a>

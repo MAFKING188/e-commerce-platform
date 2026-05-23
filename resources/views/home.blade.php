@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'LUWI | Exceptional Design')
+@section('title', 'SmartShop | Exceptional Design')
 
 @section('styles')
 <style>

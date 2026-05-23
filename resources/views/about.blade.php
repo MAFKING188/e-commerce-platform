@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Our Story | LUWI')
+@section('title', 'Our Story | SmartShop')
 
 @section('styles')
 <style>
@@ -119,7 +119,7 @@
 <div class="manifesto-section">
     <h2>Our Manifesto</h2>
     <div class="manifesto-text">
-        LUWI was born from a desire to bridge the gap between artisanal craftsmanship and modern accessibility. We don't just sell products; we curate experiences that define your personal space.
+        SmartShop was born from a desire to bridge the gap between artisanal craftsmanship and modern accessibility. We don't just sell products; we curate experiences that define your personal space.
     </div>
 </div>
 

@@ -154,7 +154,7 @@
 </div>
 
 <div style="margin-top: 3rem;">
-    {{ $products->links() }}
+    {{ $products->links('partials.pagination') }}
 </div>
 
 @endsection
