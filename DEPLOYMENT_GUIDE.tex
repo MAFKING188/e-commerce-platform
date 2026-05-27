@@ -8,9 +8,19 @@
 \usepackage{listings}
 
 \definecolor{brandblue}{RGB}{30, 64, 175}
+\definecolor{codebg}{RGB}{245, 245, 245}
 \hypersetup{colorlinks=true, linkcolor=brandblue, urlcolor=brandblue}
 
-\title{\textbf{SmartShop Deployment: The Student Pack Strategy}}
+\lstset{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray}
+}
+
+\title{\textbf{SmartShop Deployment: The Droplet (VPS) Strategy}}
 \author{LUWI Mafuleti}
 \date{\today}
 
@@ -20,62 +30,85 @@
 \tableofcontents
 \newpage
 
-\section{Phase 1: Claiming My Infrastructure}
-My GitHub Student Developer Pack provides the fuel for this deployment.
+\section{Introduction}
+Transitioning from DigitalOcean App Platform to a \textbf{Droplet} provides full control over the environment and allows us to run MySQL, Nginx, and PHP within our student credits without the overhead of Managed Database costs.
 
-\begin{enumerate}
-    \item \textbf{Access My Pack:} I visit \href{https://education.github.com/pack}{education.github.com/pack}.
-    \item \textbf{Claim DigitalOcean:} I find the DigitalOcean offer and click "Get Code" or "Authorize." I will receive \$200 in credits.
-    \item \textbf{Claim My Domain:} I use the Namecheap or .TECH offer to register \texttt{smartshop-luwi.tech} (or similar).
-\end{enumerate}
+\section{Phase 1: Provisioning the Droplet}
+1. \textbf{Create Droplet:} Choose \textbf{Ubuntu 24.04 LTS}.
+2. \textbf{Plan:} Basic Plan $\rightarrow$ Regular Intel $\rightarrow$ \$6/month (covered by \$200 credits).
+3. \textbf{Authentication:} Use \textbf{SSH Keys} (highly recommended over passwords).
+4. \textbf{Firewall:} Enable "Monitoring" and ensure SSH (22), HTTP (80), and HTTPS (443) are allowed.
 
-\section{Phase 2: Preparing My Server (DigitalOcean)}
-I will use the \textbf{App Platform} for the easiest "Git-to-Deploy" experience.
+\section{Phase 2: Server Environment Setup (LEMP)}
+Once connected via SSH (\texttt{ssh root@your\_ip}), run:
 
-\begin{enumerate}
-    \item \textbf{My New App:} In DigitalOcean, I click "Create" $\rightarrow$ "Apps."
-    \item \textbf{Connect My GitHub:} I select my \texttt{e-commerce-platform} repository.
-    \item \textbf{My Resource Configuration:} 
-    \begin{itemize}
-        \item I set the HTTP Port to \texttt{8080}.
-        \item I add a **Database** (MySQL) to my app resources.
-    \end{itemize}
-\end{enumerate}
-
-\section{Phase 3: My Environment Configuration (.env)}
-DigitalOcean needs the variables from my local \texttt{.env} to function. I add these in the "Settings" tab:
-
+\subsection{System Update \& Essentials}
 \begin{lstlisting}[language=bash]
-APP_KEY=base64:... (Generate using php artisan key:generate)
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-domain.tech
-
-# Database (DigitalOcean will provide these)
-DB_CONNECTION=mysql
-DB_HOST=${db.HOSTNAME}
-DB_DATABASE=${db.DATABASE}
-DB_USERNAME=${db.USERNAME}
-DB_PASSWORD=${db.PASSWORD}
-
-# PayPal (From your Developer Dashboard)
-PAYPAL_MODE=sandbox
-PAYPAL_SANDBOX_CLIENT_ID=your_id
-PAYPAL_SANDBOX_CLIENT_SECRET=your_secret
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl unzip zip nginx supervisor
 \end{lstlisting}
 
-\section{Phase 4: My Post-Deployment Commands}
-Once my site is "Live," I must run the migrations. In the DigitalOcean console (or via their "Run Command" feature):
-
+\subsection{PHP 8.3 Installation}
+Matches the requirement in \texttt{composer.json}.
 \begin{lstlisting}[language=bash]
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
+sudo apt install -y php8.3-fpm php8.3-mysql php8.3-mbstring php8.3-xml php8.3-bcmath php8.3-curl php8.3-zip php8.3-intl
+\end{lstlisting}
+
+\subsection{Database Setup (MySQL)}
+\begin{lstlisting}[language=bash]
+sudo apt install -y mysql-server
+sudo mysql_secure_installation
+# Create DB:
+sudo mysql -u root -e "CREATE DATABASE smartshop; CREATE USER 'luwi'@'localhost' IDENTIFIED BY 'secure_password'; GRANT ALL PRIVILEGES ON smartshop.* TO 'luwi'@'localhost'; FLUSH PRIVILEGES;"
+\end{lstlisting}
+
+\section{Phase 3: Application Deployment}
+
+\subsection{Cloning \& Permissions}
+\begin{lstlisting}[language=bash]
+cd /var/www
+sudo git clone https://github.com/yourusername/e-commerce-platform.git smartshop
+sudo chown -R www-data:www-data /var/www/smartshop
+sudo chmod -R 775 /var/www/smartshop/storage /var/www/smartshop/bootstrap/cache
+\end{lstlisting}
+
+\subsection{Composer \& Dependencies}
+\begin{lstlisting}[language=bash]
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+cd /var/www/smartshop
+composer install --no-dev --optimize-autoloader
+\end{lstlisting}
+
+\subsection{Environment Configuration}
+\begin{lstlisting}[language=bash]
+cp .env.example .env
+# Edit .env:
+# APP_ENV=production
+# APP_DEBUG=false
+# DB_DATABASE=smartshop
+# DB_USERNAME=luwi
+# DB_PASSWORD=secure_password
+php artisan key:generate
 php artisan migrate --force
-php artisan db:seed --force
 \end{lstlisting}
 
-\section{Phase 5: My SSL \& Domain}
-1. In my DigitalOcean App settings, I go to "Domains."
-2. I add my \texttt{.tech} domain.
-3. I update my Domain's DNS (at Namecheap/.TECH) to point to the DigitalOcean nameservers.
-4. DigitalOcean will automatically issue my **Let's Encrypt SSL certificate**.
+\section{Phase 4: Nginx & SSL Configuration}
+1. Create config: \texttt{sudo nano /etc/nginx/sites-available/smartshop}
+2. Link it: \texttt{sudo ln -s /etc/nginx/sites-available/smartshop /etc/nginx/sites-enabled/}
+3. Install SSL:
+\begin{lstlisting}[language=bash]
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d smartshop-luwi.tech
+\end{lstlisting}
+
+\section{Phase 5: Performance & Maintenance}
+\begin{itemize}
+    \item \textbf{Queue Management:} Configure Supervisor to run \texttt{php artisan queue:work}.
+    \item \textbf{Scheduler:} Add \texttt{* * * * * cd /var/www/smartshop && php artisan schedule:run >> /dev/null 2>&1} to crontab.
+    \item \textbf{Optimization:} Run \texttt{php artisan config:cache}, \texttt{route:cache}, and \texttt{view:cache}.
+\end{itemize}
 
 \end{document}

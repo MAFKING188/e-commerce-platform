@@ -1,0 +1,5 @@
+ac6cee1 (HEAD -> develop) docs: finalize technical architecture and system hardening report
+7b3202a ui: implement luxury dark/light theme andblade components
+8caaf71 feat: implement core e-commerce logic and PayPal integration
+9e6721c feat: design relational schema (Users,Products, Orders,Payments)
+f3f4ba7 Chore: initial project bootstrap with Laravel 11/12

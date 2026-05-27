@@ -1,0 +1,40 @@
+\section{Phase 3: System Hardening \& Application Layer}
+
+\subsection{Architectural Missions}
+
+\begin{itemize}
+    \item \textbf{Mission 5: The Messenger (Email Confirmation)} \\
+    Implement \texttt{Mail::to()} in \texttt{OrderController} using the \texttt{OrderConfirmed} mailable. Ensures asynchronous communication capability.
+    
+    \item \textbf{Mission 6: The Vault (PayPal Integration)} \\
+    Transition from local mock payments to \texttt{srmklive/paypal}. Focus on secure API initialization and webhook-driven state persistence.
+    
+    \item \textbf{Mission 7: The Bridge (API Layer)} \\
+    Decouple the backend using Laravel Sanctum. Implement paginated JSON responses for the catalog and token-based authentication.
+\end{itemize}
+
+\subsection{Production-Level Critical Hardening}
+
+\begin{enumerate}
+    \item \textbf{Concurrency Control (Race Conditions)} \\
+    \textit{Risk:} Overselling stock during simultaneous checkouts. \\
+    \textit{Fix:} Implement \texttt{lockForUpdate()} or atomic decrements within the \texttt{OrderController} transaction.
+    
+    \item \textbf{Payment Verification Integrity} \\
+    \textit{Risk:} Client-side manipulation of payment status. \\
+    \textit{Fix:} Enforce server-side verification (Webhooks/Capture) before updating the database.
+    
+    \item \textbf{Data Integrity \& Mass Assignment} \\
+    \textit{Risk:} Malicious injection of unvalidated fields into models. \\
+    \textit{Fix:} Enforce strict \texttt{\$fillable} arrays and use \texttt{validated()} data from FormRequests.
+    
+    \item \textbf{Performance Optimization} \\
+    \textit{Fix:} Resolve N+1 query patterns in \texttt{ViewController} using Eager Loading (\texttt{with()}) and implement Redis caching for the product catalog.
+\end{enumerate}
+
+\subsection{UI/UX: Universal Theme System}
+Implemented a CSS-variable based theme engine.
+\begin{itemize}
+    \item \textit{Implementation:} Persisted via \texttt{localStorage} and \texttt{data-theme} attribute on \texttt{<html>}.
+    \item \textit{Requirement:} All future views must map colors to the \texttt{:root} variable set to support dynamic switching.
+\end{itemize}
