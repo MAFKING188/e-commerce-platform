@@ -14,8 +14,8 @@ View Order Status
 
 Our logistics team will provide further updates as your package moves through the archival inspection process.
 
-Thank you for choosing LUWI.
+Thank you for choosing SmartShop.
 
 Best Regards,<br>
-The LUWI Logistics Team
+The SmartShop Logistics Team
 </x-mail::message>

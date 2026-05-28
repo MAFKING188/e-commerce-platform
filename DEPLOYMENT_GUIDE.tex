@@ -237,6 +237,19 @@ sudo certbot --nginx -d smartshop-luwi.tech -d www.smartshop-luwi.tech
 \section{Phase 6: Supervisor \& Queue Management}
 Production systems require background workers to handle emails and complex logic without slowing down the user experience.
 
+\subsection{Environment Setup for Emails}
+I configured the application to use the \texttt{database} queue driver and established a secure SMTP connection via Gmail.
+\begin{lstlisting}[language=bash]
+# Inside .env
+QUEUE_CONNECTION=database
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-16-digit-app-password
+MAIL_ENCRYPTION=tls
+\end{lstlisting}
+
 \subsection{Supervisor Configuration}
 I installed Supervisor to manage the Laravel queue worker, ensuring it restarts automatically if it crashes or the server reboots:
 \begin{lstlisting}[language=bash]
@@ -258,17 +271,19 @@ stdout_logfile=/var/www/smartshop/storage/logs/worker.log
 stopwaitsecs=3600
 \end{lstlisting}
 
-\subsection{Worker Activation}
+\subsection{Worker Activation \& Maintenance}
 \begin{lstlisting}[language=bash]
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start smartshop-worker:*
+sudo supervisorctl restart smartshop-worker:*
+# Clear any stuck failed jobs
+php artisan queue:flush
 \end{lstlisting}
 
 \newpage
 
-\section{Phase 7: Final Optimization \& Verification}
-In the final stage, I optimized the application for maximum performance.
+\section{Phase 7: Final Optimization, Verification \& Troubleshooting}
+In the final stage, I optimized the application for maximum performance and established a protocol for production monitoring.
 
 \subsection{Laravel Caching Strategy}
 I executed the following commands to compile configurations and routes into fast-access files:
@@ -277,6 +292,15 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 \end{lstlisting}
+
+\subsection{Production Email Troubleshooting}
+During deployment, I identified that the worker could log "DONE" even if the external SMTP provider (e.g., Gmail) blocks the message for security reasons. The following diagnostic protocol was established:
+\begin{itemize}
+    \item \textbf{Worker Logs:} Monitor \texttt{tail -f storage/logs/worker.log} to confirm the job is processed.
+    \item \textbf{Failed Jobs:} If the worker shows "Failed," use \texttt{php artisan queue:failed} to see why.
+    \item \textbf{SMTP Relay:} For Gmail, an "App Password" must be used instead of the standard account password.
+    \item \textbf{SPF/DKIM:} To ensure high deliverability, DNS TXT records for SPF and DKIM should be added to the domain settings.
+\end{itemize}
 
 \subsection{Production Verification}
 I verified the live site by visiting:

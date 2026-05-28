@@ -1,7 +1,7 @@
 <x-mail::message>
 # Order Cancelled
 
-Your order **#{{ $order->id }}** has been successfully cancelled. The pieces have been restored to the LUWI Archive, and any pending checkout sessions have been voided.
+Your order **#{{ $order->id }}** has been successfully cancelled. The pieces have been restored to the SmartShop Archive, and any pending checkout sessions have been voided.
 
 **Order Summary:**
 - **Order ID:** #{{ $order->id }}

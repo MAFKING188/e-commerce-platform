@@ -12,5 +12,5 @@ As a premium member, you will receive priority notifications on new acquisitions
 If you have any questions regarding your membership or a specific piece, our support team is available at [m.luwi0049@uca.ca.ma](mailto:m.luwi0049@uca.ca.ma).
 
 Regards,<br>
-The LUWI Curators
+The SmartShop Curators
 </x-mail::message>

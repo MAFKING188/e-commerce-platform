@@ -32,9 +32,10 @@
                 <a href="{{ route('orders.index') }}" class="button">View Order History</a>
             </div>
             <div class="footer">
-                &copy; {{ date('Y') }} LUWI Premium E-Commerce. Curated for the modern minimalist.
+                &copy; {{ date('Y') }} SmartShop Premium E-Commerce. Curated for the modern minimalist.
             </div>
         </div>
     </div>
 </body>
 </html>
+tml>
