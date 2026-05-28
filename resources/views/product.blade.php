@@ -111,6 +111,42 @@
             grid-template-columns: 1fr;
             gap: 2rem;
         }
+
+        .gallery {
+            position: relative;
+            top: 0;
+        }
+
+        .product-info h1 {
+            font-size: 2rem;
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+        }
+
+        .thumbnails {
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .thumbnail {
+            flex-shrink: 0;
+        }
+
+        section {
+            margin-top: 4rem !important;
+            padding-top: 3rem !important;
+        }
+
+        section h2 {
+            font-size: 1.75rem !important;
+        }
+
+        .suggestion-grid, .reviews-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+            gap: 1.25rem !important;
+        }
     }
 </style>
 @endsection

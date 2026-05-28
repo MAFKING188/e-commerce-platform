@@ -1,0 +1,9 @@
+\section{Phase 0: Readiness \& Prerequisites}
+Before initiating the server-side deployment, I ensured that all foundational assets were in place. This phase was critical for a seamless "Git-to-Server" transition.
+
+\begin{itemize}
+    \item \textbf{GitHub Repository:} The SmartShop codebase was finalized and pushed to a private repository.
+    \item \textbf{Domain Name:} I registered \texttt{smartshop-luwi.tech} via the GitHub Student Pack.
+    \item \textbf{SSH Credentials:} I generated a local SSH key pair and added the public key to my DigitalOcean account to ensure secure, passwordless access to the Droplet.
+    \item \textbf{Database Dump:} A local export of the development database (\texttt{database\_dump.sql}) was prepared for the hybrid import strategy.
+\end{itemize}

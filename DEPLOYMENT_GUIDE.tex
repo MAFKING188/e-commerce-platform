@@ -17,10 +17,12 @@
     breaklines=true,
     frame=single,
     keywordstyle=\color{blue},
-    commentstyle=\color{gray}
+    commentstyle=\color{gray},
+    numbers=left,
+    numberstyle=\tiny\color{gray}
 }
 
-\title{\textbf{SmartShop Deployment: The Droplet (VPS) Strategy}}
+\title{\textbf{SmartShop: Comprehensive Production Deployment Guide}}
 \author{LUWI Mafuleti}
 \date{\today}
 
@@ -30,51 +32,126 @@
 \tableofcontents
 \newpage
 
-\section{Introduction}
-Transitioning from DigitalOcean App Platform to a \textbf{Droplet} provides full control over the environment and allows us to run MySQL, Nginx, and PHP within our student credits without the overhead of Managed Database costs.
+\section{Phase 0: Readiness \& Prerequisites}
+Before initiating the server-side deployment, I ensured that all foundational assets were in place. This phase was critical for a seamless "Git-to-Server" transition.
 
-\section{Phase 1: Provisioning the Droplet}
-1. \textbf{Create Droplet:} Choose \textbf{Ubuntu 24.04 LTS}.
-2. \textbf{Plan:} Basic Plan $\rightarrow$ Regular Intel $\rightarrow$ \$6/month (covered by \$200 credits).
-3. \textbf{Authentication:} Use \textbf{SSH Keys} (highly recommended over passwords).
-4. \textbf{Firewall:} Enable "Monitoring" and ensure SSH (22), HTTP (80), and HTTPS (443) are allowed.
+\begin{itemize}
+    \item \textbf{GitHub Repository:} The SmartShop codebase was finalized and pushed to a private repository.
+    \item \textbf{Domain Name:} I registered \texttt{smartshop-luwi.tech} via the GitHub Student Pack.
+    \item \textbf{SSH Credentials:} I generated a local SSH key pair and added the public key to my DigitalOcean account to ensure secure, passwordless access to the Droplet.
+    \item \textbf{Database Dump:} A local export of the development database (\texttt{database\_dump.sql}) was prepared for the hybrid import strategy.
+\end{itemize}
 
-\section{Phase 2: Server Environment Setup (LEMP)}
-Once connected via SSH (\texttt{ssh root@your\_ip}), run:
+\newpage
 
-\subsection{System Update \& Essentials}
+\section{Phase 1: Infrastructure \& Resource Management}
+I provisioned a DigitalOcean Droplet with \textbf{Ubuntu 24.04 LTS} on the \$6/month plan. To ensure future-proofing and stability, I implemented VPC networking and Swap memory.
+
+\subsection{VPC Networking}
+I created a private network (\texttt{smartshop-vpc}) in the same region as my Droplet to isolate internal traffic and allow for secure communication with future services.
+
+\subsection{Resource Management: Swap Memory Implementation}
+During the early stages of service installation, I encountered "Out of Memory" (OOM) errors. To stabilize the 1GB RAM environment for MySQL, I implemented a 2GB Swap file:
+\begin{lstlisting}[language=bash]
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+\end{lstlisting}
+
+\subsection{Initial Server Hardening}
 \begin{lstlisting}[language=bash]
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y git curl unzip zip nginx supervisor
 \end{lstlisting}
 
+\newpage
+
+\section{Phase 2: The Production LEMP Stack}
+The application requires a specific version of PHP and a secured MySQL instance.
+
 \subsection{PHP 8.3 Installation}
-Matches the requirement in \texttt{composer.json}.
+I used the Ondrej PPA to source the required PHP 8.3 modules:
 \begin{lstlisting}[language=bash]
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 sudo apt install -y php8.3-fpm php8.3-mysql php8.3-mbstring php8.3-xml php8.3-bcmath php8.3-curl php8.3-zip php8.3-intl
 \end{lstlisting}
 
-\subsection{Database Setup (MySQL)}
+\subsection{MySQL: Installation, Recovery \& Security}
+Due to an OOM crash during the first attempt, I had to ensure the service was correctly enabled and started after implementing Swap.
 \begin{lstlisting}[language=bash]
 sudo apt install -y mysql-server
-sudo mysql_secure_installation
-# Create DB:
-sudo mysql -u root -e "CREATE DATABASE smartshop; CREATE USER 'luwi'@'localhost' IDENTIFIED BY 'secure_password'; GRANT ALL PRIVILEGES ON smartshop.* TO 'luwi'@'localhost'; FLUSH PRIVILEGES;"
+sudo systemctl enable mysql
+sudo systemctl start mysql
 \end{lstlisting}
 
-\section{Phase 3: Application Deployment}
+I then executed the \texttt{mysql\_secure\_installation} script with the following parameters:
+\begin{itemize}
+    \item Validate Password Plugin: \textbf{No} (to maintain flexibility during setup).
+    \item Remove Anonymous Users: \textbf{Yes}.
+    \item Disallow Remote Root Login: \textbf{Yes}.
+    \item Remove Test Database: \textbf{Yes}.
+\end{itemize}
 
-\subsection{Cloning \& Permissions}
+\subsection{Production Database Initialization}
+\begin{lstlisting}[language=bash]
+sudo mysql -u root
+CREATE DATABASE smartshop;
+CREATE USER 'luwi'@'localhost' IDENTIFIED BY 'StrongPasswordHere';
+GRANT ALL PRIVILEGES ON smartshop.* TO 'luwi'@'localhost';
+FLUSH PRIVILEGES;
+\end{lstlisting}
+
+\newpage
+
+\section{Phase 3: Git Integration \& Server-Side Repository Setup}
+With the server environment stabilized, the next critical step was the secure integration of the SmartShop codebase from GitHub.
+
+\subsection{SSH Key Configuration (Server to GitHub)}
+To allow the Droplet to pull code securely without repeated password prompts, I configured a deployment key:
+\begin{lstlisting}[language=bash]
+# Generating the key on the Droplet
+ssh-keygen -t ed25519 -C "deployment@smartshop-luwi.tech"
+# Displaying the key to be added to GitHub Repository Secrets/Deploy Keys
+cat ~/.ssh/id_ed25519.pub
+\end{lstlisting}
+
+\subsection{The Repository Clone \& "Safe Directory" Resolution}
+I cloned the repository into the standard web root. A specific security hurdle encountered was Git's \texttt{safe.directory} requirement when operating in a directory owned by another user (or root):
 \begin{lstlisting}[language=bash]
 cd /var/www
-sudo git clone https://github.com/yourusername/e-commerce-platform.git smartshop
-sudo chown -R www-data:www-data /var/www/smartshop
-sudo chmod -R 775 /var/www/smartshop/storage /var/www/smartshop/bootstrap/cache
+# Cloning using SSH for security
+git clone git@github.com:yourusername/e-commerce-platform.git smartshop
+# Resolving the ownership conflict to allow Git operations
+git config --global --add safe.directory /var/www/smartshop
 \end{lstlisting}
 
-\subsection{Composer \& Dependencies}
+\subsection{Filesystem Permissions for Git \& Laravel}
+I ensured that the repository files were owned by the Nginx user while maintaining Git's ability to track changes:
+\begin{lstlisting}[language=bash]
+sudo chown -R www-data:www-data /var/www/smartshop
+sudo chmod -R 775 /var/www/smartshop/storage
+sudo chmod -R 775 /var/www/smartshop/bootstrap/cache
+\end{lstlisting}
+
+\newpage
+
+\section{Phase 3: Git Integration \& Application Deployment}
+The core of the deployment involved pulling the code from GitHub and managing permissions for the \texttt{www-data} user.
+
+\subsection{Secure Repository Cloning}
+I cloned the repository into the standard web root. Because I was operating as the \texttt{root} user on a shared directory, I had to resolve Git's "safe directory" security feature:
+\begin{lstlisting}[language=bash]
+cd /var/www
+git clone https://github.com/yourusername/e-commerce-platform.git smartshop
+# Resolving ownership conflict for Git
+git config --global --add safe.directory /var/www/smartshop
+\end{lstlisting}
+
+\subsection{Dependency Management with Composer}
+I installed Composer globally and then executed the production-optimized install:
 \begin{lstlisting}[language=bash]
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
@@ -82,33 +159,133 @@ cd /var/www/smartshop
 composer install --no-dev --optimize-autoloader
 \end{lstlisting}
 
-\subsection{Environment Configuration}
+\subsection{Filesystem Permissions}
+To allow Laravel to write logs and handle file uploads, I assigned ownership to the Nginx user:
 \begin{lstlisting}[language=bash]
-cp .env.example .env
-# Edit .env:
-# APP_ENV=production
-# APP_DEBUG=false
-# DB_DATABASE=smartshop
-# DB_USERNAME=luwi
-# DB_PASSWORD=secure_password
-php artisan key:generate
-php artisan migrate --force
+sudo chown -R www-data:www-data /var/www/smartshop
+sudo chmod -R 775 /var/www/smartshop/storage
+sudo chmod -R 775 /var/www/smartshop/bootstrap/cache
 \end{lstlisting}
 
-\section{Phase 4: Nginx & SSL Configuration}
-1. Create config: \texttt{sudo nano /etc/nginx/sites-available/smartshop}
-2. Link it: \texttt{sudo ln -s /etc/nginx/sites-available/smartshop /etc/nginx/sites-enabled/}
-3. Install SSL:
+\newpage
+
+\section{Phase 4: Environment Configuration \& Data Recovery}
+This phase involved the transition from development settings to production-specific values.
+
+\subsection{The Terminal Configuration Fix}
+When attempting to use \texttt{nano} to edit the environment variables, I encountered the error \texttt{Error opening terminal: xterm-kitty}. I resolved this by resetting the terminal type for the session:
+\begin{lstlisting}[language=bash]
+export TERM=xterm
+nano .env
+\end{lstlisting}
+
+\subsection{The Hybrid Data Strategy}
+Instead of relying solely on migrations, which might lack development-time data, I imported my local dump after verifying the current database state:
+\begin{lstlisting}[language=bash]
+# Verify the target database is ready
+sudo mysql -e "USE smartshop; SHOW TABLES;"
+# Perform the import
+mysql -u luwi -p smartshop < database_dump.sql
+# Synchronize Laravel migration status
+php artisan migrate:status
+\end{lstlisting}
+
+\subsection{Application Key Generation}
+\begin{lstlisting}[language=bash]
+php artisan key:generate
+\end{lstlisting}
+
+\newpage
+
+\section{Phase 5: Nginx Configuration \& SSL Security}
+With the application configured, I set up the web server to route traffic and secured it with encryption.
+
+\subsection{Nginx Site Setup}
+I created a dedicated configuration for SmartShop and disabled the default Nginx welcome page:
+\begin{lstlisting}[language=bash]
+sudo nano /etc/nginx/sites-available/smartshop
+sudo ln -s /etc/nginx/sites-available/smartshop /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+\end{lstlisting}
+
+The configuration explicitly points to the \texttt{/public} directory and handles PHP processing via the 8.3 FPM socket:
+\begin{lstlisting}[language=bash]
+server {
+    listen 80;
+    server_name smartshop-luwi.tech www.smartshop-luwi.tech;
+    root /var/www/smartshop/public;
+    index index.php index.html;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+}
+\end{lstlisting}
+
+\subsection{DNS Propagation \& SSL (Certbot)}
+After verifying that the DNS A records for \texttt{smartshop-luwi.tech} had propagated, I issued a Let's Encrypt certificate:
 \begin{lstlisting}[language=bash]
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d smartshop-luwi.tech
+sudo certbot --nginx -d smartshop-luwi.tech -d www.smartshop-luwi.tech
 \end{lstlisting}
 
-\section{Phase 5: Performance & Maintenance}
+\newpage
+
+\section{Phase 6: Supervisor \& Queue Management}
+Production systems require background workers to handle emails and complex logic without slowing down the user experience.
+
+\subsection{Supervisor Configuration}
+I installed Supervisor to manage the Laravel queue worker, ensuring it restarts automatically if it crashes or the server reboots:
+\begin{lstlisting}[language=bash]
+sudo apt install -y supervisor
+sudo nano /etc/supervisor/conf.d/smartshop-worker.conf
+\end{lstlisting}
+
+The configuration targets the \texttt{database} queue and runs as the \texttt{www-data} user:
+\begin{lstlisting}[language=ini]
+[program:smartshop-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /var/www/smartshop/artisan queue:work --sleep=3 --tries=3 --timeout=90
+autostart=true
+autorestart=true
+user=www-data
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/www/smartshop/storage/logs/worker.log
+stopwaitsecs=3600
+\end{lstlisting}
+
+\subsection{Worker Activation}
+\begin{lstlisting}[language=bash]
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start smartshop-worker:*
+\end{lstlisting}
+
+\newpage
+
+\section{Phase 7: Final Optimization \& Verification}
+In the final stage, I optimized the application for maximum performance.
+
+\subsection{Laravel Caching Strategy}
+I executed the following commands to compile configurations and routes into fast-access files:
+\begin{lstlisting}[language=bash]
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+\end{lstlisting}
+
+\subsection{Production Verification}
+I verified the live site by visiting:
 \begin{itemize}
-    \item \textbf{Queue Management:} Configure Supervisor to run \texttt{php artisan queue:work}.
-    \item \textbf{Scheduler:} Add \texttt{* * * * * cd /var/www/smartshop && php artisan schedule:run >> /dev/null 2>&1} to crontab.
-    \item \textbf{Optimization:} Run \texttt{php artisan config:cache}, \texttt{route:cache}, and \texttt{view:cache}.
+    \item \texttt{https://smartshop-luwi.tech} (Encrypted)
+    \item \texttt{http://smartshop-luwi.tech} (Automatic redirect to HTTPS)
 \end{itemize}
+
+\section{Conclusion}
+The deployment of SmartShop was a multifaceted process involving custom infrastructure management, security hardening, and background process orchestration. The system is now robustly configured for production traffic.
 
 \end{document}

@@ -111,8 +111,33 @@
         color: var(--text-900);
     }
 
+    .cart-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 3rem;
+    }
+
     @media (max-width: 1024px) {
         .cart-grid { grid-template-columns: 1fr; gap: 2rem; }
+        .summary-card { position: relative; top: 0; }
+    }
+
+    @media (max-width: 640px) {
+        .cart-header h1 { font-size: 2rem; }
+        .cart-item {
+            grid-template-columns: 80px 1fr;
+            gap: 1rem;
+            padding: 1.25rem;
+        }
+        .cart-item-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
     }
 </style>
 @endsection

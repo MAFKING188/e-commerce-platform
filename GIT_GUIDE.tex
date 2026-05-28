@@ -36,6 +36,42 @@ Whenever I make a change, I follow this sequence. I never skip steps.
     \item \textbf{Push:} \texttt{git push origin main}
 \end{enumerate}
 
+\section{The Production Sync: Updating the Live Site}
+When I have tested a change locally and am ready to "go live," I follow this two-part synchronization ritual.
+
+\subsection{Step 1: The Local Push}
+I ensure my local state is clean and pushed to the cloud.
+\begin{lstlisting}[language=bash]
+git status
+git add .
+git commit -m "feat: descriptive message"
+git push origin main
+\end{lstlisting}
+
+\subsection{Step 2: The Server Pull \& Refresh}
+I SSH into my Droplet and pull the changes. \textbf{Note:} I must run the optimization commands to ensure Laravel recognizes the new code.
+\begin{lstlisting}[language=bash]
+ssh root@your_server_ip
+cd /var/www/smartshop
+
+# 1. Pull the latest code
+git pull origin main
+
+# 2. Update dependencies (Only if composer.json changed)
+# composer install --no-dev --optimize-autoloader
+
+# 3. Apply database changes (Only if I added migrations)
+# php artisan migrate --force
+
+# 4. REFRESH PRODUCTION CACHE (Mandatory)
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# 5. Restart Workers (Only if I changed Jobs/Mails)
+# sudo supervisorctl restart smartshop-worker:*
+\end{lstlisting}
+
 \section{My SmartShop Site Map (My Developer's Compass)}
 I use this map to identify which files I need to edit when a specific part of my site needs a change.
 

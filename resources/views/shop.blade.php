@@ -37,9 +37,19 @@
         gap: 3rem;
     }
 
+    @media (max-width: 1024px) {
+        .shop-header h1 { font-size: 2.5rem; }
+        .filter-form { gap: 1rem; }
+    }
+
     @media (max-width: 768px) {
+        .shop-header { margin-bottom: 2rem; text-align: center; }
+        .filter-panel { padding: 1.5rem; margin-bottom: 3rem; }
         .filter-form { grid-template-columns: 1fr; }
-        .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        .catalog-grid { 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 1.25rem; 
+        }
     }
 </style>
 @endsection

@@ -77,6 +77,12 @@
             padding: 0 2rem;
         }
 
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 1.25rem;
+            }
+        }
+
         /* PREMIUM NAVIGATION */
         nav {
             background: var(--nav-bg);
@@ -138,6 +144,79 @@
             display: flex;
             gap: 0.75rem;
             align-items: center;
+        }
+
+        /* MOBILE MENU TOGGLE */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1100;
+        }
+
+        .mobile-menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-900);
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links, .nav-auth {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: var(--surface-100);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                z-index: 1050;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .nav-auth {
+                height: auto;
+                top: 70%;
+                background: transparent;
+                pointer-events: none;
+            }
+
+            .nav-links.active {
+                display: flex;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-auth.active {
+                display: flex;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .mobile-menu-btn.active span:nth-child(1) {
+                transform: rotate(-45deg) translate(-5px, 6px);
+            }
+            .mobile-menu-btn.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .mobile-menu-btn.active span:nth-child(3) {
+                transform: rotate(45deg) translate(-5px, -6px);
+            }
         }
 
         /* THEME TOGGLE */
@@ -246,6 +325,18 @@
             text-align: left;
         }
 
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                text-align: center;
+            }
+
+            .footer-brand p {
+                margin: 0 auto;
+            }
+        }
+
         .footer-brand h2 { font-size: 1.5rem; margin-bottom: 1rem; }
         .footer-brand p { color: var(--text-400); max-width: 300px; }
         .footer-links h4 { margin-bottom: 1.5rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -278,14 +369,20 @@
     <div class="container">
         <a href="{{ route('home') }}" class="logo">SmartShop</a>
         
-        <div class="nav-links">
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-links" id="nav-links">
             <a href="{{ route('home') }}">Discovery</a>
             <a href="{{ route('shop') }}">Collection</a>
             <a href="{{ route('about') }}">Story</a>
             <a href="{{ route('contact') }}">Support</a>
         </div>
 
-        <div class="nav-auth">
+        <div class="nav-auth" id="nav-auth">
             <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn">
                 🌙
             </button>
@@ -438,6 +535,23 @@
 </footer>
 
 <script>
+    function toggleMobileMenu() {
+        const navLinks = document.getElementById('nav-links');
+        const navAuth = document.getElementById('nav-auth');
+        const btn = document.querySelector('.mobile-menu-btn');
+        
+        navLinks.classList.toggle('active');
+        navAuth.classList.toggle('active');
+        btn.classList.toggle('active');
+        
+        // Prevent scroll when menu is open
+        if (navLinks.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }
+
     function toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';

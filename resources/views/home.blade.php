@@ -45,7 +45,7 @@
     }
 
     .hero-overlay h1 {
-        font-size: clamp(3.5rem, 10vw, 6.5rem);
+        font-size: clamp(2.5rem, 10vw, 6.5rem);
         font-weight: 800;
         line-height: 0.9;
         letter-spacing: -0.05em;
@@ -59,9 +59,30 @@
         gap: 3rem;
     }
 
+    @media (max-width: 1024px) {
+        .hero-overlay { padding: 0 4rem; }
+    }
+
     @media (max-width: 768px) {
         .hero-overlay { padding: 0 2rem; text-align: center; }
-        .hero-luxury { height: 75vh; margin-bottom: 6rem; }
+        .hero-luxury { height: 75vh; margin-bottom: 6rem; border-radius: 0; }
+        .hero-overlay h1 { font-size: 3.5rem; }
+        .hero-overlay p { margin: 0 auto 3.5rem auto; }
+        .hero-overlay div { justify-content: center; flex-wrap: wrap; }
+        
+        .collection-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .luxury-section h2 {
+            font-size: 2.5rem !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-overlay h1 { font-size: 2.5rem; }
+        .hero-overlay .btn { width: 100%; }
     }
 </style>
 @endsection

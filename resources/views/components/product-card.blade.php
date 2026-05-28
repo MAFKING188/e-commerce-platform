@@ -37,6 +37,15 @@
         transition: all 0.3s ease;
     }
 
+    @media (max-width: 768px) {
+        .wishlist-btn {
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+        }
+    }
+
     .wishlist-btn:hover {
         color: var(--error);
         transform: scale(1.1);
@@ -60,6 +69,21 @@
         border: 1px solid var(--border);
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
         height: 100%;
+    }
+
+    @media (max-width: 640px) {
+        .card-luxury {
+            padding: 0.75rem;
+            border-radius: 1rem;
+        }
+
+        .info-wrap h3 {
+            font-size: 0.95rem;
+        }
+
+        .price-tag {
+            font-size: 1rem;
+        }
     }
 
     .card-luxury:hover {
