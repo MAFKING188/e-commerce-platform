@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' | LUWI')
+@section('title', $product->name . ' | SmartShop')
 
 @section('styles')
 <style>

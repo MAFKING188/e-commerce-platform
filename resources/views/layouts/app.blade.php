@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'LUWI Premium Shop')</title>
+    <title>@yield('title', 'SmartShop | Premium Collection')</title>
     
     <!-- Google Fonts: Geist or Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -508,7 +508,7 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-brand">
-                <h2>LUWI</h2>
+                <h2>SmartShop</h2>
                 <p>Curating exceptional products with a focus on quality, sustainability, and timeless design.</p>
             </div>
             <div class="footer-links">
@@ -529,7 +529,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; {{ date('Y') }} LUWI Premium E-Commerce Platform. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} SmartShop Premium E-Commerce Platform. All rights reserved.</p>
         </div>
     </div>
 </footer>

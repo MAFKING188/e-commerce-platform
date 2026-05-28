@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'SmartShop | Exceptional Design')
+@section('title', 'SmartShop | Premium E-Commerce')
 
 @section('styles')
 <style>

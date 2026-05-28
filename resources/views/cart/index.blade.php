@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Shopping Cart | LUWI')
+@section('title', 'Shopping Cart | SmartShop')
 
 @section('styles')
 <style>
