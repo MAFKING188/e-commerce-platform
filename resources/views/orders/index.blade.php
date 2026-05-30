@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order History | LUWI')
+@section('title', 'Order History | SmartShop')
 
 @section('styles')
 <style>
@@ -171,6 +171,17 @@
 <div style="max-width: 1000px; margin: 0 auto;">
     <div class="orders-header">
         <h1>Your Orders</h1>
+    </div>
+
+    {{-- ENCOURAGE SUPPORT --}}
+    <div style="background: var(--brand-accent-soft); border: 1px solid var(--brand-accent); padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 3rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--brand-accent); margin-bottom: 0.25rem;">Enjoying SmartShop?</h3>
+            <p style="font-size: 0.9rem; color: var(--text-600);">If you enjoy this project, consider supporting its growth. Your contributions help fund server costs and future architectural experiments.</p>
+        </div>
+        <a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" class="btn btn-primary" style="background: var(--brand-accent); white-space: nowrap;">
+            💳 Support Project
+        </a>
     </div>
 
     @if($orders->count())

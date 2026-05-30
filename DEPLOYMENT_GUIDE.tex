@@ -138,37 +138,6 @@ sudo chmod -R 775 /var/www/smartshop/bootstrap/cache
 
 \newpage
 
-\section{Phase 3: Git Integration \& Application Deployment}
-The core of the deployment involved pulling the code from GitHub and managing permissions for the \texttt{www-data} user.
-
-\subsection{Secure Repository Cloning}
-I cloned the repository into the standard web root. Because I was operating as the \texttt{root} user on a shared directory, I had to resolve Git's "safe directory" security feature:
-\begin{lstlisting}[language=bash]
-cd /var/www
-git clone https://github.com/yourusername/e-commerce-platform.git smartshop
-# Resolving ownership conflict for Git
-git config --global --add safe.directory /var/www/smartshop
-\end{lstlisting}
-
-\subsection{Dependency Management with Composer}
-I installed Composer globally and then executed the production-optimized install:
-\begin{lstlisting}[language=bash]
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-cd /var/www/smartshop
-composer install --no-dev --optimize-autoloader
-\end{lstlisting}
-
-\subsection{Filesystem Permissions}
-To allow Laravel to write logs and handle file uploads, I assigned ownership to the Nginx user:
-\begin{lstlisting}[language=bash]
-sudo chown -R www-data:www-data /var/www/smartshop
-sudo chmod -R 775 /var/www/smartshop/storage
-sudo chmod -R 775 /var/www/smartshop/bootstrap/cache
-\end{lstlisting}
-
-\newpage
-
 \section{Phase 4: Environment Configuration \& Data Recovery}
 This phase involved the transition from development settings to production-specific values.
 
@@ -302,12 +271,40 @@ During deployment, I identified that the worker could log "DONE" even if the ext
     \item \textbf{SPF/DKIM:} To ensure high deliverability, DNS TXT records for SPF and DKIM should be added to the domain settings.
 \end{itemize}
 
-\subsection{Production Verification}
-I verified the live site by visiting:
-\begin{itemize}
-    \item \texttt{https://smartshop-luwi.tech} (Encrypted)
-    \item \texttt{http://smartshop-luwi.tech} (Automatic redirect to HTTPS)
-\end{itemize}
+\newpage
+
+\section{Phase 8: Post-Reboot Recovery \& Persistence}
+After a system reboot (e.g., following a kernel upgrade), it is essential to verify that all architectural components have resumed operation.
+
+\subsection{Service Verification Sequence}
+Upon reconnecting via SSH, I execute the following to ensure the LEMP stack and background workers are active:
+
+\begin{lstlisting}[language=bash]
+# Check status of all critical services
+sudo systemctl status nginx
+sudo systemctl status mysql
+sudo systemctl status php8.3-fpm
+sudo systemctl status supervisor
+\end{lstlisting}
+
+\subsection{Ensuring Auto-Start (Persistence)}
+To ensure the SmartShop platform remains resilient across future reboots, I have enabled all services to start automatically on boot:
+
+\begin{lstlisting}[language=bash]
+sudo systemctl enable nginx
+sudo systemctl enable mysql
+sudo systemctl enable php8.3-fpm
+sudo systemctl enable supervisor
+\end{lstlisting}
+
+\subsection{Application Refresh}
+Finally, I clear any stale production state:
+\begin{lstlisting}[language=bash]
+cd /var/www/smartshop
+php artisan config:cache
+php artisan view:clear
+sudo supervisorctl start smartshop-worker:*
+\end{lstlisting}
 
 \section{Conclusion}
 The deployment of SmartShop was a multifaceted process involving custom infrastructure management, security hardening, and background process orchestration. The system is now robustly configured for production traffic.

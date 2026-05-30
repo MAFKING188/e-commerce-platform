@@ -123,4 +123,21 @@
     </div>
 </div>
 
+{{-- SUPPORT THE ARCHIVE SECTION --}}
+<section class="support-section" style="margin-top: 10rem; padding-top: 6rem; border-top: 1px solid var(--border); text-align: center;">
+    <div class="support-card" style="background: var(--surface-100); padding: 4rem; border-radius: var(--radius-lg); border: 1px solid var(--brand-accent); box-shadow: var(--shadow-lg); max-width: 800px; margin: 0 auto; position: relative; overflow: hidden;">
+        <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text-900);">Support the Archive</h2>
+        <p style="font-size: 1.1rem; color: var(--text-600); margin-bottom: 3rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto;">
+            SmartShop is a continuous pursuit of architectural excellence and artisanal design. 
+            Your contributions directly fund server infrastructure and the acquisition of 
+            new learning resources for future project iterations.
+        </p>
+        <div style="display: flex; justify-content: center;">
+            <a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" class="btn btn-primary" style="padding: 1.25rem 3rem; font-size: 1rem; border-radius: 12px; background: var(--brand-accent); letter-spacing: 0.05em;">
+                💳 SUPPORT VIA PAYPAL
+            </a>
+        </div>
+    </div>
+</section>
+
 @endsection

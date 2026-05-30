@@ -522,6 +522,7 @@
             <div class="footer-links">
                 <h4>Support</h4>
                 <ul>
+                    <li><a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" style="color: var(--brand-accent); font-weight: 700;">Support This Project</a></li>
                     <li><a href="#">Shipping</a></li>
                     <li><a href="#">Returns</a></li>
                     <li><a href="#">Privacy</a></li>
