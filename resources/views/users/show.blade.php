@@ -96,7 +96,23 @@
         <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">{{ auth()->user()->name }}</h1>
         <p style="color: var(--text-400); margin-bottom: 3rem;">Premium Member since {{ auth()->user()->created_at->format('M Y') }}</p>
 
-        <form action="{{ route('users.update', auth()->id()) }}" method="POST">
+        @if(session('success'))
+            <div style="background: #10b98120; color: #10b981; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; font-weight: 700;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div style="background: #ef444420; color: #ef4444; padding: 1rem; border-radius: 12px; margin-bottom: 2rem; font-size: 0.85rem;">
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('users.update') }}" method="POST">
             @csrf
             @method('PUT')
             

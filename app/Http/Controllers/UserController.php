@@ -26,13 +26,13 @@ class UserController extends Controller
         return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
 {
-    $user = User::findOrFail($id);
+    $user = Auth::user();
 
     $request->validate([
         'name' => 'required|string|max:100',
-        'email' => 'required|email',
+        'email' => 'required|email|unique:users,email,' . $user->id,
 
         // Address validation
         'line1' => 'required|string|max:255',
@@ -48,20 +48,10 @@ class UserController extends Controller
         ])
     );
 
-    /**
-     * 💡 BACKEND HEAVY LIFTING: MULTI-MODEL UPDATE
-     * TODO: Update the user's primary address.
-     * Hint: Use $user->addresses()->updateOrCreate([], $request->only(['line1', 'city', 'country']));
-     */
-
     // Update existing primary address OR create one
     $user->addresses()->updateOrCreate(
-
         // Find condition
-        [
-            'is_primary' => true
-        ],
-
+        ['is_primary' => true],
         // Data to update/create
         [
             'line1' => $request->line1,
@@ -71,10 +61,7 @@ class UserController extends Controller
     );
 
     return redirect()->back()
-        ->with(
-            'success',
-            'Identity and Residence updated successfully'
-        );
+        ->with('success', 'Identity and Residence updated successfully');
 }
 
     public function destroy($id)

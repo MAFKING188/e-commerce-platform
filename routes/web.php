@@ -64,7 +64,7 @@ Route::middleware(['auth'])->group(function () {
 
     /* Identity & Profile */
     Route::get('/profile', [UserController::class, 'show'])->name('profile');
-    Route::put('/profile/update/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::put('/profile/update', [UserController::class, 'update'])->name('users.update');
 
     /* Wishlist System */
     Route::get('/wishlist', function() {

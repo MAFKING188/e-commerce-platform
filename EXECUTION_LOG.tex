@@ -2921,4 +2921,97 @@ Critical refinements were applied to the Discovery section on the home page:
 This document represents the **execution layer** of the system design.
 Each section will be progressively expanded as implementation continues, moving from architecture → database → API → full system deployment.
 
+% ==================================================
+\section{Production Hardening: SMTP and Network Optimization}
+
+\subsection{1. Outbound SMTP Connectivity Challenge}
+
+During the transition to the DigitalOcean VPS, outbound SMTP traffic (ports 465 and 587) was initially blocked at the network level. This prevented transactional emails (order confirmations, welcome messages) from being sent via Gmail.
+
+\subsubsection{Resolution Process}
+\begin{itemize}
+    \item \textbf{Support Escalation}: A formal request was submitted to DigitalOcean Security to unblock SMTP for academic purposes.
+    \item \textbf{Verification}: Used \texttt{nc -zv smtp.gmail.com 465} to verify connectivity once the block was lifted.
+\end{itemize}
+
+\subsection{2. IPv6 Routing Conflict Resolution}
+
+After the network block was lifted, a secondary issue was identified where the server's network stack prioritized a non-functional IPv6 path to Google's SMTP servers, resulting in connection timeouts in PHP.
+
+\subsubsection{System-Level Optimization}
+To ensure reliable connectivity, the following "Senior" fixes were implemented on the production Droplet:
+
+\begin{itemize}
+    \item \textbf{IPv4 Preference}: Modified \texttt{/etc/gai.conf} to prioritize IPv4 over IPv6:
+    \begin{verbatim}
+    # Uncommented line 54
+    precedence ::ffff:0:0/96  100
+    \end{verbatim}
+    \item \textbf{Local DNS Override}: Added a static mapping to \texttt{/etc/hosts} to bypass intermittent DNS resolution delays for the SMTP host:
+    \begin{verbatim}
+    172.217.76.109 smtp.gmail.com
+    \end{verbatim}
+\end{itemize}
+
+\subsection{3. Production Mailer Configuration (.env)}
+
+The production environment was synchronized with the following secure configuration:
+
+\begin{verbatim}
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=luiemafking@gmail.com
+MAIL_PASSWORD=kzisdmjxmnngcrsf
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=luiemafking@gmail.com
+MAIL_FROM_NAME="SmartShop"
+\end{verbatim}
+
+\subsection{4. Background Worker Synchronization}
+
+To ensure these changes were picked up by the production queue, the configuration was cached and the Supervisor worker was restarted:
+
+\begin{verbatim}
+php artisan config:cache
+sudo supervisorctl restart smartshop-worker:*
+\end{verbatim}
+
+The system is now fully production-ready with a robust, asynchronous transactional email pipeline.
+
+% ==================================================
+\section{Local Environment Stability: Profile \& Address Hardening}
+
+\subsection{1. Multi-Model Update Resolution}
+
+A critical \texttt{MassAssignmentException} was identified during profile updates when saving address data. This occurred because the \texttt{Address} model lacked a defined \texttt{\$fillable} property, preventing automated attribute assignment.
+
+\subsubsection{Model Optimization}
+The \texttt{Address} model was updated to explicitly permit mass assignment for core residential fields:
+\begin{verbatim}
+protected $fillable = [
+    'user_id', 'line1', 'city', 'country', 'is_primary'
+];
+\end{verbatim}
+
+\subsection{2. Security Hardening: ID Spoofing Prevention}
+
+The profile update mechanism was re-engineered to prevent unauthorized data modification. By removing the \texttt{\{id\}} parameter from the route and relying exclusively on \texttt{Auth::user()} in the controller, the system now guarantees that users can only modify their own identity.
+
+\subsubsection{Route Refinement}
+The update route was simplified to a static endpoint:
+\begin{verbatim}
+Route::put('/profile/update', [UserController::class, 'update'])
+    ->name('users.update');
+\end{verbatim}
+
+\subsection{3. Validation \& UX Improvements}
+
+To improve data integrity and user feedback, the following refinements were applied:
+
+\begin{itemize}
+    \item \textbf{Unique Email Logic}: Updated validation to ignore the current user's ID during unique checks, preventing false-positive errors when saving the profile without changing the email.
+    \item \textbf{Error Transparency}: Implemented semantic alert blocks in the \texttt{show.blade.php} view to display both validation errors and success confirmations.
+\end{itemize}
+
 \end{document}
