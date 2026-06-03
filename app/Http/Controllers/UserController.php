@@ -26,43 +26,58 @@ class UserController extends Controller
         return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request)
-{
-    $user = Auth::user();
+    /**
+     * SELF-SERVICE: Update own profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
 
-    $request->validate([
-        'name' => 'required|string|max:100',
-        'email' => 'required|email|unique:users,email,' . $user->id,
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $user->id,
 
-        // Address validation
-        'line1' => 'required|string|max:255',
-        'city' => 'required|string|max:100',
-        'country' => 'required|string|max:100',
-    ]);
+            // Address validation
+            'line1' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'country' => 'required|string|max:100',
+        ]);
 
-    // Update user model
-    $user->update(
-        $request->only([
-            'name',
-            'email'
-        ])
-    );
+        // Update user model
+        $user->update($request->only(['name', 'email']));
 
-    // Update existing primary address OR create one
-    $user->addresses()->updateOrCreate(
-        // Find condition
-        ['is_primary' => true],
-        // Data to update/create
-        [
-            'line1' => $request->line1,
-            'city' => $request->city,
-            'country' => $request->country,
-        ]
-    );
+        // Update existing primary address OR create one
+        $user->addresses()->updateOrCreate(
+            ['is_primary' => true],
+            [
+                'line1' => $request->line1,
+                'city' => $request->city,
+                'country' => $request->country,
+            ]
+        );
 
-    return redirect()->back()
-        ->with('success', 'Identity and Residence updated successfully');
-}
+        return redirect()->back()
+            ->with('success', 'Identity and Residence updated successfully');
+    }
+
+    /**
+     * ADMINISTRATIVE: Update any user (Role, Name, Email)
+     */
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'required|in:user,admin',
+        ]);
+
+        $user->update($request->only(['name', 'email', 'role']));
+
+        return redirect()->route('users.index')
+            ->with('success', 'Member permissions updated successfully');
+    }
 
     public function destroy($id)
     {

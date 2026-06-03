@@ -3014,4 +3014,51 @@ To improve data integrity and user feedback, the following refinements were appl
     \item \textbf{Error Transparency}: Implemented semantic alert blocks in the \texttt{show.blade.php} view to display both validation errors and success confirmations.
 \end{itemize}
 
+\section{Platform Analytics: Admin Dashboard Refactoring}
+
+\subsection{1. Architectural Shift: View-to-Controller Logic}
+
+The administrative dashboard was transitioned from a "Logic-in-View" pattern to a clean MVC implementation. This decoupling improves maintainability and system performance by offloading database calculations to a dedicated controller.
+
+\subsubsection{Controller Implementation}
+Created \texttt{AdminDashboardController.php} to centralize platform metrics:
+\begin{itemize}
+    \item \textbf{Financial Auditing}: Real-time revenue calculation from completed acquisitions.
+    \item \textbf{Inventory Intelligence}: Automated "Low Stock" identification for items under a specific threshold (Stock < 5).
+    \item \textbf{Recent Activity Feed}: Integrated a "Pulse" table displaying the latest five orders with direct user relationships.
+\end{itemize}
+
+\subsection{2. UI/UX Dashboard Enhancements}
+
+The dashboard interface was updated to provide actionable insights at a glance:
+\begin{itemize}
+    \item \textbf{Dynamic Status Coloring}: Implemented conditional CSS to highlight "Low Stock" alerts in red when active.
+    \item \textbf{Acquisition Pulse}: Added a high-density activity table featuring semantic status pills and relative time-stamps (\textit{diffForHumans}).
+\end{itemize}
+
+\section{Platform Refinement: Member Management \& Shop Discovery}
+
+\subsection{1. Administrative Member Control}
+
+The member management system was upgraded from a read-only list to a functional administrative suite. This enables granular control over the community base and security roles.
+
+\subsubsection{Member Editor Implementation}
+\begin{itemize}
+    \item \textbf{Identity Orchestration}: Created a dedicated \texttt{Member Editor} view (\texttt{users/edit.blade.php}) for administrators.
+    \item \textbf{Role Elevation}: Implemented logic in \texttt{UserController@update} to allow admins to toggle user roles between \texttt{Standard Member} and \texttt{Platform Admin}.
+    \item \textbf{Safety Constraints}: Updated the management index to prevent administrators from accidentally revoking their own access.
+\end{itemize}
+
+\subsection{2. Advanced Discovery Engine (Shop Filters)}
+
+The shop catalog was enhanced with a professional filtering system to improve product discoverability as the archive scales.
+
+\subsubsection{Technical Discovery Logic}
+Updated \texttt{ViewController@shop} to process complex discovery parameters:
+\begin{itemize}
+    \item \textbf{Price Range Filtering}: Implemented \texttt{min\_price} and \texttt{max\_price} constraints on the product query.
+    \item \textbf{Semantic Sorting}: Added support for sorting by \textit{Newest Arrivals}, \textit{Price: Low to High}, and \textit{Price: High to Low}.
+    \item \textbf{Query Persistence}: Integrated \texttt{withQueryString()} into the pagination logic to ensure filters remain active across multiple pages.
+\end{itemize}
+
 \end{document}

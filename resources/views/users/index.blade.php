@@ -66,6 +66,12 @@
     <div style="font-weight: 700; color: var(--text-400);">Total: {{ $users->total() }} Members</div>
 </div>
 
+@if(session('success'))
+    <div style="background: #10b98120; color: #10b981; padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem; font-weight: 700;">
+        {{ session('success') }}
+    </div>
+@endif
+
 <div class="user-table-wrap">
     <table class="user-table">
         <thead>
@@ -73,7 +79,7 @@
                 <th>Member</th>
                 <th>Role</th>
                 <th>Registration Date</th>
-                <th style="text-align: right;">Permissions</th>
+                <th style="text-align: right;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -83,7 +89,7 @@
                         <div class="user-info">
                             <div class="user-avatar">{{ substr($user->name, 0, 1) }}</div>
                             <div>
-                                <div style="font-weight: 700; color: var(--text-900);">{{ $user->name }}</div>
+                                <div style="font-weight: 700; color: var(--text-900);">{{ $user->name }} {{ auth()->id() == $user->id ? '(You)' : '' }}</div>
                                 <div style="font-size: 0.8rem; color: var(--text-400);">{{ $user->email }}</div>
                             </div>
                         </div>
@@ -97,13 +103,21 @@
                         {{ $user->created_at->format('d M, Y') }}
                     </td>
                     <td style="text-align: right;">
-                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Revoke member access permanently?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" style="color: var(--error); background: none; border: none; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;">
-                                Revoke Access
-                            </button>
-                        </form>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center;">
+                            <a href="{{ route('users.edit', $user->id) }}" style="color: var(--brand-accent); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; text-decoration: none;">
+                                Manage
+                            </a>
+                            
+                            @if(auth()->id() !== $user->id)
+                                <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Revoke member access permanently?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="color: var(--error); background: none; border: none; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;">
+                                        Revoke
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             @endforeach

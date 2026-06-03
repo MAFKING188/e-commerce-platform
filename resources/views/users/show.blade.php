@@ -112,7 +112,7 @@
             </div>
         @endif
 
-        <form action="{{ route('users.update') }}" method="POST">
+        <form action="{{ route('profile.update') }}" method="POST">
             @csrf
             @method('PUT')
             

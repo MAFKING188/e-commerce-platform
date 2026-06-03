@@ -17,8 +17,8 @@
 
     .filter-form {
         display: grid;
-        grid-template-columns: 1fr 280px auto;
-        gap: 2rem;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+        gap: 1.5rem;
         align-items: flex-end;
     }
 
@@ -77,6 +77,23 @@
                         {{ $category->name }}
                     </option>
                 @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem; display: block; color: var(--text-400);">Price Range</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="number" name="min_price" value="{{ request('min_price') }}" class="filter-input" placeholder="Min" style="padding: 1rem 0.75rem;">
+                <input type="number" name="max_price" value="{{ request('max_price') }}" class="filter-input" placeholder="Max" style="padding: 1rem 0.75rem;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem; display: block; color: var(--text-400);">Sort By</label>
+            <select name="sort" class="filter-input">
+                <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Newest</option>
+                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
             </select>
         </div>
 

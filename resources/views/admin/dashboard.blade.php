@@ -96,23 +96,23 @@
 <div class="stats-grid">
     <div class="stat-card">
         <label>Total Revenue</label>
-        <div class="value">${{ number_format(\App\Models\Order::where('status', 'completed')->sum('total_price'), 0) }}</div>
+        <div class="value">${{ number_format($stats['revenue'], 0) }}</div>
     </div>
     <div class="stat-card">
         <label>Active Orders</label>
-        <div class="value">{{ \App\Models\Order::where('status', 'pending')->count() }}</div>
+        <div class="value">{{ $stats['active_orders'] }}</div>
     </div>
     <div class="stat-card">
         <label>Catalog Size</label>
-        <div class="value">{{ \App\Models\Product::count() }}</div>
+        <div class="value">{{ $stats['catalog_size'] }}</div>
     </div>
-    <div class="stat-card">
-        <label>Members</label>
-        <div class="value">{{ \App\Models\User::count() }}</div>
+    <div class="stat-card" style="{{ $stats['low_stock_count'] > 0 ? 'border-color: #ef4444; background: #fef2f2;' : '' }}">
+        <label style="{{ $stats['low_stock_count'] > 0 ? 'color: #ef4444;' : '' }}">Low Stock Items</label>
+        <div class="value" style="{{ $stats['low_stock_count'] > 0 ? 'color: #ef4444;' : '' }}">{{ $stats['low_stock_count'] }}</div>
     </div>
 </div>
 
-<div class="quick-actions">
+<div class="quick-actions" style="margin-bottom: 4rem;">
     <a href="{{ route('admin.orders.index') }}" class="action-panel">
         <div>
             <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
@@ -134,16 +134,48 @@
         </div>
         <span class="btn btn-primary" style="width: fit-content;">Manage Archive</span>
     </a>
+</div>
 
-    <a href="{{ route('users.index') }}" class="action-panel">
-        <div>
-            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
-                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            </div>
-            <h2>Member Base</h2>
-            <p>View user behavior, manage permissions, and track premium registrations.</p>
+<div class="recent-activity" style="background: var(--surface-100); border-radius: 2rem; border: 1px solid var(--border); padding: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--text-900);">Pulse: Recent Acquisitions</h2>
+        <a href="{{ route('admin.orders.index') }}" style="color: var(--brand-accent); font-weight: 700; text-decoration: none;">View All</a>
+    </div>
+
+    @if($recentOrders->isEmpty())
+        <div style="text-align: center; padding: 4rem; color: var(--text-400); font-weight: 600;">
+            No recent activity recorded.
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #10b981;">Manage Users</span>
-    </a>
+    @else
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid var(--border);">
+                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Order ID</th>
+                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Member</th>
+                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Value</th>
+                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Status</th>
+                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($recentOrders as $order)
+                        <tr style="border-bottom: 1px solid var(--border); transition: background 0.3s ease;">
+                            <td style="padding: 1.5rem 0; font-weight: 800; color: var(--brand-accent);">#{{ $order->id }}</td>
+                            <td style="padding: 1.5rem 0; font-weight: 600;">{{ $order->user->name }}</td>
+                            <td style="padding: 1.5rem 0; font-weight: 800;">${{ number_format($order->total_price, 2) }}</td>
+                            <td style="padding: 1.5rem 0;">
+                                <span style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 20px; 
+                                    {{ $order->status == 'completed' ? 'background: rgba(16, 185, 129, 0.1); color: #10b981;' : 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;' }}">
+                                    {{ $order->status }}
+                                </span>
+                            </td>
+                            <td style="padding: 1.5rem 0; color: var(--text-400); font-size: 0.9rem;">{{ $order->created_at->diffForHumans() }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 </div>
 @endsection

@@ -28,21 +28,39 @@ class ViewController extends Controller
 
     public function shop(Request $request)
     {
-        /* 
-         * TODO: PERFORMANCE & UX - SEARCH & FILTERING
-         * Requirement: Allow users to search products by name and filter by category.
-         * Hint: Change the signature to shop(Request $request) and use Product::query().
-         */
+        $query = Product::with(['category','images']);
 
-        $query = Product::with(['category','images'])->latest();
-
-        if($request->filled('search'))
-            {
-                $query->where('name', 'like', '%' . $request->search . '%');
+        // Search by name
+        if($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
-        if($request->filled('category'))
-            {
-                $query->where('category_id', $request->category);
+
+        // Filter by category
+        if($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Filter by price range
+        if($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Sorting
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
         }
         
         // 🚀 PRODUCTION SCALE: Use paginate() instead of get()

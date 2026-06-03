@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    AdminDashboardController,
     AdminOrderController,
     AuthController,
     CartController,
@@ -64,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
     /* Identity & Profile */
     Route::get('/profile', [UserController::class, 'show'])->name('profile');
-    Route::put('/profile/update', [UserController::class, 'update'])->name('users.update');
+    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 
     /* Wishlist System */
     Route::get('/wishlist', function() {
@@ -78,9 +79,7 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function() {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     /* Order Management */
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
