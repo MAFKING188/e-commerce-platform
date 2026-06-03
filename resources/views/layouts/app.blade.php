@@ -121,6 +121,12 @@
             display: inline-block;
         }
 
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+
         .nav-links {
             display: flex;
             gap: 2.5rem;
@@ -170,8 +176,7 @@
                 display: block;
             }
 
-            .nav-links, .nav-auth {
-                display: none;
+            .nav-menu {
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -179,33 +184,39 @@
                 height: 100vh;
                 background: var(--surface-100);
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
                 align-items: center;
-                gap: 2rem;
+                gap: 3rem;
                 z-index: 1050;
+                padding: 8rem 2rem 4rem;
+                overflow-y: auto;
                 opacity: 0;
                 visibility: hidden;
-                transition: all 0.3s ease;
+                transform: translateY(-10px);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .nav-menu.active {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+
+            .nav-links, .nav-auth {
+                flex-direction: column;
+                width: 100%;
+                gap: 2rem;
             }
 
             .nav-auth {
-                height: auto;
-                top: 70%;
-                background: transparent;
-                pointer-events: none;
+                margin-top: 1rem;
+                padding-top: 2rem;
+                border-top: 1px solid var(--border);
             }
 
-            .nav-links.active {
-                display: flex;
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .nav-auth.active {
-                display: flex;
-                opacity: 1;
-                visibility: visible;
-                pointer-events: auto;
+            .nav-auth .btn {
+                width: 100%;
+                max-width: 300px;
             }
 
             .mobile-menu-btn.active span:nth-child(1) {
@@ -375,32 +386,34 @@
             <span></span>
         </button>
 
-        <div class="nav-links" id="nav-links">
-            <a href="{{ route('home') }}">Discovery</a>
-            <a href="{{ route('shop') }}">Collection</a>
-            <a href="{{ route('about') }}">Story</a>
-            <a href="{{ route('contact') }}">Support</a>
-        </div>
+        <div class="nav-menu" id="nav-menu">
+            <div class="nav-links">
+                <a href="{{ route('home') }}">Discovery</a>
+                <a href="{{ route('shop') }}">Collection</a>
+                <a href="{{ route('about') }}">Story</a>
+                <a href="{{ route('contact') }}">Support</a>
+            </div>
 
-        <div class="nav-auth" id="nav-auth">
-            <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn">
-                🌙
-            </button>
-            @auth
-                <a href="{{ route('profile') }}" class="btn btn-ghost">Profile</a>
-                @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Admin</a>
-                @endif
-                <a href="{{ route('cart.index') }}" class="btn btn-ghost">Cart</a>
-                <a href="{{ route('orders.index') }}" class="btn btn-ghost">Orders</a>
-                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                    @csrf
-                    <button type="submit" class="btn btn-primary" style="background: #ef4444;">Sign Out</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-ghost">Member Login</a>
-                <a href="{{ route('signup') }}" class="btn btn-primary">Join Now</a>
-            @endauth
+            <div class="nav-auth">
+                <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn">
+                    🌙
+                </button>
+                @auth
+                    <a href="{{ route('profile') }}" class="btn btn-ghost">Profile</a>
+                    @if(auth()->user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Admin</a>
+                    @endif
+                    <a href="{{ route('cart.index') }}" class="btn btn-ghost">Cart</a>
+                    <a href="{{ route('orders.index') }}" class="btn btn-ghost">Orders</a>
+                    <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="btn btn-primary" style="background: #ef4444;">Sign Out</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-ghost">Member Login</a>
+                    <a href="{{ route('signup') }}" class="btn btn-primary">Join Now</a>
+                @endauth
+            </div>
         </div>
     </div>
 </nav>
@@ -537,16 +550,14 @@
 
 <script>
     function toggleMobileMenu() {
-        const navLinks = document.getElementById('nav-links');
-        const navAuth = document.getElementById('nav-auth');
+        const navMenu = document.getElementById('nav-menu');
         const btn = document.querySelector('.mobile-menu-btn');
         
-        navLinks.classList.toggle('active');
-        navAuth.classList.toggle('active');
+        navMenu.classList.toggle('active');
         btn.classList.toggle('active');
         
         // Prevent scroll when menu is open
-        if (navLinks.classList.contains('active')) {
+        if (navMenu.classList.contains('active')) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'auto';
