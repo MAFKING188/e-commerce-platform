@@ -68,9 +68,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 
     /* Wishlist System */
-    Route::get('/wishlist', function() {
-        return view('wishlist', ['wishlistItems' => collect()]); 
-    })->name('wishlist.index');
+    Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 /*
