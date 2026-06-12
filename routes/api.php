@@ -4,7 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 
+use App\Http\Controllers\AuthController;
+
 // 🎯 MISSION 7: THE BRIDGE (API LAYER)
+
+Route::post('/login', [AuthController::class, 'apiLogin']);
+Route::post('/register', [AuthController::class, 'apiRegister']);
 
 /*
 |--------------------------------------------------------------------------
