@@ -63,16 +63,11 @@ return view('products.edit', compact('product', 'categories'));
         return redirect()->route('products.index')->with('success','Product Removed successfully');
     }
 
-   public function update(Request $request, $id)
+   public function update(\App\Http\Requests\UpdateProductRequest $request, $id)
 {
     $product = Product::findOrFail($id);
 
-    $product->update([
-        'name' => $request->name,
-        'price' => $request->price,
-        'stock' => $request->stock,
-        'description' => $request->description
-    ]);
+    $product->update($request->validated());
 
     // Optional: replace image
     if ($request->hasFile('image')) {

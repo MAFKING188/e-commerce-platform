@@ -38,7 +38,7 @@ class AddressController extends Controller
         return redirect()->route('addresses.index')->with('success', 'Address added');
     }
 
-    public function destroy()
+    public function destroy($id)
     {
         Address::destroy($id);
 
