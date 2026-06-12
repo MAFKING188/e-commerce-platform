@@ -1,0 +1,404 @@
+\documentclass[12pt,a4paper]{article}
+
+% -------- PACKAGES (Engineering Standard) --------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+
+% -------- BRANDING & COLORS --------
+\definecolor{mainblue}{RGB}{0,102,204}
+\definecolor{darkgray}{RGB}{50,50,50}
+\definecolor{codebg}{RGB}{248,248,248}
+
+% -------- SECTION STYLING --------
+\titleformat{\section}{\Large\bfseries\color{mainblue}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{darkgray}}{\thesubsection}{1em}{}
+
+% -------- HEADER/FOOTER --------
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize SmartShop: Technical Submission}
+\rhead{\footnotesize LUWI Mafuleti}
+\cfoot{\thepage}
+
+% -------- CODE BLOCK STYLE --------
+\lstset{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    language=PHP,
+    showstringspaces=false
+}
+
+\hypersetup{colorlinks=true, linkcolor=mainblue, urlcolor=blue}
+
+\begin{document}
+
+% ============================
+% COVER PAGE
+% ============================
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Full-page background image
+        \node at (current page.center) 
+            {\includegraphics[width=\paperwidth,height=\paperheight]{LLDP-and-CDP-2.jpg}};
+        
+        % Semi-transparent white box for readability
+        \fill[white, opacity=0.85] 
+            (current page.north west) rectangle (current page.south east);
+    \end{tikzpicture}
+
+    \begin{center}
+        % Logo at top
+        \vspace*{1.5cm}
+        \includegraphics[width=0.85\textwidth,height=4cm]{FST Marrakech.png} \\[1cm]
+
+        % Main Technical Title
+        {\Huge \textbf{FINAL MODULE PROJECT REPORT}} \\[0.5cm]
+        {\LARGE \textit{``Back-End Web Development''}} \\[1cm]
+        
+        {\Large \textbf{Architectural Design, Hardening, and Production Deployment of the}} \\[0.3cm]
+        {\Huge \textcolor{mainblue}{\textbf{SmartShop Platform}}} \\[1.5cm]
+
+        % Authors
+        {\large \textbf{Developed by:}} \\[0.3cm]
+        {\Large MAFULETI Luwi} \\[2cm]
+
+        % Supervisor
+        {\large \textbf{Supervised by:}} \\[0.3cm]
+        {\Large Prof. SADQI Yassine} \\[2.5cm]
+
+        % Academic year
+        {\large Academic Year 2025-2026}
+
+        \vfill
+        \textbf{Project Repository:} \href{https://github.com/yourusername/e-commerce-platform}{GitHub: SmartShop Platform}
+    \end{center}
+\end{titlepage}
+\vfill
+\begin{center}
+    \textbf{Project Repository:} \href{https://github.com/yourusername/e-commerce-platform}{GitHub: SmartShop Platform}
+\end{center}
+\newpage
+
+\tableofcontents
+\newpage
+
+% ==================================================
+% PHASE I: CONCEPTUAL GENESIS & PLANNING
+% ==================================================
+\section{Phase I: Conceptual Genesis \& Architectural Planning}
+
+In the initial stage of this project, my focus was on defining a robust architectural foundation. I aimed to transition from a traditional CRUD mindset to a scalable transactional system. I began by conducting a comprehensive feasibility study and architectural mapping, which I have archived in \texttt{LUWI\_Mafuleti\_IRISI\_Laravel\_Project\_Plan.pdf} and \texttt{LUWI\_Mafuleti\_IRISI\_Laravel\_Project\_Execution-3.pdf}. These documents served as my primary research guides for the initial MCD and MLD design.
+
+\subsection{1. My Vision: Engineering for Scalability}
+The objective was to engineer a high-integrity e-commerce engine. I defined three core pillars for the platform:
+\begin{itemize}
+    \item \textbf{High-Integrity Transactions:} Ensuring data consistency during the order lifecycle.
+    \item \textbf{Actor-Based Access:} I implemented a granular separation between Guests, Members, and Administrators to protect the system's perimeter.
+    \item \textbf{Relational Excellence:} I designed a normalized database structure that is fully extensible for future multi-vendor integrations.
+\end{itemize}
+
+\subsection{2. System Requirements \& Stakeholder Mapping}
+I mapped the ecosystem to ensure that each system actor had a defined boundary of interaction. I planned a frictionless consumer journey from product discovery to secure checkout, while simultaneously designing a control layer for catalog governance.
+
+\subsection{3. Conceptual Data Model (MCD)}
+The blueprint of SmartShop began with the \textbf{MCD}. I established strict relational cardinalities to prevent data drift. My design accounted for core entities like Users and Products, alongside production-grade entities like Variants and Payments.
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{mcd.png}
+    \caption{My Conceptual Data Model - Defined as the blueprint for system integrity.}
+\end{figure}
+
+\subsection{4. Complete Logical Data Model (MLD)}
+I translated my conceptual vision into a 3rd Normal Form (3NF) Logical Model. The following entities represent the full implemented state of my database:
+
+\subsubsection{4.1 Core Transactional Entities}
+\begin{itemize}[noitemsep]
+    \item \textbf{USERS:} The identity core (\underline{id}, name, email, password, role, timestamps).
+    \item \textbf{CATEGORIES \& PRODUCTS:} The taxonomy core (\underline{id}, name, price, stock, \#category\_id, timestamps).
+    \item \textbf{CART \& CART\_ITEMS:} Active persistence layer (\underline{id}, \#user\_id, \#product\_id, quantity).
+    \item \textbf{ORDERS \& ORDER\_ITEMS:} Immutable records (\underline{id}, \#user\_id, total\_price, status, timestamps).
+\end{itemize}
+
+\subsubsection{4.2 Extended Scalability Layer}
+To support production-grade functionality, I implemented:
+\begin{itemize}[noitemsep]
+    \item \textbf{PRODUCT\_IMAGES \& VARIANTS:} Handling multi-media and SKU-level data (\underline{id}, \#product\_id, url, sku, price).
+    \item \textbf{REVIEWS \& PAYMENTS:} Enabling user feedback and financial persistence (\underline{id}, \#user\_id, \#order\_id, amount, rating).
+    \item \textbf{ADDRESSES:} Supporting residential delivery with primary-flag logic (\underline{id}, \#user\_id, city, country, is\_primary).
+    \item \textbf{VENDORS \& VENDOR\_PRODUCTS:} Prepared the schema for a multi-seller marketplace (\underline{id}, name, \#product\_id).
+\end{itemize}
+
+\subsection{5. Hybrid Data Strategy}
+I adopted a hybrid approach for data initialization. I first imported a verified \texttt{database\_dump.sql} to preserve development-time data and then utilized Laravel's migration system to ensure schema synchronization. This strategy guaranteed that my production environment was both data-rich and architecturally aligned.
+
+\vfill
+\begin{center}
+    \textit{Further details on the initial design constraints and technical business rules can be found in my Project Plan and Execution PDFs.}
+\end{center}
+
+\newpage
+% ==================================================
+% PHASE II: TECHNICAL IMPLEMENTATION & EXECUTION
+% Source: EXECUTION_LOG.tex, MASTER_DOCUMENTATION.tex
+% ==================================================
+\section{Phase II: Technical Implementation \& Execution}
+
+With the architectural blueprint finalized, I transitioned into the execution phase. I adopted an iterative development approach, documented meticulously in \texttt{EXECUTION\_LOG.tex}. My primary focus was to maintain a clean separation of concerns while ensuring that the backend logic remained performant and secure.
+
+\subsection{1. The MVC Engine: Model-View-Controller Mastery}
+I implemented the core logic using Laravel’s MVC pattern. My objective was to keep controllers lean by offloading data logic to the Eloquent models and request validation to dedicated FormRequest classes.
+
+\subsubsection{1.1 Eloquent ORM \& Relationship Orchestration}
+I leveraged Eloquent to handle complex relational data. To prevent the common "N+1" performance issue, I enforced eager loading (\texttt{with()}) across all catalog queries.
+
+\textbf{Performance Audit: My N+1 Query Resolution} \\
+During my technical audit, I identified that the \texttt{ViewController} was executing individual queries for every product's category and images. I refactored the retrieval logic as follows:
+\begin{lstlisting}
+// BEFORE: Individual queries triggered during loop (Performance Leak)
+// $products = Product::paginate(12);
+
+// AFTER: Eager loading optimized for production (Linear Efficiency)
+$products = Product::with(['category', 'images'])->paginate(12);
+\end{lstlisting}
+
+\textbf{Example: My Image Resolution Logic} \\
+In the \texttt{Product} model, I developed a custom attribute to handle image fallbacks and standardized storage paths, ensuring that both local and remote (Unsplash) assets are resolved seamlessly:
+\begin{lstlisting}
+public function getImageUrlAttribute() {
+    $firstImage = $this->images->first();
+    if (!$firstImage || empty($firstImage->url)) {
+        return 'https://images.unsplash.com/fallback-image-url';
+    }
+    return str_starts_with($firstImage->url, 'http') 
+        ? $firstImage->url 
+        : asset('storage/' . str_replace('storage/', '', $firstImage->url));
+}
+\end{lstlisting}
+
+\subsection{2. Transactional Integrity: The Cart \& Checkout Lifecycle}
+I engineered the checkout process to be atomic. I used database transactions to ensure that the user’s order is only finalized if the inventory is successfully decremented and the cart is cleared in a single, uninterrupted operation.
+
+\begin{lstlisting}
+DB::transaction(function () use ($cart) {
+    $order = Order::create([
+        'user_id' => auth()->id(),
+        'total_price' => $cart->total_price,
+        'status' => 'pending'
+    ]);
+
+    foreach ($cart->items as $item) {
+        // I ensured stock is decremented immediately to prevent overselling
+        $item->product->decrement('stock', $item->quantity);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $item->product_id,
+            'quantity' => $item->quantity,
+            'price' => $item->product->price
+        ]);
+    }
+    $cart->items()->delete();
+});
+\end{lstlisting}
+
+\subsection{3. Frontend Layer: Blade Componentization}
+My UI strategy focused on modularity. I developed a suite of reusable Blade components (e.g., \texttt{product-card}) and a master layout (\texttt{app.blade.php}) to ensure design consistency. I also integrated a dynamic theme engine, allowing users to toggle between Light and Dark modes, with state persisted via \texttt{localStorage}.
+
+\subsection{4. Background Task Orchestration}
+To optimize the user experience, I offloaded time-consuming tasks like mailable generation to a database queue. This ensures that the user receives an immediate confirmation on the frontend while the system handles email delivery asynchronously via a dedicated background worker.
+
+\vfill
+\begin{center}
+    \textit{The complete record of my implementation commands and versioned milestones is preserved in the MASTER\_DOCUMENTATION.tex file.}
+\end{center}
+
+
+\newpage
+% ==================================================
+% PHASE III: HARDENING, SECURITY & STABILIZATION
+% Source: HARDENING_PLAN.tex, SESSION_HANDOVER.md
+% ==================================================
+\section{Phase III: Strategic Hardening \& System Stabilization}
+
+The final phase of development was dedicated to transforming a functional prototype into a hardened, production-ready platform. I executed a series of strategic missions to secure administrative boundaries and ensure the long-term integrity of user data. My comprehensive strategy for this phase is outlined in \texttt{HARDENING\_PLAN.tex}.
+
+\subsection{Mission: The Executive Command Center (Governance)}
+I refactored the administrative experience into a centralized "Executive Command Center." My objective was to provide administrators with actionable intelligence rather than raw data.
+
+\begin{itemize}
+    \item \textbf{Real-Time Analytics:} I implemented a controller-driven dashboard that aggregates platform health metrics, including total revenue and active order counts.
+    \item \textbf{Mission: Inventory Intelligence (Low Stock Pulse):} I developed an automated alerting system that highlights products with less than 5 units remaining, enabling proactive inventory management.
+    \item \textbf{Member Moderation:} I built an administrative suite to manage the community, allowing for role elevation (User to Admin) and account governance.
+\end{itemize}
+
+\subsection{Mission: Defensive Perimeter (Security Hardening)}
+I identified and mitigated several critical security risks during my stabilization audit:
+
+\subsubsection{Mission: Identity \& Anti-Spoofing Architecture}
+I identified a vulnerability where user profiles could potentially be accessed or modified via ID parameters in the URL. I re-engineered the routing architecture to be static, relying exclusively on \texttt{Auth::user()} in the controller.
+\begin{lstlisting}
+// I refactored the route to remove user IDs, ensuring absolute isolation
+Route::put('/profile/update', [UserController::class, 'updateProfile'])
+    ->name('profile.update');
+\end{lstlisting}
+
+\subsubsection{Mission: Concurrency Control (Atomic Inventory Security)}
+A significant production risk I identified was the potential for "Overselling" during simultaneous checkouts. To ensure 100\% stock integrity, I implemented \texttt{lockForUpdate()} within my checkout transactions. This ensures that the system locks the product row during the stock check, preventing other requests from modifying it until the decrement is complete.
+\begin{lstlisting}
+// Ensuring stock integrity under high load
+$product = Product::where('id', $item->product_id)->lockForUpdate()->first();
+if ($product->stock >= $item->quantity) {
+    $product->decrement('stock', $item->quantity);
+}
+\end{lstlisting}
+
+\subsubsection{Mission: Data Integrity \& CSRF Protection}
+I enforced strict \texttt{\$fillable} arrays across all models—most notably the \texttt{Address} and \texttt{User} models—to prevent malicious attribute injection. Furthermore, I ensured that every form submission is protected by Laravel's CSRF (\textbf{Cross-Site Request Forgery}) middleware. I also implemented dedicated \textbf{FormRequest} classes to decouple validation logic from my controllers, ensuring that only sanitized data enters the domain layer.
+
+\subsection{Mission: Universal Accessibility (Mobile Excellence)}
+I conducted a final audit of the user experience to ensure a premium feel across all devices.
+\begin{itemize}
+    \item \textbf{Mobile Navigation Overhaul:} I redesigned the navigation architecture to prevent UI overlapping on small viewports, ensuring 100\% accessibility for mobile shoppers.
+    \item \textbf{Mission: The Messenger (Feedback):} I integrated a custom toast notification system to provide semantic feedback (Success/Error) during critical user actions.
+\end{itemize}
+
+\vfill
+\begin{center}
+    \textit{Detailed technical specifications on these missions are available in the HARDENING\_PLAN.tex and recent session handover notes.}
+\end{center}
+
+
+\newpage
+% ==================================================
+% PHASE IV: PRODUCTION DEPLOYMENT & INFRASTRUCTURE
+% Source: DEPLOYMENT_GUIDE.tex
+% ==================================================
+\section{Phase IV: Production Deployment \& Infrastructure Orchestration}
+
+The transition from local development to a live production environment was a multi-stage engineering challenge. I successfully deployed the platform on a hardened Linux environment, managing everything from infrastructure provisioning to server-level security negotiations. My full deployment protocol is documented in \texttt{DEPLOYMENT\_GUIDE.tex}.
+
+\subsection{1. Infrastructure Acquisition (GitHub Education)}
+I initiated the deployment by applying for the \textbf{GitHub Student Developer Pack}. Following a 72-hour identity verification process, I successfully claimed \$200 in DigitalOcean credits. For security and verification reasons, I linked my payment information, which included a \$5 initial account charge to activate the production-grade resources.
+
+\subsection{2. Server Architecture: Choosing the Droplet}
+During the architectural selection process, I evaluated the DigitalOcean App Platform but identified a critical constraint: it defaults to PostgreSQL. Given that SmartShop is optimized for \textbf{MySQL}, I chose to provision a custom \textbf{Droplet} (Ubuntu 24.04 LTS) to maintain full control over the environment.
+
+\subsubsection{2.1 Mission: OOM Recovery \& Resource Stability}
+During the initial MySQL installation on the 1GB RAM Droplet, I encountered several \textbf{Out of Memory (OOM)} crashes. To stabilize the environment and ensure high-availability for the database, I implemented a \textbf{2GB Swap file}. This allowed the system to offload inactive memory to the disk, preventing further crashes during peak resource usage:
+\begin{lstlisting}[language=bash]
+# I stabilized the server by implementing Swap memory
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+\end{lstlisting}
+
+\subsubsection{2.2 Database Migration \& LEMP Stack}
+I followed a ``Database-First'' deployment strategy. I first initialized a secured MySQL instance on the server, imported my \texttt{database\_dump.sql}, and then configured the Droplet to merge the application files via Git. This hybrid strategy ensured that my development-time data and schema were perfectly synchronized in production.
+
+\subsection{3. Mission: The Mailing & Persistence Resolution}
+A significant production hurdle was the default security policy of DigitalOcean, which blocks outgoing ports \textbf{465 and 587}. I resolved this by engaging with DigitalOcean Support, successfully unblocking the ports for real-time notifications. 
+
+To ensure the persistence of my background workers, I implemented a \textbf{Supervisor} configuration to manage the Laravel queue. This guarantees that my mailable processes are automatically restarted if they crash or following a server reboot:
+\begin{lstlisting}[language=bash]
+# I ensured mailable persistence with Supervisor
+[program:smartshop-worker]
+command=php /var/www/smartshop/artisan queue:work --sleep=3 --tries=3
+autostart=true
+autorestart=true
+user=www-data
+\end{lstlisting}
+
+\vfill
+\begin{center}
+    \textit{The complete record of my infrastructure configuration, Nginx setup, and SSL encryption (Certbot) is preserved in the DEPLOYMENT\_GUIDE.tex file.}
+\end{center}
+
+% ==================================================
+\newpage
+\section{V. My Visual Evidence (System Demonstration)}
+
+I have compiled a comprehensive gallery of the live system (\texttt{smartshop-luwi.tech}) to demonstrate the platform’s functionality and my version control methodology.
+
+\subsection{1. Core Storefront Journey}
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{homepage.png}
+    \caption{Homepage - The entry point to the Discovery Engine.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{collections.png}
+    \caption{Collections (Shop) - Advanced filtering and search in action.}
+\end{figure}
+
+\subsection{2. User Identity \& Commerce Flows}
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{profile.png}
+    \caption{Member Profile - Secure identity and residential management.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{cart.png}
+    \caption{Persistent Cart - Real-time total calculation and item management.}
+    \centering
+    % \includegraphics[width=\textwidth]{orders.png}
+    \caption{Order History - Tracking the full transactional lifecycle.}
+\end{figure}
+
+\subsection{3. Administrative Command Center}
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{admin.png}
+    \caption{Admin Dashboard - Centralized analytics and management.}
+\end{figure}
+
+\subsection{4. Git Methodology (Version Control Evidence)}
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=\textwidth]{git_history.png}
+    \caption{Git Commit History - Documenting my atomic, feature-branch development workflow.}
+\end{figure}
+
+\vfill
+\begin{center}
+    \textit{Additional screenshots for Discover, Story, Support, Login, and Signup are included in the final technical archive submitted via email.}
+\end{center}
+
+% ==================================================
+\chapter{Conclusion: Reflections on a Production Journey}
+
+The development and deployment of the \textbf{SmartShop} platform have been a definitive exercise in transitioning from conceptual software design to a hardened, production-grade reality. This project allowed me to demonstrate mastery over the Laravel ecosystem, not merely as a CRUD framework, but as a robust engine for high-integrity transactional commerce.
+
+Throughout this journey, I prioritized three core engineering principles:
+\begin{itemize}
+    \item \textbf{Architectural Integrity:} By enforcing a strict 3NF database schema and a layered MVC structure, I built a foundation that is technically prepared for future multi-vendor scaling.
+    \item \textbf{Resilient Infrastructure:} Navigating the complexities of DigitalOcean—from OOM recovery via Swap memory to negotiating server-level SMTP port security—proved my ability to manage the full lifecycle of a production system.
+    \item \textbf{Uncompromising Security:} From atomic concurrency control to anti-spoofing route refactoring, I ensured that system integrity remains the perimeter that protects both the user data and the transactional record.
+\end{itemize}
+
+SmartShop stands as a mature, stable, and highly performant platform. It represents the successful convergence of technical optimization and professional deployment, ready to handle real-world traffic while maintaining a premium user experience. This project has solidified my expertise in back-end engineering, infrastructure orchestration, and the strategic hardening required for modern web applications.
+
+\end{document}
+
