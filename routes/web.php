@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     PaymentController,
     ProductController,
     UserController,
-    ViewController
+    ViewController,
+    WishlistController
 };
 
 /*
