@@ -3178,9 +3178,27 @@ The platform's connectivity was expanded through a robust API tier using Laravel
     \item \textbf{OpenGraph Hardening:} Integrated dynamic SEO meta-tags (OG Title, Description, Image) across the platform to ensure high-fidelity social sharing.
 \end{itemize}
 
+\section{Architectural Review \& Audit Remediation}
+
+During a comprehensive architectural audit, multiple critical divergences, bugs, and security gaps were identified and resolved to ensure high availability and application layer security.
+
+\subsection{1. Wishlist Module Stabilization}
+\begin{itemize}
+    \item \textbf{Fatal Routing Resolution:} Fixed a class namespace error in \texttt{routes/web.php} by importing the missing \texttt{WishlistController} class. This resolved the runtime crash where accessing the wishlist yielded a fatal \texttt{ClassNotFoundException}.
+    \item \textbf{Wishlist State Persistence:} Implemented the skeleton \texttt{isWishlistedByUser()} method inside the \texttt{Product} model, querying the database check \texttt{\textbackslash App\textbackslash Models\textbackslash Wishlist::where('product\_id', \$this->id)->where('user\_id', \$userId)->exists()}.
+    \item \textbf{UI Button Binding:} Updated the \texttt{product-card.blade.php} components to conditionally append the \texttt{active} class during server rendering, enabling heart toggles to correctly reflect DB status upon page load.
+\end{itemize}
+
+\subsection{2. Security Hardening \& Code Cleanup}
+\begin{itemize}
+    \item \textbf{File Upload Security:} Added file size and MIME-type constraints on product creation via the \texttt{StoreProductRequest} rules array. This ensures incoming images are restricted to valid image types (JPEG, PNG, JPG, GIF) and are limited to 2MB, securing the platform from potential malicious upload exploits.
+    \item \textbf{Dead Code Elimination:} Deleted the redundant and unused controller \texttt{AddressController.php} to simplify codebase structure. This prevents architectural duplication as all user profile address updates are consolidated inside the profile dashboard through the \texttt{UserController}.
+    \item \textbf{Test Suite Verification:} Enabled the \texttt{RefreshDatabase} trait on \texttt{tests/Feature/ExampleTest.php} to migrate SQLite tables automatically, achieving a clean test pass across the application.
+\end{itemize}
+
 \vfill
 \begin{center}
-    \textit{With these enhancements, the SmartShop platform is now a fully hardened, API-integrated, and production-ready ecosystem.}
+    \textit{With these audit fixes, the SmartShop platform has successfully resolved its architectural debt and secured its runtime execution paths.}
 \end{center}
 
 \end{document}

@@ -24,3 +24,16 @@
 ---
 **Status:** All Production-Ready Plan missions (Part 1 & 2) successfully executed. System is now fully hardened and API-ready.
 
+## Session Milestone: Architectural Review & Audit Remediation (June 12, 2026)
+
+### 1. Wishlist System Integrity
+- **Routing Import Fix:** Fixed class resolution error in [web.php](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/routes/web.php) by importing the [WishlistController](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/app/Http/Controllers/WishlistController.php) class, restoring functional access to `/archive` and `/wishlist/toggle`.
+- **Active State Persistence:** Implemented the query check in [Product@isWishlistedByUser](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/app/Models/Product.php#L66-L75) using direct query on the `Wishlist` model, and integrated it inside the [product-card.blade.php](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/resources/views/components/product-card.blade.php#L16-L18) button to render active heart icons correctly.
+
+### 2. Validation & Security Cleanup
+- **File Upload Security:** Added validation rules for the `image` parameter inside [StoreProductRequest](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/app/Http/Requests/StoreProductRequest.php#L31-L40) to mirror the size and MIME type checks used in updates, securing product creation.
+- **Controller Refactoring:** Cleaned up the redundant [AddressController](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/app/Http/Controllers/AddressController.php) from the codebase, avoiding duplicate architecture since user profile address updates are handled inside [UserController@updateProfile](file:///home/mafuleti/STCEJORP/CYCLE/S2/Web-Backend-Dev/cours/LARAVEL/e-commerce-platform/app/Http/Controllers/UserController.php#L42-L71).
+
+---
+**Status:** Code audit completed. All architectural divergences, routing bugs, and unvalidated uploads resolved. System verified with full test-suite pass.
+
