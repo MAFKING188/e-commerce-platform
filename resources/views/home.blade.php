@@ -13,7 +13,7 @@
         position: relative;
         border-radius: 2rem;
         overflow: hidden;
-        margin-bottom: 12rem; /* Extreme air gap */
+        margin-bottom: 6rem; /* Restored elegant spacing */
         background: #0f172a;
         z-index: 100; /* Ensure hero stays above and separate */
     }
@@ -105,7 +105,7 @@
     </div>
 </section>
 
-<section class="luxury-section" style="margin-bottom: 12rem;">
+<section class="luxury-section" style="margin-bottom: 6rem;">
     <div style="margin-bottom: 5rem; border-left: 5px solid var(--brand-accent); padding-left: 2.5rem;">
         <span style="font-size: 0.75rem; font-weight: 800; color: var(--brand-accent); letter-spacing: 0.3em; text-transform: uppercase;">Curated Selection</span>
         <h2 style="font-size: 3.5rem; font-weight: 800; color: var(--text-900);">Editor's Choice.</h2>

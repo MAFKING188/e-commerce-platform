@@ -79,7 +79,7 @@
         <span class="btn btn-ghost" style="width: 100%;">Access Inventory</span>
     </a>
 
-    <a href="{{ route('orders.index') }}" class="dash-card">
+    <a href="{{ route('admin.orders.index') }}" class="dash-card">
         <h3>Transaction Flow</h3>
         <p>Monitor customer purchases, fulfillment status, and lifecycle events.</p>
         <span class="btn btn-ghost" style="width: 100%;">View Sales</span>

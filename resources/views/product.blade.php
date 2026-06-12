@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('title', $product->name . ' | SmartShop')
+@section('description', \Illuminate\Support\Str::limit($product->description, 160))
+@section('og_image', $product->image_url)
 
 @section('styles')
 <style>

@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SmartShop | Premium Collection')</title>
     
+    <!-- SEO & OpenGraph -->
+    <meta name="description" content="@yield('description', 'SmartShop: High-Fidelity E-Commerce Ecosystem. Curating exceptional products with a focus on quality and timeless design.')">
+    <meta property="og:title" content="@yield('title', 'SmartShop | Premium Collection')">
+    <meta property="og:description" content="@yield('description', 'SmartShop: High-Fidelity E-Commerce Ecosystem. Curating exceptional products with a focus on quality and timeless design.')">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="@yield('og_image', asset('favicon.ico'))">
+    <meta name="twitter:card" content="summary_large_image">
+    
     <!-- Google Fonts: Geist or Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -580,12 +589,32 @@
     }
 
     function toggleWishlist(btn, productId) {
-        btn.classList.toggle('active');
-        if (btn.classList.contains('active')) {
-            showToast('Added to your Archive Collection', 'success');
-        } else {
-            showToast('Removed from Archive', 'error');
-        }
+        @guest
+            showToast('Please login to save pieces to your Archive.', 'error');
+            return;
+        @endguest
+
+        fetch("{{ url('/wishlist/toggle') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.classList.toggle('active');
+                showToast(data.message, 'success');
+            } else {
+                showToast(data.message || 'Unable to update Archive.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Wishlist Error:', error);
+            showToast('Network error while saving to Archive.', 'error');
+        });
     }
 
     updateToggleBtn();

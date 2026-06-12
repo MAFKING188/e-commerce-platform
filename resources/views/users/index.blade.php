@@ -63,7 +63,17 @@
         <span class="cat-badge">Member Base</span>
         <h1>Community.</h1>
     </div>
-    <div style="font-weight: 700; color: var(--text-400);">Total: {{ $users->total() }} Members</div>
+    <div style="display: flex; align-items: flex-end; gap: 2rem;">
+        <form action="{{ route('users.index') }}" method="GET" style="display: flex; gap: 0.5rem;">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or email..." 
+                style="padding: 0.75rem 1.5rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--surface-100); width: 250px; font-size: 0.9rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 1rem;">Search</button>
+            @if(request('search'))
+                <a href="{{ route('users.index') }}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem; border-radius: 1rem; display: flex; align-items: center; text-decoration: none;">Clear</a>
+            @endif
+        </form>
+        <div style="font-weight: 700; color: var(--text-400);">Total: {{ $users->total() }} Members</div>
+    </div>
 </div>
 
 @if(session('success'))
