@@ -59,6 +59,11 @@ class Product extends Model
         return $this->HasMany(Review::class);
     }
 
+    public function vendors()
+    {
+        return $this->belongsToMany(Vendor::class, 'vendor_products');
+    }
+
     /**
      * TODO: Implement the check to see if this product is in the user's archive.
      * Hint: Use $this->hasMany(Wishlist::class) and check if the user_id matches.

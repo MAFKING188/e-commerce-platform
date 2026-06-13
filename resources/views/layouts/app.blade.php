@@ -408,6 +408,7 @@
                     🌙
                 </button>
                 @auth
+                    <a href="{{ route('profile.wishlist') }}" class="btn btn-ghost">Archive</a>
                     <a href="{{ route('profile') }}" class="btn btn-ghost">Profile</a>
                     @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Admin</a>

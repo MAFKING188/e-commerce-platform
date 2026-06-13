@@ -9,12 +9,12 @@ class ViewController extends Controller
 {
     public function home()
     {
-        $latestProducts = Product::with('images')
+        $latestProducts = Product::with(['images', 'vendors'])
             ->latest()
             ->take(8)
             ->get();
 
-        $featuredProducts = Product::with('images')
+        $featuredProducts = Product::with(['images', 'vendors'])
             ->where('stock', '>', 0)
             ->latest()
             ->take(6)
@@ -28,7 +28,7 @@ class ViewController extends Controller
 
     public function shop(Request $request)
     {
-        $query = Product::with(['category','images']);
+        $query = Product::with(['category', 'images', 'vendors']);
 
         // Search by name
         if($request->filled('search')) {
@@ -71,7 +71,9 @@ class ViewController extends Controller
 
     public function product($id)
     {
-        $product = Product::with(['category', 'images', 'reviews.user'])
+        $product = Product::with(['category', 'images', 'vendors', 'reviews' => function($query) {
+                $query->where('status', 'approved')->with('user');
+            }])
             ->findOrFail($id);
 
         return view('product', compact('product'));

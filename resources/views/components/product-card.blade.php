@@ -6,7 +6,12 @@
                  onerror="this.src='https://images.unsplash.com/photo-1441984904996-e0b6ba687e12?w=800'; this.onerror=null;">
         </div>
         <div class="info-wrap">
-            <span class="cat-badge">{{ $product->category->name ?? 'Collection' }}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <span class="cat-badge">{{ $product->category->name ?? 'Collection' }}</span>
+                @if($product->vendors->isNotEmpty())
+                    <span style="font-size: 0.6rem; font-weight: 700; color: var(--text-400); text-transform: uppercase;">By {{ $product->vendors->first()->name }}</span>
+                @endif
+            </div>
             <h3>{{ $product->name }}</h3>
             <div class="price-tag">${{ number_format($product->price, 0) }}</div>
         </div>
