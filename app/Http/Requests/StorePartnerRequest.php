@@ -23,7 +23,8 @@ class StorePartnerRequest extends FormRequest
             'name' => 'required|string|max:150|unique:partners,name',
             'description' => 'nullable|string|max:2000',
             'contact_info' => 'nullable|string|max:1000',
-            'website' => 'nullable|url|max:255'
+            'website' => 'nullable|url|max:255',
+            'user_id' => 'required|exists:users,id'
         ];
     }
 

@@ -23,7 +23,8 @@ class PartnerController extends Controller
 
     public function create()
     {
-        return view('admin.partners.create');
+        $users = \App\Models\User::all();
+        return view('admin.partners.create', compact('users'));
     }
 
     /**
@@ -32,8 +33,10 @@ class PartnerController extends Controller
     public function store(StorePartnerRequest $request)
     {
         try {
-            Partner::create($request->validated());
-            return redirect()->route('admin.partners.index')->with('success', 'Partner Partner established successfully');
+            Log::info('Partner Store Request Data: ', $request->validated());
+            $data = $request->validated();
+            Partner::create($data);
+            return redirect()->route('admin.partners.index')->with('success', 'Partner established successfully');
         } catch (\Exception $e) {
             Log::error("Partner Creation Error: " . $e->getMessage());
             return back()->withInput()->with('error', 'Unable to initialize partner registry.');
