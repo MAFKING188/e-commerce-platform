@@ -13,7 +13,7 @@ use App\Http\Controllers\{
     ProductController,
     ReviewController,
     UserController,
-    VendorController,
+    PartnerController,
     ViewController,
     WishlistController
 };
@@ -113,14 +113,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
         'update' => 'categories.update',
         'destroy' => 'categories.destroy',
     ]);
-    Route::resource('vendors', \App\Http\Controllers\VendorController::class)->names([
-        'index' => 'vendors.index',
-        'create' => 'vendors.create',
-        'store' => 'vendors.store',
-        'show' => 'vendors.show',
-        'edit' => 'vendors.edit',
-        'update' => 'vendors.update',
-        'destroy' => 'vendors.destroy',
+    Route::resource('partners', \App\Http\Controllers\PartnerController::class)->names([
+        'index' => 'partners.index',
+        'create' => 'partners.create',
+        'store' => 'partners.store',
+        'show' => 'partners.show',
+        'edit' => 'partners.edit',
+        'update' => 'partners.update',
+        'destroy' => 'partners.destroy',
     ]);
     
     /* Community Moderation */
@@ -129,8 +129,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::post('/reviews/{id}/reject', [\App\Http\Controllers\ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [\App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    Route::post('/vendors/{id}/add-product', [\App\Http\Controllers\VendorController::class, 'addProduct'])->name('vendors.add_product');
-    Route::delete('/vendors/{id}/remove-product/{productId}', [\App\Http\Controllers\VendorController::class, 'removeProduct'])->name('vendors.remove_product');
+    Route::post('/partners/{id}/add-product', [\App\Http\Controllers\PartnerController::class, 'addProduct'])->name('partners.add_product');
+    Route::delete('/partners/{id}/remove-product/{productId}', [\App\Http\Controllers\PartnerController::class, 'removeProduct'])->name('partners.remove_product');
 });
 
 /*
@@ -138,6 +138,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 | Artisan Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'vendor'])->prefix('artisan')->as('artisan.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\VendorDashboardController::class, 'index'])->name('dashboard');
+Route::prefix('partner')->as('partner.')->group(function () {
+    Route::get('dashboard', [\App\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
 });

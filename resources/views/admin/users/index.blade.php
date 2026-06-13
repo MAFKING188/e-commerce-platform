@@ -92,7 +92,7 @@
                             <input type="hidden" name="status" value="{{ $user->status }}">
                             <select name="role" onchange="this.form.submit()" style="background: transparent; border: none; font-weight: 700; color: var(--brand-accent); outline: none; cursor: pointer;">
                                 <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>USER</option>
-                                <option value="vendor" {{ $user->role == 'vendor' ? 'selected' : '' }}>VENDOR</option>
+                                <option value="partner" {{ $user->role == 'partner' ? 'selected' : '' }}>PARTNER</option>
                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>ADMIN</option>
                             </select>
                         </form>

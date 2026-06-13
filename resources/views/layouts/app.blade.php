@@ -413,8 +413,8 @@
                     @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Admin</a>
                     @endif
-                    @if(auth()->user()->role === 'vendor')
-                        <a href="{{ route('artisan.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Vendor Dashboard</a>
+                    @if(auth()->user()->role === 'partner')
+                        <a href="{{ route('partner.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Partner Dashboard</a>
                     @endif
                     <a href="{{ route('cart.index') }}" class="btn btn-ghost">Cart</a>
                     <a href="{{ route('orders.index') }}" class="btn btn-ghost">Orders</a>
