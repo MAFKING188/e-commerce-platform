@@ -132,3 +132,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::post('/vendors/{id}/add-product', [\App\Http\Controllers\VendorController::class, 'addProduct'])->name('vendors.add_product');
     Route::delete('/vendors/{id}/remove-product/{productId}', [\App\Http\Controllers\VendorController::class, 'removeProduct'])->name('vendors.remove_product');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Artisan Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'vendor'])->prefix('artisan')->as('artisan.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\VendorDashboardController::class, 'index'])->name('dashboard');
+});
