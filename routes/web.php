@@ -26,6 +26,7 @@ use App\Http\Controllers\{
 Route::get('/', [ViewController::class, 'home'])->name('home');
 Route::get('/shop', [ViewController::class, 'shop'])->name('shop');
 Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.show');
+Route::get('/artisan-profile/{id}', [ViewController::class, 'partnerProfile'])->name('partner.profile');
 Route::get('/about', [ViewController::class, 'about'])->name('about');
 Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
 
@@ -140,4 +141,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 */
 Route::prefix('partner')->as('partner.')->group(function () {
     Route::get('dashboard', [\App\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
+    
+    Route::resource('inventory', \App\Http\Controllers\PartnerInventoryController::class);
+    Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
 });

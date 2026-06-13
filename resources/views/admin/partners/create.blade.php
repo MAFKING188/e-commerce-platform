@@ -31,6 +31,19 @@
         @csrf
         
         <div class="form-group">
+            <label>Associate Partner Account (User)</label>
+            <select name="user_id" class="form-control" required>
+                <option value="">Select a user...</option>
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                @endforeach
+            </select>
+            @error('user_id')
+                <div style="color: #ef4444; margin-top: 0.5rem; font-size: 0.8rem;">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label>Artisan / Partner Name</label>
             <input type="text" name="name" class="form-control" placeholder="e.g. Atelier Mafuleti" required>
         </div>
