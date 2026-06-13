@@ -35,11 +35,11 @@ class AdminUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        \Log::info('Role Update Request:', $request->all());
+        \Log::info('DEBUG: Raw Request Input:', $request->all());
         $user = User::findOrFail($id);
 
         $request->validate([
-            'role' => 'required|in:user,vendor,admin',
+            'role' => 'required|in:user,partner,admin',
             'status' => 'required|in:active,pending,suspended'
         ]);
 
