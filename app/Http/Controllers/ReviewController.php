@@ -14,7 +14,7 @@ class ReviewController extends Controller
                          ->latest()
                          ->paginate(10);
 
-        return view('reviews.index', compact('reviews'));
+        return view('admin.reviews.index', compact('reviews'));
     }
 
     public function create($productId)
@@ -69,10 +69,34 @@ class ReviewController extends Controller
     {
         $review = Review::findOrFail($id);
 
-        $this->authorize('delete', $review);
+        if (auth()->user()->role !== 'admin' && auth()->id() !== $review->user_id) {
+            abort(403);
+        }
 
         $review->delete();
 
-        return redirect()->back()->with('success', 'Review deleted successfully');
+        return redirect()->back()->with('success', 'Review removed successfully');
+    }
+
+    /**
+     * Moderate: Approve a community piece.
+     */
+    public function approve($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->update(['status' => 'approved']);
+
+        return redirect()->back()->with('success', 'Review curated to public view.');
+    }
+
+    /**
+     * Moderate: Reject/Hide a community piece.
+     */
+    public function reject($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->update(['status' => 'rejected']);
+
+        return redirect()->back()->with('success', 'Review hidden from public catalog.');
     }
 }
