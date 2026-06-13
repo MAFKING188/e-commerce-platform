@@ -126,7 +126,7 @@
         <span class="btn btn-primary" style="width: fit-content; background: #3b82f6;">Order Queue</span>
     </a>
 
-    <a href="{{ route('products.index') }}" class="action-panel">
+    <a href="{{ route('admin.products.index') }}" class="action-panel">
         <div>
             <div class="icon-box">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -137,7 +137,7 @@
         <span class="btn btn-primary" style="width: fit-content;">Manage Archive</span>
     </a>
 
-    <a href="{{ route('users.index') }}" class="action-panel">
+    <a href="{{ route('admin.users.index') }}" class="action-panel">
         <div>
             <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -150,7 +150,7 @@
         </span>
     </a>
 
-    <a href="{{ route('vendors.index') }}" class="action-panel">
+    <a href="{{ route('admin.vendors.index') }}" class="action-panel">
         <div>
             <div class="icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>

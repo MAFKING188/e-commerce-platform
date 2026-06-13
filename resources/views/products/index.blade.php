@@ -97,7 +97,7 @@
         <span class="cat-badge">Stock Control</span>
         <h1>Product Inventory.</h1>
     </div>
-    <a href="{{ route('products.create') }}" class="btn btn-primary">Add New Product</a>
+    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Add New Product</a>
 </div>
 
 <div class="inventory-table-wrap">
@@ -140,8 +140,8 @@
                     </td>
                     <td style="text-align: right;">
                         <div class="action-links" style="justify-content: flex-end;">
-                            <a href="{{ route('products.edit', $product->id) }}" class="link-edit">Edit</a>
-                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Archive this product permanently?')">
+                            <a href="{{ route('admin.products.edit', $product->id) }}" class="link-edit">Edit</a>
+                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Archive this product permanently?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="link-delete">Delete</button>

@@ -67,7 +67,7 @@
     </div>
 
     <div class="editor-card">
-        <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -117,7 +117,7 @@
 
             <div style="margin-top: 3rem; display: flex; gap: 1rem;">
                 <button type="submit" class="btn btn-primary" style="flex: 2; padding: 1.25rem;">Update Product Details</button>
-                <a href="{{ route('products.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+                <a href="{{ route('admin.products.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
             </div>
         </form>
     </div>

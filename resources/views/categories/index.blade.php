@@ -36,7 +36,7 @@
         <span class="cat-badge">Taxonomy</span>
         <h1>Collections.</h1>
     </div>
-    <a href="{{ route('categories.create') }}" class="btn btn-primary">Create New Collection</a>
+    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">Create New Collection</a>
 </div>
 
 <div class="category-grid">
@@ -47,8 +47,8 @@
                 <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-400);">{{ $category->products()->count() }} items mapped</span>
             </div>
             <div style="display: flex; gap: 1rem;">
-                <a href="{{ route('categories.edit', $category->id) }}" style="color: var(--brand-accent); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; text-decoration: none;">Edit</a>
-                <form action="{{ route('categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Deleting a collection may orphan products. Proceed?')">
+                <a href="{{ route('admin.categories.edit', $category->id) }}" style="color: var(--brand-accent); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; text-decoration: none;">Edit</a>
+                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Deleting a collection may orphan products. Proceed?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" style="color: var(--error); background: none; border: none; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer;">Delete</button>

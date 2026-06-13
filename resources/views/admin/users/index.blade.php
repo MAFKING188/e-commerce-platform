@@ -56,7 +56,7 @@
         <span class="cat-badge">Member Base</span>
         <h1>Registry.</h1>
     </div>
-    <form action="{{ route('users.index') }}" method="GET" style="display: flex; gap: 1rem;">
+    <form action="{{ route('admin.users.index') }}" method="GET" style="display: flex; gap: 1rem;">
         <select name="status" class="form-input" style="width: 150px; padding: 0.75rem;">
             <option value="">All Status</option>
             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
@@ -86,7 +86,7 @@
                         <div style="font-size: 0.8rem; color: var(--text-400);">{{ $user->email }}</div>
                     </td>
                     <td>
-                        <form action="{{ route('users.update', $user->id) }}" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
+                        <form action="{{ route('admin.users.update', $user->id) }}" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="status" value="{{ $user->status }}">
@@ -110,7 +110,7 @@
                                     <button type="submit" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.7rem;">Approve</button>
                                 </form>
                             @endif
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Purge this member?')">
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Purge this member?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" style="color: var(--error); background: none; border: none; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;">Purge</button>

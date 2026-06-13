@@ -10,7 +10,7 @@
     </div>
 
     <div style="background: var(--surface-100); padding: 3rem; border-radius: 2rem; border: 1px solid var(--border);">
-        <form action="{{ isset($category) ? route('categories.update', $category->id) : route('categories.store') }}" method="POST">
+        <form action="{{ isset($category) ? route('admin.categories.update', $category->id) : route('admin.categories.store') }}" method="POST">
             @csrf
             @if(isset($category)) @method('PUT') @endif
 
@@ -21,7 +21,7 @@
 
             <div style="margin-top: 3rem; display: flex; gap: 1rem;">
                 <button type="submit" class="btn btn-primary" style="flex: 2; padding: 1.25rem;">{{ isset($category) ? 'Update' : 'Initialize' }} Collection</button>
-                <a href="{{ route('categories.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+                <a href="{{ route('admin.categories.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
             </div>
         </form>
     </div>

@@ -4,13 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AdminDashboardController,
     AdminOrderController,
+    AdminUserController,
     AuthController,
     CartController,
     CategoryController,
     OrderController,
     PaymentController,
     ProductController,
+    ReviewController,
     UserController,
+    VendorController,
     ViewController,
     WishlistController
 };
@@ -78,26 +81,54 @@ Route::middleware(['auth'])->group(function () {
 | Administrative Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     /* Order Management */
-    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-    Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('admin.orders.complete');
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
-    Route::resource('products', ProductController::class);
-    Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show']);
-    Route::post('/users/{id}/approve', [AdminUserController::class, 'approve'])->name('admin.users.approve');
-    Route::resource('categories', CategoryController::class);
-    Route::resource('vendors', VendorController::class);
+    Route::resource('products', \App\Http\Controllers\ProductController::class)->names([
+        'index' => 'products.index',
+        'create' => 'products.create',
+        'store' => 'products.store',
+        'show' => 'products.show',
+        'edit' => 'products.edit',
+        'update' => 'products.update',
+        'destroy' => 'products.destroy',
+    ]);
+    Route::resource('users', \App\Http\Controllers\AdminUserController::class)->except(['create', 'store', 'show'])->names([
+        'index' => 'users.index',
+        'edit' => 'users.edit',
+        'update' => 'users.update',
+        'destroy' => 'users.destroy',
+    ]);
+    Route::post('/users/{id}/approve', [\App\Http\Controllers\AdminUserController::class, 'approve'])->name('users.approve');
+    Route::resource('categories', \App\Http\Controllers\CategoryController::class)->names([
+        'index' => 'categories.index',
+        'create' => 'categories.create',
+        'store' => 'categories.store',
+        'edit' => 'categories.edit',
+        'update' => 'categories.update',
+        'destroy' => 'categories.destroy',
+    ]);
+    Route::resource('vendors', \App\Http\Controllers\VendorController::class)->names([
+        'index' => 'vendors.index',
+        'create' => 'vendors.create',
+        'store' => 'vendors.store',
+        'show' => 'vendors.show',
+        'edit' => 'vendors.edit',
+        'update' => 'vendors.update',
+        'destroy' => 'vendors.destroy',
+    ]);
     
     /* Community Moderation */
-    Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
-    Route::post('/reviews/{id}/approve', [ReviewController::class, 'approve'])->name('admin.reviews.approve');
-    Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('admin.reviews.reject');
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::get('/reviews', [\App\Http\Controllers\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{id}/approve', [\App\Http\Controllers\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{id}/reject', [\App\Http\Controllers\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{id}', [\App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    Route::post('/vendors/{id}/add-product', [VendorController::class, 'addProduct'])->name('admin.vendors.add_product');
-    Route::delete('/vendors/{id}/remove-product/{productId}', [VendorController::class, 'removeProduct'])->name('admin.vendors.remove_product');
+    Route::post('/vendors/{id}/add-product', [\App\Http\Controllers\VendorController::class, 'addProduct'])->name('vendors.add_product');
+    Route::delete('/vendors/{id}/remove-product/{productId}', [\App\Http\Controllers\VendorController::class, 'removeProduct'])->name('vendors.remove_product');
 });

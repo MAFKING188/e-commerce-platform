@@ -38,7 +38,7 @@
         <span class="cat-badge">Member Editor</span>
         <h1 style="font-size: 2rem; font-weight: 800; margin: 1rem 0 3rem;">Adjust Permissions</h1>
 
-        <form action="{{ route('users.update', $user->id) }}" method="POST">
+        <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -62,7 +62,7 @@
 
             <div style="display: flex; gap: 1rem; margin-top: 3rem;">
                 <button type="submit" class="btn btn-primary" style="flex: 1; padding: 1.25rem;">Save Changes</button>
-                <a href="{{ route('users.index') }}" class="btn" style="padding: 1.25rem; background: var(--surface-300); color: var(--text-600);">Cancel</a>
+                <a href="{{ route('admin.users.index') }}" class="btn" style="padding: 1.25rem; background: var(--surface-300); color: var(--text-600);">Cancel</a>
             </div>
         </form>
     </div>
