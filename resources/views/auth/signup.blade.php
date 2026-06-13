@@ -124,6 +124,15 @@
                 <input type="password" name="password" required placeholder="Min. 8 characters" class="form-input">
             </div>
 
+            <div class="form-group">
+                <label class="form-label">Account Type</label>
+                <select name="role" class="form-input" required>
+                    <option value="user">Private Member (Instant Access)</option>
+                    <option value="vendor">Partner Artisan (Requires Confirmation)</option>
+                    <option value="admin">System Administrator (Requires Confirmation)</option>
+                </select>
+            </div>
+
             <button type="submit" class="auth-button">Create Account</button>
         </form>
 

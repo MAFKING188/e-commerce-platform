@@ -17,22 +17,29 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:8',
+            'role' => 'required|in:user,vendor,admin'
         ]);
+
+        $status = ($data['role'] === 'user') ? 'active' : 'pending';
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'],
-            'role' => 'user' // default role
+            'password' => $data['password'], // Password is hashed in the model cast
+            'role' => $data['role'],
+            'status' => $status
         ]);
 
         // 📧 Trigger Welcome Email
         Mail::to($user)->queue(new WelcomeMember($user));
 
-        Auth::login($user);
+        if ($status === 'active') {
+            Auth::login($user);
+            return redirect('/')->with('status', 'Welcome to the Collection! Account created.');
+        }
 
-        return redirect('/')->with('status', 'Welcome to the Collection! Account created.');
+        return redirect('/login')->with('status', 'Account request received. Please wait for administrative confirmation.');
     }
 
     /* LOGIN */
@@ -42,6 +49,15 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
+
+        // Check if user is active before attempting login
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->status !== 'active') {
+            return back()->withErrors([
+                'email' => 'Your account is currently ' . $user->status . '. Please contact support.'
+            ]);
+        }
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
