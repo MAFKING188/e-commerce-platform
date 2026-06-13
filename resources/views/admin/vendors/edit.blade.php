@@ -27,7 +27,7 @@
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Refine Partner.</h1>
     </div>
 
-    <form action="{{ route('vendors.update', $vendor->id) }}" method="POST">
+    <form action="{{ route('admin.vendors.update', $vendor->id) }}" method="POST">
         @csrf
         @method('PUT')
         
@@ -53,7 +53,7 @@
 
         <div style="display: flex; gap: 2rem; margin-top: 4rem;">
             <button type="submit" class="btn btn-primary" style="flex: 1; padding: 1.25rem;">Refine Metadata</button>
-            <a href="{{ route('vendors.index') }}" class="btn btn-ghost" style="flex: 1; padding: 1.25rem;">Cancel</a>
+            <a href="{{ route('admin.vendors.index') }}" class="btn btn-ghost" style="flex: 1; padding: 1.25rem;">Cancel</a>
         </div>
     </form>
 </div>

@@ -33,7 +33,7 @@ class VendorController extends Controller
     {
         try {
             Vendor::create($request->validated());
-            return redirect()->route('vendors.index')->with('success', 'Partner Vendor established successfully');
+            return redirect()->route('admin.vendors.index')->with('success', 'Partner Vendor established successfully');
         } catch (\Exception $e) {
             Log::error("Vendor Creation Error: " . $e->getMessage());
             return back()->withInput()->with('error', 'Unable to initialize partner registry.');
@@ -54,7 +54,7 @@ class VendorController extends Controller
         try {
             $vendor = Vendor::findOrFail($id);
             $vendor->update($request->validated());
-            return redirect()->route('vendors.index')->with('success', 'Vendor profiles updated');
+            return redirect()->route('admin.vendors.index')->with('success', 'Vendor profiles updated');
         } catch (\Exception $e) {
             Log::error("Vendor Update Error: " . $e->getMessage());
             return back()->withInput()->with('error', 'Unable to refine partner metadata.');
@@ -73,7 +73,7 @@ class VendorController extends Controller
             $vendor->delete();
             
             DB::commit();
-            return redirect()->route('vendors.index')->with('success', 'Vendor relationship terminated and mappings cleared');
+            return redirect()->route('admin.vendors.index')->with('success', 'Vendor relationship terminated and mappings cleared');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Vendor Deletion Error: " . $e->getMessage());

@@ -61,7 +61,7 @@
         <span class="cat-badge">Supply Chain</span>
         <h1>Ecosystem.</h1>
     </div>
-    <a href="{{ route('vendors.create') }}" class="btn btn-primary">Establish New Partner</a>
+    <a href="{{ route('admin.vendors.create') }}" class="btn btn-primary">Establish New Partner</a>
 </div>
 
 <div class="vendor-table-wrap">
@@ -94,13 +94,13 @@
                     </td>
                     <td style="text-align: right;">
                         <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center;">
-                            <a href="{{ route('vendors.show', $vendor->id) }}" style="color: var(--brand-accent); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; text-decoration: none;">
+                            <a href="{{ route('admin.vendors.show', $vendor->id) }}" style="color: var(--brand-accent); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; text-decoration: none;">
                                 Inventory
                             </a>
-                            <a href="{{ route('vendors.edit', $vendor->id) }}" style="color: var(--text-600); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; text-decoration: none;">
+                            <a href="{{ route('admin.vendors.edit', $vendor->id) }}" style="color: var(--text-600); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; text-decoration: none;">
                                 Edit
                             </a>
-                            <form action="{{ route('vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Terminate this vendor relationship?')">
+                            <form action="{{ route('admin.vendors.destroy', $vendor->id) }}" method="POST" onsubmit="return confirm('Terminate this vendor relationship?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" style="color: var(--error); background: none; border: none; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;">

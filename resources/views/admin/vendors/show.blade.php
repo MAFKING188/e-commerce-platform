@@ -48,7 +48,7 @@
 
 @section('content')
 <div style="margin-bottom: 2rem;">
-    <a href="{{ route('vendors.index') }}" style="color: var(--text-400); font-weight: 700;">← Back to Ecosystem</a>
+    <a href="{{ route('admin.vendors.index') }}" style="color: var(--text-400); font-weight: 700;">← Back to Ecosystem</a>
 </div>
 
 <div class="vendor-profile-header">
