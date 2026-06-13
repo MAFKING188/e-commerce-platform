@@ -35,6 +35,7 @@ class AdminUserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        \Log::info('Role Update Request:', $request->all());
         $user = User::findOrFail($id);
 
         $request->validate([
@@ -43,6 +44,7 @@ class AdminUserController extends Controller
         ]);
 
         $user->update($request->only(['role', 'status']));
+        \Log::info('User Updated:', $user->fresh()->toArray());
 
         return redirect()->back()->with('success', 'Member credentials refined.');
     }
