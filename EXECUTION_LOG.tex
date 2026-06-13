@@ -298,11 +298,11 @@ Schema::create('addresses', function (Blueprint $table) {
 % ===================== VENDORS =====================
 \subsubsection{13. VENDORS}
 \begin{verbatim}
-php artisan make:migration create_vendors_table
+php artisan make:migration create_partners_table
 \end{verbatim}
 
 \begin{verbatim}
-Schema::create('vendors', function (Blueprint $table) {
+Schema::create('partners', function (Blueprint $table) {
     $table->id();
     $table->string('name')->nullable();
     $table->string('contact_info')->nullable();
@@ -313,14 +313,14 @@ Schema::create('vendors', function (Blueprint $table) {
 % ===================== VENDOR PRODUCTS =====================
 \subsubsection{14. VENDOR PRODUCTS}
 \begin{verbatim}
-php artisan make:migration create_vendor_products_table
+php artisan make:migration create_partner_products_table
 \end{verbatim}
 
 \begin{verbatim}
-Schema::create('vendor_products', function (Blueprint $table) {
+Schema::create('partner_products', function (Blueprint $table) {
     $table->id();
 
-    $table->foreignId('vendor_id')->constrained('vendors');
+    $table->foreignId('partner_id')->constrained('partners');
     $table->foreignId('product_id')->constrained('products');
 });
 \end{verbatim}% ==================================================
@@ -349,8 +349,8 @@ php artisan make:model ProductVariant
 php artisan make:model Review
 php artisan make:model Payment
 php artisan make:model Address
-php artisan make:model Vendor
-php artisan make:model VendorProduct
+php artisan make:model Partner
+php artisan make:model PartnerProduct
 \end{verbatim}
 
 % ==================================================
@@ -430,9 +430,9 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
-    public function vendors()
+    public function partners()
     {
-        return $this->belongsToMany(Vendor::class, 'vendor_products');
+        return $this->belongsToMany(Partner::class, 'partner_products');
     }
 }
 \end{verbatim}
@@ -540,13 +540,13 @@ class Review extends Model
 \end{verbatim}
 
 % ===================== VENDOR =====================
-\paragraph{Vendor Model}
+\paragraph{Partner Model}
 \begin{verbatim}
-class Vendor extends Model
+class Partner extends Model
 {
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'vendor_products');
+        return $this->belongsToMany(Product::class, 'partner_products');
     }
 }
 \end{verbatim}\
@@ -573,7 +573,7 @@ php artisan make:controller OrderController
 php artisan make:controller PaymentController
 php artisan make:controller ReviewController
 php artisan make:controller AddressController
-php artisan make:controller VendorController
+php artisan make:controller PartnerController
 \end{verbatim}
 
 % ==================================================
@@ -909,20 +909,20 @@ class AddressController extends Controller
 \end{verbatim}
 
 % ==================================================
-\subsubsection{9. VendorController}
+\subsubsection{9. PartnerController}
 
 \begin{verbatim}
-class VendorController extends Controller
+class PartnerController extends Controller
 {
     public function index()
     {
-        $vendors = Vendor::all();
-        return view('vendors.index', compact('vendors'));
+        $partners = Partner::all();
+        return view('partners.index', compact('partners'));
     }
 
     public function create()
     {
-        return view('vendors.create');
+        return view('partners.create');
     }
 
     public function store(Request $request)
@@ -931,10 +931,10 @@ class VendorController extends Controller
             'name' => 'required|string'
         ]);
 
-        Vendor::create($request->all());
+        Partner::create($request->all());
 
-        return redirect()->route('vendors.index')
-            ->with('success', 'Vendor created');
+        return redirect()->route('partners.index')
+            ->with('success', 'Partner created');
     }
 }
 \end{verbatim}
@@ -3201,18 +3201,18 @@ During a comprehensive architectural audit, multiple critical divergences, bugs,
     \textit{With these audit fixes, the SmartShop platform has successfully resolved its architectural debt and secured its runtime execution paths.}
 \end{center}
 
-\section{Phase 5: Supply Chain \& Vendor Ecosystem}
-To fulfill the strategic goal of full platform traceability, I implemented a robust Vendor Management module.
+\section{Phase 5: Supply Chain \& Partner Ecosystem}
+To fulfill the strategic goal of full platform traceability, I implemented a robust Partner Management module.
 \begin{itemize}
-    \item \textbf{Architectural Mapping:} Developed a Many-to-Many relationship between \texttt{Products} and \texttt{Vendors} via the \texttt{vendor\_products} pivot table.
-    \item \texttt{VendorController}: Implemented full CRUD operations with secure validation logic and a dedicated "Inventory Mapping" interface.
-    \item \textbf{Dashboard Integration}: Expanded the Admin Command Center with a new "Supply Chain" panel, enabling immediate access to vendor metadata and origin tracking.
+    \item \textbf{Architectural Mapping:} Developed a Many-to-Many relationship between \texttt{Products} and \texttt{Partners} via the \texttt{partner\_products} pivot table.
+    \item \texttt{PartnerController}: Implemented full CRUD operations with secure validation logic and a dedicated "Inventory Mapping" interface.
+    \item \textbf{Dashboard Integration}: Expanded the Admin Command Center with a new "Supply Chain" panel, enabling immediate access to partner metadata and origin tracking.
 \end{itemize}
 
 \section{Phase 7: Strategic Role Management \& UX Maturity}
 To achieve high-fidelity user management and administrative scalability, I implemented a multi-tier confirmation workflow and a UI overhaul.
 \begin{itemize}
-    \item \textbf{Identity Confirmation Workflow}: Refactored the registration process to hold \texttt{vendor} and \texttt{admin} accounts in a \texttt{pending} state, requiring manual verification.
+    \item \textbf{Identity Confirmation Workflow}: Refactored the registration process to hold \texttt{partner} and \texttt{admin} accounts in a \texttt{pending} state, requiring manual verification.
     \item \textbf{Administrative Sub-Navigation}: Introduced a consolidated navigation bar to decongest the admin header and provide seamless access to all management modules.
     \item \textbf{Community Moderation Portal}: Built a dedicated interface for administrators to curate or hide user reviews, ensuring platform sentiment integrity.
     \item \textbf{Artisan Visibility}: Integrated partner names directly into catalog cards, enhancing transparency and origin storytelling.
