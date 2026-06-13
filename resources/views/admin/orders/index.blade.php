@@ -26,6 +26,8 @@
 @endsection
 
 @section('content')
+@include('partials.admin-nav')
+
 <div class="admin-orders-header">
     <h1>Order Management</h1>
     <p>Monitor and process all customer acquisitions.</p>

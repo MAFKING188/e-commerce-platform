@@ -29,6 +29,8 @@
 @endsection
 
 @section('content')
+@include('partials.admin-nav')
+
 <div class="admin-header">
     <div>
         <span class="cat-badge">Taxonomy</span>

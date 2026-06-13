@@ -85,6 +85,8 @@
 @endsection
 
 @section('content')
+@include('partials.admin-nav')
+
 <div class="admin-header">
     <div>
         <span style="font-weight: 800; color: var(--brand-accent); text-transform: uppercase; letter-spacing: 0.2em;">Platform Overview</span>
@@ -112,7 +114,7 @@
     </div>
 </div>
 
-<div class="quick-actions" style="margin-bottom: 4rem;">
+<div class="quick-actions" style="margin-bottom: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
     <a href="{{ route('admin.orders.index') }}" class="action-panel">
         <div>
             <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
@@ -133,6 +135,43 @@
             <p>Manage products, adjust stock levels, and curate the luxury catalog.</p>
         </div>
         <span class="btn btn-primary" style="width: fit-content;">Manage Archive</span>
+    </a>
+
+    <a href="{{ route('users.index') }}" class="action-panel">
+        <div>
+            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+            <h2>Member Base</h2>
+            <p>Administer user permissions, verify identities, and manage the community.</p>
+        </div>
+        <span class="btn btn-primary" style="width: fit-content; background: #10b981;">
+            Access Registry ({{ $stats['pending_users'] }})
+        </span>
+    </a>
+
+    <a href="{{ route('vendors.index') }}" class="action-panel">
+        <div>
+            <div class="icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <h2>Supply Chain</h2>
+            <p>Manage partner vendors, track sources, and map inventory origins.</p>
+        </div>
+        <span class="btn btn-primary" style="width: fit-content; background: #8b5cf6;">Vendor Ecosystem</span>
+    </a>
+
+    <a href="{{ route('admin.reviews.index') }}" class="action-panel">
+        <div>
+            <div class="icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+            </div>
+            <h2>Community Feedback</h2>
+            <p>Moderate user reviews, curate testimonials, and manage platform sentiment.</p>
+        </div>
+        <span class="btn btn-primary" style="width: fit-content; background: #f59e0b;">
+            Moderate ({{ $stats['pending_reviews'] }})
+        </span>
     </a>
 </div>
 

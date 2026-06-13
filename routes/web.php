@@ -87,6 +87,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('admin.orders.complete');
 
     Route::resource('products', ProductController::class);
-    Route::resource('users', UserController::class);
+    Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show']);
+    Route::post('/users/{id}/approve', [AdminUserController::class, 'approve'])->name('admin.users.approve');
     Route::resource('categories', CategoryController::class);
+    Route::resource('vendors', VendorController::class);
+    
+    /* Community Moderation */
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::post('/reviews/{id}/approve', [ReviewController::class, 'approve'])->name('admin.reviews.approve');
+    Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('admin.reviews.reject');
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+    Route::post('/vendors/{id}/add-product', [VendorController::class, 'addProduct'])->name('admin.vendors.add_product');
+    Route::delete('/vendors/{id}/remove-product/{productId}', [VendorController::class, 'removeProduct'])->name('admin.vendors.remove_product');
 });

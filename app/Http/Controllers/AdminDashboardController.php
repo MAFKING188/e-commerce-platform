@@ -22,6 +22,8 @@ class AdminDashboardController extends Controller
             'catalog_size' => Product::count(),
             'total_members' => User::count(),
             'low_stock_count' => Product::where('stock', '<', 5)->count(),
+            'pending_reviews' => \App\Models\Review::where('status', 'pending')->count(),
+            'pending_users' => User::where('status', 'pending')->count(),
         ];
 
         // 🕒 Pulse: Recent Acquisitions
