@@ -59,9 +59,9 @@ class Product extends Model
         return $this->HasMany(Review::class);
     }
 
-    public function vendors()
+    public function partners()
     {
-        return $this->belongsToMany(Vendor::class, 'vendor_products');
+        return $this->belongsToMany(Partner::class, 'partner_products');
     }
 
     /**

@@ -8,8 +8,8 @@
         <div class="info-wrap">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <span class="cat-badge">{{ $product->category->name ?? 'Collection' }}</span>
-                @if($product->vendors->isNotEmpty())
-                    <span style="font-size: 0.6rem; font-weight: 700; color: var(--text-400); text-transform: uppercase;">By {{ $product->vendors->first()->name }}</span>
+                @if($product->partners->isNotEmpty())
+                    <span style="font-size: 0.6rem; font-weight: 700; color: var(--text-400); text-transform: uppercase;">By {{ $product->partners->first()->name }}</span>
                 @endif
             </div>
             <h3>{{ $product->name }}</h3>

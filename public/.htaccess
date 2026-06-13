@@ -4,6 +4,16 @@
     </IfModule>
 
     RewriteEngine On
+<IfModule mod_rewrite.c>
+        RewriteEngine On
+   
+        # EXPLICITLY TELL APACHE TO IGNORE THE PHYSICAL VENDOR FOLDER
+        # FOR URLS STARTING WITH /vendor/
+        RewriteRule ^vendor/ - [L]
+   
+        # ... rest of your existing rules ...
+    </IfModule>
+
     # If the URL starts with /vendor/ but is NOT the physical vendor folder, 
          # force it through index.php
          RewriteRule ^vendor/dashboard - [L]

@@ -150,15 +150,15 @@
         </span>
     </a>
 
-    <a href="{{ route('admin.vendors.index') }}" class="action-panel">
+    <a href="{{ route('admin.partners.index') }}" class="action-panel">
         <div>
             <div class="icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             </div>
             <h2>Supply Chain</h2>
-            <p>Manage partner vendors, track sources, and map inventory origins.</p>
+            <p>Manage partner partners, track sources, and map inventory origins.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #8b5cf6;">Vendor Ecosystem</span>
+        <span class="btn btn-primary" style="width: fit-content; background: #8b5cf6;">Partner Ecosystem</span>
     </a>
 
     <a href="{{ route('admin.reviews.index') }}" class="action-panel">

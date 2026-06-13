@@ -19,7 +19,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'role' => 'required|in:user,vendor,admin'
+            'role' => 'required|in:user,partner,admin'
         ]);
 
         $status = ($data['role'] === 'user') ? 'active' : 'pending';
