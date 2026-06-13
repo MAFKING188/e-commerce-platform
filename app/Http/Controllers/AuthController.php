@@ -14,6 +14,7 @@ class AuthController extends Controller
     /* REGISTER */
     public function register(Request $request)
     {
+        \Log::info('Registration Request:', $request->all());
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
@@ -30,6 +31,7 @@ class AuthController extends Controller
             'role' => $data['role'],
             'status' => $status
         ]);
+        \Log::info('User Created:', $user->toArray());
 
         // 📧 Trigger Welcome Email
         Mail::to($user)->queue(new WelcomeMember($user));
