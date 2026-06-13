@@ -120,6 +120,31 @@ I utilized a structured commit convention (\texttt{feat}, \texttt{fix}, \texttt{
 
 [Insert Application Screenshots here with descriptions]
 
+\section{The Vendor Portal Architecture}
+
+To extend the platform into a multi-seller marketplace, I have architected a dedicated Vendor Portal. This addition adheres to the "Hardened System" philosophy by enforcing strict resource isolation.
+
+\subsection{1. Vendor Access Rules \& Security}
+Vendors operate within a strict "My-Data-Only" sandbox:
+\begin{itemize}
+    \item \textbf{Authentication:} Vendor-specific login facilitated by the \texttt{role} attribute.
+    \item \textbf{Data Isolation (Policies):}
+    \begin{itemize}
+        \item \textbf{ProductPolicy:} Ensures a vendor can only view/edit/delete products associated with their \texttt{vendor\_id}.
+        \item \textbf{OrderPolicy:} Restricts order view access to orders containing items owned by the vendor.
+    \end{itemize}
+    \item \textbf{Middleware:} A \texttt{VendorMiddleware} (or extended \texttt{AdminMiddleware}) restricts access to \texttt{/vendor/*} routes.
+\end{itemize}
+
+\subsection{2. Vendor Dashboard Scope}
+The portal is comprised of the following functional pages:
+\begin{enumerate}
+    \item \textbf{Dashboard:} Vendor-specific performance overview (sales, total earnings, inventory count).
+    \item \textbf{My Inventory:} CRUD interface for products owned strictly by the authenticated vendor.
+    \item \textbf{Fulfillment:} List of orders containing items belonging to the vendor.
+    \item \textbf{Partner Profile:} Management of brand philosophy, contact details, and website links.
+\end{enumerate}
+
 \section{System Analysis: Pros, Cons, and Hardening}
 
 \subsection{1. The Checkout Pipeline (Atomic Transactions)}
@@ -145,6 +170,31 @@ I implemented a 4-tier notification suite:
     \item \textbf{OrderCancelled:} Triggered upon user-led cancellation (restoring stock).
     \item \textbf{PaymentSuccess:} Triggered after successful PayPal capture.
 \end{itemize}
+
+\section{The Vendor Portal Architecture}
+
+To extend the platform into a multi-seller marketplace, I have architected a dedicated Vendor Portal. This addition adheres to the "Hardened System" philosophy by enforcing strict resource isolation.
+
+\subsection{1. Vendor Access Rules \& Security}
+Vendors operate within a strict "My-Data-Only" sandbox:
+\begin{itemize}
+    \item \textbf{Authentication:} Vendor-specific login facilitated by the \texttt{role} attribute.
+    \item \textbf{Data Isolation (Policies):}
+    \begin{itemize}
+        \item \textbf{ProductPolicy:} Ensures a vendor can only view/edit/delete products associated with their \texttt{vendor\_id}.
+        \item \textbf{OrderPolicy:} Restricts order view access to orders containing items owned by the vendor.
+    \end{itemize}
+    \item \textbf{Middleware:} A \texttt{VendorMiddleware} (or extended \texttt{AdminMiddleware}) restricts access to \texttt{/vendor/*} routes.
+\end{itemize}
+
+\subsection{2. Vendor Dashboard Scope}
+The portal is comprised of the following functional pages:
+\begin{enumerate}
+    \item \textbf{Dashboard:} Vendor-specific performance overview (sales, total earnings, inventory count).
+    \item \textbf{My Inventory:} CRUD interface for products owned strictly by the authenticated vendor.
+    \item \textbf{Fulfillment:} List of orders containing items belonging to the vendor.
+    \item \textbf{Partner Profile:} Management of brand philosophy, contact details, and website links.
+\end{enumerate}
 
 \section{System Analysis: Pros, Cons, and Hardening}
 

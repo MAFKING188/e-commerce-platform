@@ -4,6 +4,17 @@
     </IfModule>
 
     RewriteEngine On
+    # If the URL starts with /vendor/ but is NOT the physical vendor folder, 
+         # force it through index.php
+         RewriteRule ^vendor/dashboard - [L]
+         RewriteRule ^vendor/profile - [L]
+         # (Add other vendor routes here if needed)
+    
+        # Handle Authorization Header
+        RewriteCond %{HTTP:Authorization} .
+        RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+        
+        # ... rest of your rules
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
