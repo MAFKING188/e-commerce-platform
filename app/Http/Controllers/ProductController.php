@@ -36,7 +36,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully');
+        return redirect()->route('admin.products.index')->with('success', 'Product created successfully');
     }
 
 
@@ -53,14 +53,14 @@ return view('products.edit', compact('product', 'categories'));
 
         //$product->update($request->all());
 
-      //  return redirect()->route('products.index')->with('success','Product updated successfully');
+      //  return redirect()->route('admin.products.index')->with('success','Product updated successfully');
     //}
 
     public function destroy($id)
     {
         Product::destroy($id);
 
-        return redirect()->route('products.index')->with('success','Product Removed successfully');
+        return redirect()->route('admin.products.index')->with('success','Product Removed successfully');
     }
 
    public function update(\App\Http\Requests\UpdateProductRequest $request, $id)
@@ -86,6 +86,6 @@ return view('products.edit', compact('product', 'categories'));
         ]);
     }
 
-    return redirect()->route('products.index')->with('success', 'Product updated');
+    return redirect()->route('admin.products.index')->with('success', 'Product updated');
 }
 }
