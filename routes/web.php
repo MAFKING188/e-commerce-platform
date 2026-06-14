@@ -90,6 +90,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
+    Route::post('/products/{product}/reorder-images', [\App\Http\Controllers\ProductController::class, 'reorderImages'])->name('products.reorder-images');
+    Route::delete('/products/{product}/images/{image}', [\App\Http\Controllers\ProductController::class, 'deleteImage'])->name('products.delete-image');
     Route::resource('products', \App\Http\Controllers\ProductController::class)->names([
         'index' => 'products.index',
         'create' => 'products.create',
@@ -130,6 +132,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::post('/reviews/{id}/reject', [\App\Http\Controllers\ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [\App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
+    /* Payout Management */
+    Route::get('/payouts', [\App\Http\Controllers\AdminPayoutController::class, 'index'])->name('payouts.index');
+    Route::post('/payouts/{id}/process', [\App\Http\Controllers\AdminPayoutController::class, 'process'])->name('payouts.process');
+
     Route::post('/partners/{id}/add-product', [\App\Http\Controllers\PartnerController::class, 'addProduct'])->name('partners.add_product');
     Route::delete('/partners/{id}/remove-product/{productId}', [\App\Http\Controllers\PartnerController::class, 'removeProduct'])->name('partners.remove_product');
 });
@@ -139,9 +145,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 | Artisan Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('partner')->as('partner.')->group(function () {
-    Route::get('dashboard', [\App\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
-    
-    Route::resource('inventory', \App\Http\Controllers\PartnerInventoryController::class);
-    Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
-});
+    Route::middleware(['auth', 'partner'])->prefix('partner')->as('partner.')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
+        
+        Route::post('inventory/bulk-action', [\App\Http\Controllers\PartnerInventoryController::class, 'bulkAction'])->name('inventory.bulk-action');
+        Route::post('inventory/{product}/reorder-images', [\App\Http\Controllers\PartnerInventoryController::class, 'reorderImages'])->name('inventory.reorder-images');
+        Route::delete('inventory/{product}/images/{image}', [\App\Http\Controllers\PartnerInventoryController::class, 'deleteImage'])->name('inventory.delete-image');
+        Route::resource('inventory', \App\Http\Controllers\PartnerInventoryController::class);
+        Route::get('payouts', [\App\Http\Controllers\PartnerPayoutController::class, 'index'])->name('payouts.index');
+        Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
+    });

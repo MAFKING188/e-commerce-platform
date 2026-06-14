@@ -3,6 +3,8 @@
 @section('title', 'My Orders | Partner Dashboard')
 
 @section('content')
+@include('partials.partner-nav')
+
 <div style="margin-bottom: 4rem;">
     <span class="cat-badge">Order Fulfillment</span>
     <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">My Orders.</h1>

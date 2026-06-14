@@ -16,11 +16,7 @@ class StoreProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if($this->user() && $this->user()->role =="admin")
-            {
-                return true;
-            }
-        return false;
+        return $this->user() && in_array($this->user()->role, ['admin', 'partner']);
     }
 
     /**
@@ -36,7 +32,9 @@ class StoreProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'stock' => 'required|integer',
             'description' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
     }
 }
