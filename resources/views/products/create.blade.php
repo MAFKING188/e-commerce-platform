@@ -174,14 +174,14 @@
                 </div>
 
                 <div class="form-group field-full">
-                    <label class="form-label">Visual Narrative (Primary Image)</label>
+                    <label class="form-label">Visual Narrative (Narrative Images)</label>
                     <div class="image-upload-zone">
                         <span class="upload-icon">✦</span>
                         <div class="file-input-wrapper">
-                            <span class="btn btn-ghost" style="border-radius: 99px; padding: 0.75rem 2rem;">Select Asset</span>
-                            <input type="file" name="image" required>
+                            <span class="btn btn-ghost" style="border-radius: 99px; padding: 0.75rem 2rem;">Select Assets</span>
+                            <input type="file" name="images[]" multiple required>
                         </div>
-                        <p style="font-size: 0.8rem; color: var(--text-400); margin-top: 1.5rem; font-weight: 600;">High-resolution JPG or PNG recommended</p>
+                        <p style="font-size: 0.8rem; color: var(--text-400); margin-top: 1.5rem; font-weight: 600;">High-resolution JPG or PNG recommended. Select one or more.</p>
                     </div>
                 </div>
             </div>

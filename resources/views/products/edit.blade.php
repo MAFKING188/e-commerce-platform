@@ -38,24 +38,13 @@
         grid-column: span 2;
     }
 
-    .image-preview-zone {
-        margin-top: 1rem;
-        padding: 2rem;
-        border: 2px dashed var(--border);
-        border-radius: var(--radius-md);
-        text-align: center;
-        background: var(--surface-200);
-    }
-
-    .current-img {
-        width: 120px;
-        height: 120px;
-        border-radius: 8px;
-        object-fit: cover;
-        margin-bottom: 1rem;
-        border: 1px solid var(--border);
-    }
+    .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+    .media-item { position: relative; border-radius: 1rem; overflow: hidden; border: 1px solid var(--border); background: var(--surface-200); aspect-ratio: 1; cursor: move; }
+    .media-item img { width: 100%; height: 100%; object-fit: cover; }
+    .media-actions { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem; }
+    .media-btn { background: rgba(255, 255, 255, 0.9); border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ef4444; font-size: 0.8rem; box-shadow: var(--shadow-sm); }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 @endsection
 
 @section('content')
@@ -104,14 +93,22 @@
                 </div>
 
                 <div class="form-group field-full">
-                    <label class="form-label">Product Imagery</label>
-                    <div class="image-preview-zone">
-                        @if($product->images->first())
-                            <img src="{{ asset('storage/' . str_replace('storage/', '', $product->images->first()->url)) }}" class="current-img" alt="">
-                            <p style="font-size: 0.8rem; color: var(--text-600); margin-bottom: 1rem;">Current active image</p>
-                        @endif
-                        <input type="file" name="image" class="auth-input" style="background: white;">
+                    <label class="form-label">Product Narrative Gallery (Drag to Reorder)</label>
+                    <div class="media-gallery" id="media-gallery">
+                        @foreach($product->images->sortBy('position') as $image)
+                            <div class="media-item" data-id="{{ $image->id }}">
+                                <img src="{{ asset($image->url) }}" alt="">
+                                <div class="media-actions">
+                                    <button type="button" class="media-btn" onclick="deleteVisual({{ $product->id }}, {{ $image->id }}, this)" title="Remove Visual">✕</button>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
+                </div>
+
+                <div class="form-group field-full">
+                    <label class="form-label">Add Narrative Visuals</label>
+                    <input type="file" name="images[]" class="auth-input" style="background: white;" multiple>
                 </div>
             </div>
 
@@ -123,4 +120,56 @@
     </div>
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const el = document.getElementById('media-gallery');
+        if (el && Sortable) {
+            Sortable.create(el, {
+                animation: 150,
+                onEnd: function() {
+                    const order = Array.from(el.children).map(item => item.dataset.id);
+                    updateVisualSequence({{ $product->id }}, order);
+                }
+            });
+        }
+    });
+
+    function updateVisualSequence(productId, order) {
+        fetch(`{{ url('admin/products') }}/${productId}/reorder-images`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order: order })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast(data.message, 'success');
+            }
+        });
+    }
+
+    function deleteVisual(productId, imageId, btn) {
+        if (!confirm('Remove this visual?')) return;
+
+        fetch(`{{ url('admin/products') }}/${productId}/images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.closest('.media-item').remove();
+                showToast(data.message, 'success');
+            }
+        });
+    }
+</script>
 @endsection

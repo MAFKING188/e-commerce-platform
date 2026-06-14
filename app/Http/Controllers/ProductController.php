@@ -26,66 +26,76 @@ class ProductController extends Controller
     {
         $product = Product::create($request->validated());
 
-        // ✅ Handle image upload
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('products', 'public');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'url' => 'storage/' . $path,
+                    'position' => $index
+                ]);
+            }
+        } elseif ($request->hasFile('image')) {
             $path = $request->file('image')->store('products', 'public');
-
             ProductImage::create([
                 'product_id' => $product->id,
-                'url' => 'storage/' . $path
+                'url' => 'storage/' . $path,
+                'position' => 0
             ]);
         }
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully');
     }
 
-
     public function edit($id)
-{
-$product = Product::findOrFail($id);
-$categories = Category::all();
-return view('products.edit', compact('product', 'categories'));
-}
-
-    //public function edit($id)
-    //{
-        //$product = Product::findOrFail($id);
-
-        //$product->update($request->all());
-
-      //  return redirect()->route('admin.products.index')->with('success','Product updated successfully');
-    //}
-
-    public function destroy($id)
     {
-        Product::destroy($id);
-
-        return redirect()->route('admin.products.index')->with('success','Product Removed successfully');
+        $product = Product::with('images')->findOrFail($id);
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
     }
 
-   public function update(\App\Http\Requests\UpdateProductRequest $request, $id)
-{
-    $product = Product::findOrFail($id);
+    public function update(\App\Http\Requests\UpdateProductRequest $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update($request->validated());
 
-    $product->update($request->validated());
-
-    // Optional: replace image
-    if ($request->hasFile('image')) {
-
-        // delete old images (optional but recommended)
-        foreach ($product->images as $img) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $img->url));
-            $img->delete();
+        if ($request->hasFile('images')) {
+            $lastPosition = $product->images()->max('position') ?? -1;
+            foreach ($request->file('images') as $index => $file) {
+                $path = $file->store('products', 'public');
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'url' => 'storage/' . $path,
+                    'position' => $lastPosition + $index + 1
+                ]);
+            }
         }
 
-        $path = $request->file('image')->store('products', 'public');
-
-        ProductImage::create([
-            'product_id' => $product->id,
-            'url' => 'storage/' . $path
-        ]);
+        return redirect()->route('admin.products.index')->with('success', 'Product updated');
     }
 
-    return redirect()->route('admin.products.index')->with('success', 'Product updated');
-}
+    public function deleteImage($productId, $imageId)
+    {
+        $product = Product::findOrFail($productId);
+        $image = $product->images()->findOrFail($imageId);
+
+        Storage::disk('public')->delete(str_replace('storage/', '', $image->url));
+        $image->delete();
+
+        return response()->json(['status' => 'success', 'message' => 'Visual removed.']);
+    }
+
+    public function reorderImages(Request $request, $productId)
+    {
+        $product = Product::findOrFail($productId);
+        $order = $request->input('order', []);
+
+        foreach ($order as $position => $imageId) {
+            $product->images()->where('id', $imageId)->update(['position' => $position]);
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Sequence updated.']);
+    }
+
+    public function destroy($id)
 }
