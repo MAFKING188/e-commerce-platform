@@ -4,6 +4,7 @@
     <a href="{{ route('admin.products.index') }}" class="btn {{ request()->routeIs('admin.products.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Inventory</a>
     <a href="{{ route('admin.users.index') }}" class="btn {{ request()->routeIs('admin.users.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Members</a>
     <a href="{{ route('admin.partners.index') }}" class="btn {{ request()->routeIs('admin.partners.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Supply Chain</a>
+    <a href="{{ route('admin.payouts.index') }}" class="btn {{ request()->routeIs('admin.payouts.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Financials</a>
     <a href="{{ route('admin.reviews.index') }}" class="btn {{ request()->routeIs('admin.reviews.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Community</a>
     <a href="{{ route('admin.categories.index') }}" class="btn {{ request()->routeIs('admin.categories.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Categories</a>
 </div>

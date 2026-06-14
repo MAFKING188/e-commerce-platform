@@ -21,11 +21,40 @@ class AdminOrderController extends Controller
 
     public function complete($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('items.product.partners')->findOrFail($id);
+        
         if ($order->status === 'paid') {
-            $order->update(['status' => 'completed']);
-            return back()->with('status', 'Order marked as completed/shipped.');
+            \DB::transaction(function () use ($order) {
+                $order->update(['status' => 'completed']);
+
+                // Calculate payouts for each partner involved in this order
+                $partnerItems = [];
+                foreach ($order->items as $item) {
+                    foreach ($item->product->partners as $partner) {
+                        if (!isset($partnerItems[$partner->id])) {
+                            $partnerItems[$partner->id] = 0;
+                        }
+                        $partnerItems[$partner->id] += ($item->price * $item->quantity);
+                    }
+                }
+
+                foreach ($partnerItems as $partnerId => $grossAmount) {
+                    // Platform takes 10% commission
+                    $netAmount = $grossAmount * 0.90;
+
+                    \App\Models\Payout::firstOrCreate([
+                        'order_id' => $order->id,
+                        'partner_id' => $partnerId
+                    ], [
+                        'amount' => $netAmount,
+                        'status' => 'pending'
+                    ]);
+                }
+            });
+
+            return back()->with('status', 'Order marked as completed and payouts generated.');
         }
+        
         return back()->withErrors('Only paid orders can be marked as completed.');
     }
 }

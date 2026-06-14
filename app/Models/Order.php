@@ -25,4 +25,9 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function payouts()
+    {
+        return $this->hasMany(Payout::class);
+    }
 }

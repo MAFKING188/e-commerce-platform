@@ -24,6 +24,11 @@ class Partner extends Model
         return $this->belongsToMany(Product::class, 'partner_products');
     }
 
+    public function payouts()
+    {
+        return $this->hasMany(Payout::class);
+    }
+
     public function orders()
     {
         return $this->belongsToMany(Order::class, 'order_items', 'product_id', 'order_id')
