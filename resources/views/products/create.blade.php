@@ -70,6 +70,12 @@
         gap: 2rem;
     }
 
+    @media (max-width: 768px) {
+        .field-grid { grid-template-columns: 1fr; }
+        .editor-card { padding: 2rem; }
+        .editor-header h1 { font-size: 2.5rem; }
+    }
+
     .field-full {
         grid-column: span 2;
     }

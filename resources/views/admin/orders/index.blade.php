@@ -4,8 +4,9 @@
 
 @section('styles')
 <style>
-    .admin-orders-header { margin-bottom: 2rem; }
-    .order-table { width: 100%; border-collapse: collapse; background: var(--surface-100); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .admin-orders-header { margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; }
+    .table-container { background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto; box-shadow: var(--shadow-sm); }
+    .order-table { width: 100%; border-collapse: collapse; min-width: 900px; }
     .order-table th, .order-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
     .order-table th { background: var(--surface-200); font-size: 0.75rem; text-transform: uppercase; color: var(--text-400); }
     .status-pill { 
@@ -33,42 +34,44 @@
     <p>Monitor and process all customer acquisitions.</p>
 </div>
 
-<table class="order-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($orders as $order)
-        <tr>
-            <td>#{{ $order->id }}</td>
-            <td>{{ $order->user->name }}</td>
-            <td>${{ number_format($order->total_price, 2) }}</td>
-            <td>
-                <span class="status-pill status-{{ strtolower($order->status) }}">
-                    {{ $order->status }}
-                </span>
-            </td>
-            <td>{{ $order->created_at->format('M d, H:i') }}</td>
-            <td>
-                <div style="display: flex; gap: 0.5rem;">
-                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn-sm">View</a>
-                    @if($order->status === 'paid')
-                        <form action="{{ route('admin.orders.complete', $order->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn-sm btn-complete">Mark Shipped</button>
-                        </form>
-                    @endif
-                </div>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+<div class="table-container">
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($orders as $order)
+            <tr>
+                <td>#{{ $order->id }}</td>
+                <td>{{ $order->user->name }}</td>
+                <td>@money($order->total_price)</td>
+                <td>
+                    <span class="status-pill status-{{ strtolower($order->status) }}">
+                        {{ $order->status }}
+                    </span>
+                </td>
+                <td>{{ $order->created_at->format('M d, H:i') }}</td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{{ route('admin.orders.show', $order->id) }}" class="btn-sm">View</a>
+                        @if($order->status === 'paid')
+                            <form action="{{ route('admin.orders.complete', $order->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn-sm btn-complete">Mark Shipped</button>
+                            </form>
+                        @endif
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
 @endsection

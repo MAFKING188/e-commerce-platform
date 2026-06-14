@@ -5,8 +5,8 @@
 @section('styles')
 <style>
     .inventory-header { margin-bottom: 4rem; display: flex; justify-content: space-between; align-items: flex-end; }
-    .inventory-table-wrap { background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow: hidden; }
-    .inventory-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .inventory-table-wrap { background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto; }
+    .inventory-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 800px; }
     .inventory-table th { padding: 1.5rem; background: var(--surface-200); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-600); border-bottom: 1px solid var(--border); }
     .inventory-table td { padding: 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
     .inventory-table tr:last-child td { border-bottom: none; }

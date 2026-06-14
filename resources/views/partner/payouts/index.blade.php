@@ -21,8 +21,8 @@
     </div>
 </div>
 
-<div class="inventory-table-wrap" style="background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow: hidden;">
-    <table class="inventory-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+<div class="inventory-table-wrap" style="background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto;">
+    <table class="inventory-table" style="width: 100%; border-collapse: collapse; text-align: left; min-width: 900px;">
         <thead>
             <tr>
                 <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600);">Order Ref</th>

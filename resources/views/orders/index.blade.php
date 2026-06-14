@@ -86,6 +86,11 @@
     .order-items-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    .order-items-table-wrap {
+        overflow-x: auto;
     }
 
     .order-items-table th {
@@ -209,29 +214,31 @@
             </div>
 
             <!-- Items Table -->
-            <table class="order-items-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($order->items as $item)
+            <div class="order-items-table-wrap">
+                <table class="order-items-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="product-cell">
-                                    <img src="{{ $item->product->image_url }}" class="product-thumb" alt="{{ $item->product->name }}">
-                                    <span style="font-weight: 600; color: var(--text-900);">{{ $item->product->name }}</span>
-                                </div>
-                            </td>
-                            <td style="color: var(--text-600);">{{ $item->quantity }}</td>
-                            <td style="font-weight: 600; color: var(--text-900);">@money($item->price)</td>
+                            <th>Piece</th>
+                            <th>Quantity</th>
+                            <th>Value</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($order->items as $item)
+                            <tr>
+                                <td>
+                                    <div class="product-cell">
+                                        <img src="{{ $item->product->image_url }}" class="product-thumb" alt="{{ $item->product->name }}">
+                                        <span style="font-weight: 600; color: var(--text-900);">{{ $item->product->name }}</span>
+                                    </div>
+                                </td>
+                                <td style="color: var(--text-600);">{{ $item->quantity }}</td>
+                                <td style="font-weight: 600; color: var(--text-900);">@money($item->price)</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Actions -->
             @if($order->status === 'pending')

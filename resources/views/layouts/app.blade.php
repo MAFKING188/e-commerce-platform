@@ -180,7 +180,58 @@
             transition: 0.3s;
         }
 
-        @media (max-width: 1024px) {
+        /* USER DROPDOWN */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--surface-100);
+            min-width: 240px;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            z-index: 1200;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            animation: dropdownFade 0.2s ease-out;
+        }
+
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-content a {
+            color: var(--text-600);
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--surface-200);
+            color: var(--brand-accent);
+        }
+
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.25rem 0;
+        }
+
+        @media (max-width: 1140px) {
             .mobile-menu-btn {
                 display: block;
             }
@@ -223,9 +274,25 @@
                 border-top: 1px solid var(--border);
             }
 
-            .nav-auth .btn {
+            .nav-auth .btn, .user-dropdown {
                 width: 100%;
-                max-width: 300px;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            .dropdown-content {
+                position: static;
+                display: block;
+                box-shadow: none;
+                border: none;
+                background: transparent;
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .dropdown-content a {
+                padding: 0.75rem 0;
+                text-align: center;
             }
 
             .mobile-menu-btn.active span:nth-child(1) {
@@ -420,20 +487,33 @@
                     🌙
                 </button>
                 @auth
-                    <a href="{{ route('profile.wishlist') }}" class="btn btn-ghost">Archive</a>
-                    <a href="{{ route('profile') }}" class="btn btn-ghost">Profile</a>
-                    @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Admin</a>
-                    @endif
-                    @if(auth()->user()->role === 'partner')
-                        <a href="{{ route('partner.dashboard') }}" class="btn btn-ghost" style="color: var(--brand-accent);">Partner Dashboard</a>
-                    @endif
-                    <a href="{{ route('cart.index') }}" class="btn btn-ghost">Cart</a>
-                    <a href="{{ route('orders.index') }}" class="btn btn-ghost">Orders</a>
-                    <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-                        @csrf
-                        <button type="submit" class="btn btn-primary" style="background: #ef4444;">Sign Out</button>
-                    </form>
+                    <div class="user-dropdown">
+                        <button class="btn btn-ghost">
+                            {{ auth()->user()->name }} <span style="font-size: 0.6rem; margin-left: 0.5rem;">▼</span>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{{ route('profile') }}">My Profile</a>
+                            <a href="{{ route('profile.wishlist') }}">My Archive</a>
+                            <a href="{{ route('orders.index') }}">Order History</a>
+                            <a href="{{ route('cart.index') }}">Shopping Bag</a>
+                            
+                            @if(auth()->user()->role === 'admin')
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ route('admin.dashboard') }}" style="color: var(--brand-accent);">Admin Command Center</a>
+                            @endif
+                            
+                            @if(auth()->user()->role === 'partner')
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ route('partner.dashboard') }}" style="color: var(--brand-accent);">Artisan Portal</a>
+                            @endif
+                            
+                            <div class="dropdown-divider"></div>
+                            <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                                @csrf
+                                <button type="submit" style="width: 100%; text-align: center; padding: 1rem; border: none; background: none; color: #ef4444; font-weight: 700; cursor: pointer; font-family: inherit;">Sign Out</button>
+                            </form>
+                        </div>
+                    </div>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-ghost">Member Login</a>
                     <a href="{{ route('signup') }}" class="btn btn-primary">Join Now</a>

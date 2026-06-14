@@ -266,7 +266,7 @@
             <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--text-900);">Complete The Look.</h2>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 3rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 3rem;">
             @foreach($relatedProducts as $related)
                 @include('components.product-card', ['product' => $related])
             @endforeach

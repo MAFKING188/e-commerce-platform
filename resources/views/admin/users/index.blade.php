@@ -4,18 +4,18 @@
 
 @section('styles')
 <style>
-    .admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+    .admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; gap: 2rem; flex-wrap: wrap; }
     .admin-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }
 
     .user-table-wrap {
         background: var(--surface-100);
         border-radius: 2rem;
         border: 1px solid var(--border);
-        overflow: hidden;
+        overflow-x: auto;
         box-shadow: var(--shadow-md);
     }
 
-    .user-table { width: 100%; border-collapse: collapse; }
+    .user-table { width: 100%; border-collapse: collapse; min-width: 900px; }
     .user-table th {
         text-align: left;
         padding: 1.5rem 2rem;

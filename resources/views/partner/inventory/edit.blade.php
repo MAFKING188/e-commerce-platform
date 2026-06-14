@@ -9,6 +9,11 @@
     .form-group label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-600); }
     .form-control { width: 100%; padding: 1rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--surface-200); font-family: inherit; font-size: 1rem; transition: 0.2s; }
     .form-control:focus { outline: none; border-color: var(--brand-accent); box-shadow: 0 0 0 4px var(--brand-accent-soft); }
+    
+    @media (max-width: 768px) {
+        .form-container { padding: 1.5rem; }
+    }
+
     .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
     .media-item { position: relative; border-radius: 1rem; overflow: hidden; border: 1px solid var(--border); background: var(--surface-200); aspect-ratio: 1; cursor: move; }
     .media-item img { width: 100%; height: 100%; object-fit: cover; }

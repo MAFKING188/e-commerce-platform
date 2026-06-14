@@ -34,8 +34,18 @@
         gap: 2rem;
     }
 
+    @media (max-width: 768px) {
+        .field-grid { grid-template-columns: 1fr; }
+        .editor-card { padding: 2rem; }
+        .editor-header h1 { font-size: 2.5rem; }
+    }
+
     .field-full {
         grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+        .field-full { grid-column: span 1; }
     }
 
     .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
