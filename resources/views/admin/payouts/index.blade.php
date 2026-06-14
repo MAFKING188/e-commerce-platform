@@ -3,6 +3,8 @@
 @section('title', 'Financial Registry | Admin Command Center')
 
 @section('content')
+@include('partials.admin-nav')
+
 <div style="margin-bottom: 4rem;">
     <span class="cat-badge">Financial Command</span>
     <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Partner Payouts.</h1>

@@ -114,6 +114,10 @@
             gap: 2rem;
         }
 
+        .product-info {
+            padding: 0 1rem;
+        }
+
         .gallery {
             position: relative;
             top: 0;
