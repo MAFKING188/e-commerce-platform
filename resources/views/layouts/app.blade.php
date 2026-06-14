@@ -404,6 +404,18 @@
             </div>
 
             <div class="nav-auth">
+                <form action="{{ url()->current() }}" method="GET" id="currency-form" style="margin: 0;">
+                    @foreach(request()->except('currency') as $key => $value)
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endforeach
+                    <select name="currency" onchange="this.form.submit()" class="theme-toggle" style="width: auto; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 800; padding: 0 0.5rem; background: var(--surface-300);">
+                        @foreach(config('currency.supported') as $code => $details)
+                            <option value="{{ $code }}" {{ \App\Services\CurrencyService::getCurrent() === $code ? 'selected' : '' }}>
+                                {{ $code }} ({{ $details['symbol'] }})
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
                 <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn">
                     🌙
                 </button>

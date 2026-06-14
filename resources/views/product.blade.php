@@ -187,7 +187,7 @@
             <span style="font-size: 0.75rem; background: #fee2e2; color: #991b1b; padding: 0.25rem 0.75rem; border-radius: 2rem; font-weight: 700;">OUT OF STOCK</span>
         @endif
 
-        <div class="price-tag">${{ number_format($product->price, 2) }}</div>
+        <div class="price-tag">@money($product->price)</div>
 
         <div class="description-box">
             <h3 style="color: #1e293b; margin-bottom: 1rem; font-size: 1.1rem;">Description</h3>

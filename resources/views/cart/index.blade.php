@@ -165,12 +165,12 @@
                     
                     <div class="cart-item-info">
                         <h3>{{ $item->product->name }}</h3>
-                        <p>Unit Price: ${{ number_format($item->product->price, 2) }}</p>
+                        <p>Unit Price: @money($item->product->price)</p>
                         <p>Quantity: {{ $item->quantity }}</p>
                     </div>
 
                     <div class="cart-item-actions">
-                        <span class="subtotal-val">${{ number_format($subtotal, 2) }}</span>
+                        <span class="subtotal-val">@money($subtotal)</span>
                         <form method="POST" action="{{ route('cart.remove', $item->id) }}" style="margin: 0;">
                             @csrf
                             @method('DELETE')
@@ -184,18 +184,18 @@
         <!-- Summary -->
         <div class="summary-card">
             <h2>Order Summary</h2>
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>${{ number_format($total, 2) }}</span>
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span>@money($total)</span>
             </div>
             <div class="summary-row">
                 <span>Shipping</span>
                 <span style="color: #10b981; font-weight: 600;">Calculated at next step</span>
             </div>
             
-            <div class="summary-total">
+            <div class="summary-row total-row">
                 <span>Total</span>
-                <span>${{ number_format($total, 2) }}</span>
+                <span>@money($total)</span>
             </div>
 
             <form method="POST" action="{{ route('orders.store') }}" style="margin-top: 2rem;">

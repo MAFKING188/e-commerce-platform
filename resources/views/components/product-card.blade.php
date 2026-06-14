@@ -13,7 +13,7 @@
                 @endif
             </div>
             <h3>{{ $product->name }}</h3>
-            <div class="price-tag">${{ number_format($product->price, 0) }}</div>
+            <div class="price-tag">@money($product->price)</div>
         </div>
     </a>
 

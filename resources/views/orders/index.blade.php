@@ -195,7 +195,7 @@
                 </div>
                 <div class="summary-item">
                     <label>Total Price</label>
-                    <span>${{ number_format($order->total_price, 2) }}</span>
+                    <span>@money($order->total_price)</span>
                 </div>
                 <div class="summary-item">
                     <label>Order ID</label>
@@ -227,7 +227,7 @@
                                 </div>
                             </td>
                             <td style="color: var(--text-600);">{{ $item->quantity }}</td>
-                            <td style="font-weight: 600; color: var(--text-900);">${{ number_format($item->price, 2) }}</td>
+                            <td style="font-weight: 600; color: var(--text-900);">@money($item->price)</td>
                         </tr>
                     @endforeach
                 </tbody>
