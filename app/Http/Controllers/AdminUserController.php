@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Mail\UserStatusUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class AdminUserController extends Controller
 {
@@ -37,6 +39,7 @@ class AdminUserController extends Controller
     {
         \Log::info('DEBUG: Raw Request Input:', $request->all());
         $user = User::findOrFail($id);
+        $oldStatus = $user->status;
 
         $request->validate([
             'role' => 'required|in:user,partner,admin',
@@ -44,6 +47,11 @@ class AdminUserController extends Controller
         ]);
 
         $user->update($request->only(['role', 'status']));
+        
+        if ($oldStatus !== $user->status) {
+            Mail::to($user->email)->send(new UserStatusUpdated($user));
+        }
+
         \Log::info('User Updated:', $user->fresh()->toArray());
 
         return redirect()->back()->with('success', 'Member credentials refined.');
@@ -56,6 +64,8 @@ class AdminUserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->update(['status' => 'active']);
+
+        Mail::to($user->email)->send(new UserStatusUpdated($user));
 
         return redirect()->back()->with('success', 'Member access granted.');
     }
