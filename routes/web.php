@@ -8,14 +8,6 @@ use App\Http\Controllers\{
     PaymentController
 };
 use Modules\CatalogDelivery\Http\Controllers\ReviewController;
-use Modules\CatalogDelivery\Http\Controllers\ViewController;
-
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
-Route::get('/artisan-profile/{id}', [ViewController::class, 'partnerProfile'])->name('partner.profile');
 
 /*
 |--------------------------------------------------------------------------
@@ -56,22 +48,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
-    Route::resource('partners', \Modules\PartnerHub\Http\Controllers\PartnerController::class)->names([
-        'index' => 'partners.index',
-        'create' => 'partners.create',
-        'store' => 'partners.store',
-        'show' => 'partners.show',
-        'edit' => 'partners.edit',
-        'update' => 'partners.update',
-        'destroy' => 'partners.destroy',
-    ]);
-    
     /* Payout Management */
     Route::get('/payouts', [\App\Http\Controllers\AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::post('/payouts/{id}/process', [\App\Http\Controllers\AdminPayoutController::class, 'process'])->name('payouts.process');
-
-    Route::post('/partners/{id}/add-product', [\Modules\PartnerHub\Http\Controllers\PartnerController::class, 'addProduct'])->name('partners.add_product');
-    Route::delete('/partners/{id}/remove-product/{productId}', [\Modules\PartnerHub\Http\Controllers\PartnerController::class, 'removeProduct'])->name('partners.remove_product');
 });
 
 /*
@@ -80,8 +59,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 |--------------------------------------------------------------------------
 */
     Route::middleware(['auth', 'partner'])->prefix('partner')->as('partner.')->group(function () {
-        Route::get('dashboard', [\Modules\PartnerHub\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
-        
         Route::get('payouts', [\App\Http\Controllers\PartnerPayoutController::class, 'index'])->name('payouts.index');
         Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
     });
