@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Modules\PartnerHub\Models;
 
+use App\Models\Order;
+use App\Models\Payout;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CatalogDelivery\Models\Product;
+use Modules\IdentityAccess\Models\User;
 
 class Partner extends Model
 {

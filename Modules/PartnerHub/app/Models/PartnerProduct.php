@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\PartnerHub\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\CatalogDelivery\Models\Product;

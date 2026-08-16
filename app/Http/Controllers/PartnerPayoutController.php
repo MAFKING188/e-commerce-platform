@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Partner;
+use Modules\PartnerHub\Models\Partner;
 use App\Models\Payout;
 use Illuminate\Http\Request;
 

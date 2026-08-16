@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Partner;
+use Modules\PartnerHub\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
 use App\Http\Requests\StorePartnerRequest;
 use App\Http\Requests\UpdatePartnerRequest;

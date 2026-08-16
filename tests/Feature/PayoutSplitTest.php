@@ -6,7 +6,7 @@ use Modules\IdentityAccess\Models\User;
 use Modules\CatalogDelivery\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Partner;
+use Modules\PartnerHub\Models\Partner;
 use App\Models\Payout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

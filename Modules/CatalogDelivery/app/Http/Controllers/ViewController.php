@@ -39,7 +39,7 @@ class ViewController extends Controller
     public function partnerProfile($id)
     {
         // dd('DEBUG: Reached partnerProfile with id: ' . $id);
-        $partner = \App\Models\Partner::with('products.images')->findOrFail($id);
+        $partner = \Modules\PartnerHub\Models\Partner::with('products.images')->findOrFail($id);
         return view('partner_profile', compact('partner'));
     }
 }

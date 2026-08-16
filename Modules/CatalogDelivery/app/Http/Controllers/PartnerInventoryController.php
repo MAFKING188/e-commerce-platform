@@ -3,7 +3,7 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Partner;
+use Modules\PartnerHub\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\Category;
 use Modules\CatalogDelivery\Http\Requests\StoreProductRequest;
