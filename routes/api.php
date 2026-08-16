@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 
-use App\Http\Controllers\AuthController;
+use Modules\IdentityAccess\Http\Controllers\AuthController;
 
 // 🎯 MISSION 7: THE BRIDGE (API LAYER)
 

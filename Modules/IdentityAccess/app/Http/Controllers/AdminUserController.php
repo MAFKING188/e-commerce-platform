@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\IdentityAccess\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\IdentityAccess\Models\User;
-use App\Mail\UserStatusUpdated;
+use Modules\IdentityAccess\Mail\UserStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 

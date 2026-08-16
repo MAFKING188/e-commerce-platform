@@ -4,17 +4,19 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AdminDashboardController,
     AdminOrderController,
-    AdminUserController,
-    AuthController,
     CartController,
     CategoryController,
     OrderController,
     PaymentController,
     ProductController,
     ReviewController,
-    UserController,
     PartnerController,
-    ViewController,
+    ViewController
+};
+use Modules\IdentityAccess\Http\Controllers\{
+    AdminUserController,
+    AuthController,
+    UserController,
     WishlistController
 };
 
@@ -103,13 +105,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
         'update' => 'products.update',
         'destroy' => 'products.destroy',
     ]);
-    Route::resource('users', \App\Http\Controllers\AdminUserController::class)->except(['create', 'store', 'show'])->names([
+    Route::resource('users', \Modules\IdentityAccess\Http\Controllers\AdminUserController::class)->except(['create', 'store', 'show'])->names([
         'index' => 'users.index',
         'edit' => 'users.edit',
         'update' => 'users.update',
         'destroy' => 'users.destroy',
     ]);
-    Route::post('/users/{id}/approve', [\App\Http\Controllers\AdminUserController::class, 'approve'])->name('users.approve');
+    Route::post('/users/{id}/approve', [\Modules\IdentityAccess\Http\Controllers\AdminUserController::class, 'approve'])->name('users.approve');
     Route::resource('categories', \App\Http\Controllers\CategoryController::class)->names([
         'index' => 'categories.index',
         'create' => 'categories.create',

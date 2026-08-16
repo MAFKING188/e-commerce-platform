@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace Modules\IdentityAccess\Mail;
 
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Bus\Queueable;
@@ -40,7 +40,7 @@ class WelcomeMember extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.members.welcome',
+            markdown: 'identityaccess::emails.members.welcome',
         );
     }
 

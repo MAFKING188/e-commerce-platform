@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\IdentityAccess\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\WelcomeMember;
+use Modules\IdentityAccess\Mail\WelcomeMember;
 
 class AuthController extends Controller
 {

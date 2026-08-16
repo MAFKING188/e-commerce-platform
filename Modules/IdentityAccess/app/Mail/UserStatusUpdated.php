@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace Modules\IdentityAccess\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -40,7 +40,7 @@ class UserStatusUpdated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.user_status_updated',
+            view: 'identityaccess::emails.user_status_updated',
         );
     }
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\IdentityAccess\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\IdentityAccess\Models\Wishlist;
 use App\Models\Product;
 use Illuminate\Http\Request;
