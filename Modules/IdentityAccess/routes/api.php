@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\IdentityAccess\Http\Controllers\IdentityAccessController;
+use Modules\IdentityAccess\Http\Controllers\AuthController;
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('identityaccesses', IdentityAccessController::class)->names('identityaccess');
-});
+Route::post('/login', [AuthController::class, 'apiLogin']);
+Route::post('/register', [AuthController::class, 'apiRegister']);
+Route::get('/user', function (Illuminate\Http\Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');

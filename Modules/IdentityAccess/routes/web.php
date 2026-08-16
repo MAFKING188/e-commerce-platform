@@ -1,8 +1,35 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\IdentityAccess\Http\Controllers\IdentityAccessController;
+use Modules\IdentityAccess\Http\Controllers\AdminUserController;
+use Modules\IdentityAccess\Http\Controllers\AuthController;
+use Modules\IdentityAccess\Http\Controllers\UserController;
+use Modules\IdentityAccess\Http\Controllers\WishlistController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('identityaccesses', IdentityAccessController::class)->names('identityaccess');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', fn() => view('identityaccess::auth.login'))->name('login');
+    Route::get('/signup', fn() => view('identityaccess::auth.signup'))->name('signup');
+});
+
+Route::post('/createaccount', [AuthController::class, 'register']);
+Route::post('/accessaccount', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UserController::class, 'show'])->name('profile');
+    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+
+    Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/dashboard', [\Modules\IdentityAccess\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show'])->names([
+        'index' => 'users.index',
+        'edit' => 'users.edit',
+        'update' => 'users.update',
+        'destroy' => 'users.destroy',
+    ]);
+    Route::post('/users/{id}/approve', [AdminUserController::class, 'approve'])->name('users.approve');
 });

@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    AdminDashboardController,
     AdminOrderController,
     CartController,
     CategoryController,
@@ -12,12 +11,6 @@ use App\Http\Controllers\{
     ReviewController,
     PartnerController,
     ViewController
-};
-use Modules\IdentityAccess\Http\Controllers\{
-    AdminUserController,
-    AuthController,
-    UserController,
-    WishlistController
 };
 
 /*
@@ -31,20 +24,6 @@ Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.s
 Route::get('/artisan-profile/{id}', [ViewController::class, 'partnerProfile'])->name('partner.profile');
 Route::get('/about', [ViewController::class, 'about'])->name('about');
 Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
-
-/*
-|--------------------------------------------------------------------------
-| Authentication Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware('guest')->group(function () {
-    Route::get('/login', fn() => view('auth.login'))->name('login');
-    Route::get('/signup', fn() => view('auth.signup'))->name('signup');
-});
-
-Route::post('/createaccount', [AuthController::class, 'register']);
-Route::post('/accessaccount', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
@@ -70,14 +49,6 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('orders.index')->withErrors('Payment cancelled');
     })->name('paypal.cancel');
 
-    /* Identity & Profile */
-    Route::get('/profile', [UserController::class, 'show'])->name('profile');
-    Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
-
-    /* Wishlist System */
-    Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
-    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-
     /* Reviews */
     Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
 });
@@ -88,8 +59,6 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
     /* Order Management */
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -105,13 +74,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
         'update' => 'products.update',
         'destroy' => 'products.destroy',
     ]);
-    Route::resource('users', \Modules\IdentityAccess\Http\Controllers\AdminUserController::class)->except(['create', 'store', 'show'])->names([
-        'index' => 'users.index',
-        'edit' => 'users.edit',
-        'update' => 'users.update',
-        'destroy' => 'users.destroy',
-    ]);
-    Route::post('/users/{id}/approve', [\Modules\IdentityAccess\Http\Controllers\AdminUserController::class, 'approve'])->name('users.approve');
     Route::resource('categories', \App\Http\Controllers\CategoryController::class)->names([
         'index' => 'categories.index',
         'create' => 'categories.create',

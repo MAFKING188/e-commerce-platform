@@ -1,15 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 
-use Modules\IdentityAccess\Http\Controllers\AuthController;
-
 // 🎯 MISSION 7: THE BRIDGE (API LAYER)
-
-Route::post('/login', [AuthController::class, 'apiLogin']);
-Route::post('/register', [AuthController::class, 'apiRegister']);
 
 /*
 |--------------------------------------------------------------------------
@@ -28,22 +22,6 @@ Route::get('/catalog', function () {
             'images'
         ])->paginate(15)
 
-    );
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| TODO: Implement Protected User Route
-| Requirement: Use 'auth:sanctum' middleware to return the authenticated user.
-|--------------------------------------------------------------------------
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-
-    return response()->json(
-        $request->user()
     );
 
 });
