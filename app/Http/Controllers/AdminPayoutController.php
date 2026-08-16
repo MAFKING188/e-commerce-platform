@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payout;
+use Modules\MarketplacePipeline\Models\Payout;
 use Illuminate\Http\Request;
 
 class AdminPayoutController extends Controller

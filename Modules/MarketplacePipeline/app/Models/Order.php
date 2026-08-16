@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\MarketplacePipeline\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\IdentityAccess\Models\User;

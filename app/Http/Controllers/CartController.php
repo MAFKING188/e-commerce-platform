@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
-use App\Models\CartItem;
+use Modules\MarketplacePipeline\Models\Cart;
+use Modules\MarketplacePipeline\Models\CartItem;
 use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
 

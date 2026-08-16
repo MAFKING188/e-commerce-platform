@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
+use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
 
 class AdminOrderController extends Controller
@@ -46,7 +46,7 @@ class AdminOrderController extends Controller
                     // Platform takes commission_rate (default 10%) commission
                     $netAmount = $grossAmount * (1 - config('shop.commission_rate'));
 
-                    \App\Models\Payout::updateOrCreate(
+                    \Modules\MarketplacePipeline\Models\Payout::updateOrCreate(
                         ['order_id' => $order->id, 'partner_id' => $partnerId],
                         ['amount' => $netAmount, 'status' => 'pending']
                     );

@@ -4,7 +4,7 @@ namespace Modules\PartnerHub\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
-use App\Models\Order;
+use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
 
 class PartnerDashboardController extends Controller
@@ -20,7 +20,7 @@ class PartnerDashboardController extends Controller
         $inventoryCount = $partner->products()->count();
         
         // Calculate total revenue and items sold specifically for this partner's items
-        $allOrderItems = \App\Models\OrderItem::whereHas('product.partners', function($q) use ($partner) {
+        $allOrderItems = \Modules\MarketplacePipeline\Models\OrderItem::whereHas('product.partners', function($q) use ($partner) {
             $q->where('partners.id', $partner->id);
         })->get();
 
@@ -38,7 +38,7 @@ class PartnerDashboardController extends Controller
         })->latest()->take(5)->get();
 
         // 📈 Time-Series Analytics: Daily Sales (Last 30 Days)
-        $salesData = \App\Models\OrderItem::whereHas('product.partners', function($q) use ($partner) {
+        $salesData = \Modules\MarketplacePipeline\Models\OrderItem::whereHas('product.partners', function($q) use ($partner) {
                 $q->where('partners.id', $partner->id);
             })
             ->whereHas('order', function($q) {

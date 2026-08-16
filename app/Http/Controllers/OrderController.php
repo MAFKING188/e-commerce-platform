@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Cart;
+use Modules\MarketplacePipeline\Models\Order;
+use Modules\MarketplacePipeline\Models\OrderItem;
+use Modules\MarketplacePipeline\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderCancelled;
 use Modules\CatalogDelivery\Models\Product;
-use App\Models\Payment;
+use Modules\MarketplacePipeline\Models\Payment;
 
 class OrderController extends Controller
 {

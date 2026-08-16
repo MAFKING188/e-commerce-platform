@@ -4,8 +4,8 @@ namespace Modules\IdentityAccess\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Address;
-use App\Models\Cart;
-use App\Models\Order;
+use Modules\MarketplacePipeline\Models\Cart;
+use Modules\MarketplacePipeline\Models\Order;
 use Database\Factories\UserFactory;
 use Modules\CatalogDelivery\Models\Review;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
 use Modules\CatalogDelivery\Models\Product;
-use App\Models\Order;
-use App\Models\OrderItem;
+use Modules\MarketplacePipeline\Models\Order;
+use Modules\MarketplacePipeline\Models\OrderItem;
 use Modules\PartnerHub\Models\Partner;
-use App\Models\Payout;
+use Modules\MarketplacePipeline\Models\Payout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

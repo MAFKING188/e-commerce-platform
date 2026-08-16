@@ -2,8 +2,8 @@
 
 namespace Modules\CatalogDelivery\Models;
 
-use App\Models\CartItem;
-use App\Models\OrderItem;
+use Modules\MarketplacePipeline\Models\CartItem;
+use Modules\MarketplacePipeline\Models\OrderItem;
 use Modules\PartnerHub\Models\Partner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

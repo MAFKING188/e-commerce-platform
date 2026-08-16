@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Models;
+namespace Modules\MarketplacePipeline\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\CatalogDelivery\Models\Product;
 
-class CartItem extends Model
+class OrderItem extends Model
 {
     protected $fillable = [
-    'cart_id',
+    'order_id',
     'product_id',
-    'quantity'
+    'quantity',
+    'price'
 ];
-    public function cart()
+    public function order()
     {
-        return $this->belongsTo(Cart::class);
+        return $this->belongsTo(Order::class);
     }
 
     public function product()

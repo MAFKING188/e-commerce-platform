@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Modules\PartnerHub\Models\Partner;
-use App\Models\Payout;
+use Modules\MarketplacePipeline\Models\Payout;
 use Illuminate\Http\Request;
 
 class PartnerPayoutController extends Controller

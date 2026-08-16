@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Modules\PartnerHub\Models\Partner;
-use App\Models\Order;
+use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
 
 class PartnerOrderController extends Controller

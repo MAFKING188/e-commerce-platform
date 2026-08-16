@@ -2,7 +2,7 @@
 
 namespace Modules\IdentityAccess\Services;
 
-use App\Models\Order;
+use Modules\MarketplacePipeline\Models\Order;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\Review;
 use Modules\IdentityAccess\Models\User;
