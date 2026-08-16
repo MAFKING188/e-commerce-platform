@@ -1,19 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\IdentityAccess\Services;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Review;
 use Modules\IdentityAccess\Models\User;
-use Illuminate\Http\Request;
 
-class AdminDashboardController extends Controller
+class GovernanceService
 {
-    /**
-     * Display the Administrative Command Center.
-     * Centralizes statistics and recent activity for platform management.
-     */
-    public function index()
+    public function getDashboardMetrics(): array
     {
         // 📊 Aggregate Statistics
         $stats = [
@@ -22,7 +18,7 @@ class AdminDashboardController extends Controller
             'catalog_size' => Product::count(),
             'total_members' => User::count(),
             'low_stock_count' => Product::where('stock', '<', 5)->count(),
-            'pending_reviews' => \App\Models\Review::where('status', 'pending')->count(),
+            'pending_reviews' => Review::where('status', 'pending')->count(),
             'pending_users' => User::where('status', 'pending')->count(),
         ];
 
@@ -32,6 +28,6 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentOrders'));
+        return compact('stats', 'recentOrders');
     }
 }
