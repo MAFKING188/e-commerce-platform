@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Order History | SmartShop')
 
 @section('styles')
@@ -171,7 +169,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div style="max-width: 1000px; margin: 0 auto;">
     <div class="orders-header">
@@ -269,4 +267,4 @@
     </div>
 @endif
 
-@endsection
+</x-app-layout>

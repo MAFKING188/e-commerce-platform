@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Support | SmartShop')
 
 @section('styles')
@@ -104,7 +102,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="contact-layout">
     <div class="contact-info">
@@ -156,4 +154,4 @@
     </div>
 </div>
 
-@endsection
+</x-app-layout>

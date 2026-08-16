@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', 'My Orders | Partner Dashboard')
 
-@section('content')
+<x-app-layout>
 @include('partials.partner-nav')
 
 <div style="margin-bottom: 4rem;">
@@ -38,4 +36,4 @@
 <div style="margin-top: 3rem;">
     {{ $orders->links() }}
 </div>
-@endsection
+</x-app-layout>

@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Member Registry | Admin')
 
 @section('styles')
@@ -48,7 +46,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div class="admin-header">
@@ -126,4 +124,4 @@
 <div style="margin-top: 3rem;">
     {{ $users->links() }}
 </div>
-@endsection
+</x-app-layout>

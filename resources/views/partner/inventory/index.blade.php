@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'My Inventory | Partner Dashboard')
 
 @section('styles')
@@ -18,7 +16,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.partner-nav')
 
 <div class="inventory-header">
@@ -95,4 +93,4 @@
         checkboxes.forEach(cb => cb.checked = this.checked);
     });
 </script>
-@endsection
+</x-app-layout>

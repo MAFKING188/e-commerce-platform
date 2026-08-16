@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Member Profile | LUWI')
 
 @section('styles')
@@ -86,7 +84,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="profile-grid">
     <!-- Left: Settings -->
     <div class="settings-card">
@@ -177,4 +175,4 @@
         @endforelse
     </div>
 </div>
-@endsection
+</x-app-layout>

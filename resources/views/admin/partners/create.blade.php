@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Establish Partner | Admin')
 
 @section('styles')
@@ -20,7 +18,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="form-container">
     <div style="margin-bottom: 4rem;">
         <span class="cat-badge">Supply Chain</span>
@@ -69,4 +67,4 @@
         </div>
     </form>
 </div>
-@endsection
+</x-app-layout>

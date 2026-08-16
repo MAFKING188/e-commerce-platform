@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', 'Financial Insights | Partner Dashboard')
 
-@section('content')
+<x-app-layout>
 @include('partials.partner-nav')
 
 <div style="margin-bottom: 4rem;">
@@ -65,4 +63,4 @@
 <div style="margin-top: 3rem;">
     {{ $payouts->links() }}
 </div>
-@endsection
+</x-app-layout>

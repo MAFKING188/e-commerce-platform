@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Our Story | SmartShop')
 
 @section('styles')
@@ -92,7 +90,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="story-hero">
     <div class="story-hero-content">
@@ -140,4 +138,4 @@
     </div>
 </section>
 
-@endsection
+</x-app-layout>

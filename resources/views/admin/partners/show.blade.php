@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', $partner->name . ' | Partner Profile')
 
 @section('styles')
@@ -46,7 +44,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div style="margin-bottom: 2rem;">
     <a href="{{ route('admin.partners.index') }}" style="color: var(--text-400); font-weight: 700;">← Back to Ecosystem</a>
 </div>
@@ -110,4 +108,4 @@
         @endforeach
     </div>
 </div>
-@endsection
+</x-app-layout>

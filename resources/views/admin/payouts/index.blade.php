@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', 'Financial Registry | Admin Command Center')
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div style="margin-bottom: 4rem;">
@@ -60,4 +58,4 @@
 <div style="margin-top: 3rem;">
     {{ $payouts->links() }}
 </div>
-@endsection
+</x-app-layout>

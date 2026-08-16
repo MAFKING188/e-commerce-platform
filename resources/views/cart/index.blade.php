@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Shopping Cart | SmartShop')
 
 @section('styles')
@@ -142,7 +140,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="cart-header">
     <h1>Your Bag</h1>
@@ -218,4 +216,4 @@
     </div>
 @endif
 
-@endsection
+</x-app-layout>

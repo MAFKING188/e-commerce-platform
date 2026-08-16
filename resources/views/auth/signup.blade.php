@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Join the Collection | LUWI')
 
 @section('styles')
@@ -101,7 +99,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="auth-wrapper">
     <div class="auth-card">
         <h1 class="auth-title">Join the Collection</h1>
@@ -141,4 +139,4 @@
         </p>
     </div>
 </div>
-@endsection
+</x-app-layout>

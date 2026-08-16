@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app-layout>
 <div style="background: var(--surface-100); padding: 4rem; border-radius: 2rem; border: 1px solid var(--border); max-width: 600px; margin: 4rem auto; text-align: center;">
     <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 2rem; color: var(--text-900);">Member Status Update</h1>
     
@@ -28,4 +26,4 @@
         &copy; {{ date('Y') }} SmartShop Premium Ecosystem.
     </div>
 </div>
-@endsection
+</x-app-layout>

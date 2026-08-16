@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Category Archive | LUWI Admin')
 
 @section('styles')
@@ -28,7 +26,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div class="admin-header">
@@ -57,4 +55,4 @@
         </div>
     @endforeach
 </div>
-@endsection
+</x-app-layout>

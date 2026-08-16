@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Add Product | Partner Dashboard')
 
 @section('styles')
@@ -13,7 +11,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.partner-nav')
 
 <div style="margin-bottom: 4rem; text-align: center;">
@@ -68,4 +66,4 @@
         </div>
     </form>
 </div>
-@endsection
+</x-app-layout>

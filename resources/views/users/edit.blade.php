@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Edit Member | SmartShop Admin')
 
 @section('styles')
@@ -32,7 +30,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="editor-container">
     <div class="editor-card">
         <span class="cat-badge">Member Editor</span>
@@ -67,4 +65,4 @@
         </form>
     </div>
 </div>
-@endsection
+</x-app-layout>

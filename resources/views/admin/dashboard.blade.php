@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Admin Command Center | LUWI')
 
 @section('styles')
@@ -84,7 +82,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div class="admin-header">
@@ -217,4 +215,4 @@
         </div>
     @endif
 </div>
-@endsection
+</x-app-layout>

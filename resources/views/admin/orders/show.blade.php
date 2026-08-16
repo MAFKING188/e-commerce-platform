@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', 'Order Details | Admin')
 
-@section('content')
+<x-app-layout>
 <div style="max-width: 800px; margin: 0 auto;">
     <div style="margin-bottom: 2rem;">
         <a href="{{ route('admin.orders.index') }}" style="color: var(--text-400); text-decoration: none;">&larr; Back to Orders</a>
@@ -44,4 +42,4 @@
         </table>
     </div>
 </div>
-@endsection
+</x-app-layout>

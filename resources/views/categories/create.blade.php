@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', 'Collection Editor | LUWI Admin')
 
-@section('content')
+<x-app-layout>
 <div style="max-width: 600px; margin: 0 auto;">
     <div style="text-align: center; margin-bottom: 4rem;">
         <span class="cat-badge">Taxonomy Editor</span>
@@ -26,4 +24,4 @@
         </form>
     </div>
 </div>
-@endsection
+</x-app-layout>

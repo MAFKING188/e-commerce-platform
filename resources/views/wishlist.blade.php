@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Your Archive | SmartShop')
 
 @section('styles')
@@ -38,7 +36,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="archive-header">
     <span class="cat-badge" style="margin-bottom: 1rem; display: inline-block;">Personal Curation</span>
     <h1>Your Archive.</h1>
@@ -61,4 +59,4 @@
         @endforeach
     </div>
 @endif
-@endsection
+</x-app-layout>

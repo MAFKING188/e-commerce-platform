@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Curate New Piece | LUWI')
 
 @section('styles')
@@ -133,7 +131,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="editor-stage">
     <div class="editor-header">
@@ -200,4 +198,4 @@
     </div>
 </div>
 
-@endsection
+</x-app-layout>

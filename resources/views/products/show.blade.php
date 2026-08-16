@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app-layout>
 
 <h1>{{ $product->name }}</h1>
 
@@ -45,4 +43,4 @@
     <button type="submit">Add to Cart</button>
 </form>
 
-@endsection
+</x-app-layout>

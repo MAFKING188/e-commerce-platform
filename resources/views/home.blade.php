@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'SmartShop | Premium E-Commerce')
 
 @section('styles')
@@ -87,7 +85,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <section class="hero-luxury">
     <!-- Using ID 1027 (Luxury Watch) for guaranteed Hero display -->
@@ -131,4 +129,4 @@
     </div>
 </section>
 
-@endsection
+</x-app-layout>

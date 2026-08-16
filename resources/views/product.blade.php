@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', $product->name . ' | SmartShop')
 @section('description', \Illuminate\Support\Str::limit($product->description, 160))
 @section('og_image', $product->image_url)
@@ -157,7 +155,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="product-details">
     <!-- Left: Gallery -->
@@ -309,4 +307,4 @@
     }
 </script>
 
-@endsection
+</x-app-layout>

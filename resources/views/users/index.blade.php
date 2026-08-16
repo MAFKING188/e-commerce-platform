@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Member Management | LUWI Admin')
 
 @section('styles')
@@ -57,7 +55,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 <div class="admin-header">
     <div>
         <span class="cat-badge">Member Base</span>
@@ -138,4 +136,4 @@
 <div style="margin-top: 3rem;">
     {{ $users->links('partials.pagination') }}
 </div>
-@endsection
+</x-app-layout>

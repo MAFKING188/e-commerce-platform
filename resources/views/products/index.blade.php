@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Product Inventory | LUWI Admin')
 
 @section('styles')
@@ -89,7 +87,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div class="admin-header">
@@ -158,4 +156,4 @@
     {{ $products->links('partials.pagination') }}
 </div>
 
-@endsection
+</x-app-layout>

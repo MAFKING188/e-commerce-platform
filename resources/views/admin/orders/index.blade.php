@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Order Management | Admin')
 
 @section('styles')
@@ -26,7 +24,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.admin-nav')
 
 <div class="admin-orders-header">
@@ -74,4 +72,4 @@
         </tbody>
     </table>
 </div>
-@endsection
+</x-app-layout>

@@ -1,8 +1,6 @@
-@extends('layouts.app')
-
 @section('title', $partner->name . ' | Partner Profile')
 
-@section('content')
+<x-app-layout>
 <div style="text-align: center; margin-bottom: 4rem;">
     <h1 style="font-size: 3rem; font-weight: 800;">{{ $partner->name }}</h1>
     <p style="color: var(--text-600); max-width: 600px; margin: 1rem auto;">{{ $partner->description }}</p>
@@ -19,4 +17,4 @@
         @endforeach
     </div>
 </div>
-@endsection
+</x-app-layout>

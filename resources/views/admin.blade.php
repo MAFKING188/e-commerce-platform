@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Executive Dashboard | LUWI')
 
 @section('styles')
@@ -65,7 +63,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 
 <div class="dash-header">
     <span class="stat-label">Administrative Portal</span>
@@ -98,4 +96,4 @@
     </a>
 </div>
 
-@endsection
+</x-app-layout>

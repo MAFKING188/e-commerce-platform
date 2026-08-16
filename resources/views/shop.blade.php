@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Archive Collection | SmartShop')
 
 @section('styles')
@@ -97,7 +95,25 @@
 </style>
 @endsection
 
-@section('content')
+@section('scripts')
+<script>
+    function toggleFilters(open) {
+        const drawer = document.getElementById('filterDrawer');
+        const overlay = document.getElementById('filterOverlay');
+        
+        if (open) {
+            drawer.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+</script>
+@endsection
+<x-app-layout>
 
 <div class="shop-header">
     <div>
@@ -177,23 +193,6 @@
     </div>
 @endif
 
-@endsection
+</x-app-layout>
 
-@section('scripts')
-<script>
-    function toggleFilters(open) {
-        const drawer = document.getElementById('filterDrawer');
-        const overlay = document.getElementById('filterOverlay');
-        
-        if (open) {
-            drawer.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        } else {
-            drawer.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-    }
-</script>
-@endsection
+

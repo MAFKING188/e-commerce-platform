@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Refine Product | LUWI Admin')
 
 @section('styles')
@@ -57,7 +55,58 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 @endsection
 
-@section('content')
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const el = document.getElementById('media-gallery');
+        if (el && Sortable) {
+            Sortable.create(el, {
+                animation: 150,
+                onEnd: function() {
+                    const order = Array.from(el.children).map(item => item.dataset.id);
+                    updateVisualSequence({{ $product->id }}, order);
+                }
+            });
+        }
+    });
+
+    function updateVisualSequence(productId, order) {
+        fetch(`{{ url('admin/products') }}/${productId}/reorder-images`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order: order })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showToast(data.message, 'success');
+            }
+        });
+    }
+
+    function deleteVisual(productId, imageId, btn) {
+        if (!confirm('Remove this visual?')) return;
+
+        fetch(`{{ url('admin/products') }}/${productId}/images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.closest('.media-item').remove();
+                showToast(data.message, 'success');
+            }
+        });
+    }
+</script>
+@endsection
+<x-app-layout>
 
 <div class="editor-stage">
     <div class="editor-header">
@@ -130,56 +179,6 @@
     </div>
 </div>
 
-@endsection
+</x-app-layout>
 
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const el = document.getElementById('media-gallery');
-        if (el && Sortable) {
-            Sortable.create(el, {
-                animation: 150,
-                onEnd: function() {
-                    const order = Array.from(el.children).map(item => item.dataset.id);
-                    updateVisualSequence({{ $product->id }}, order);
-                }
-            });
-        }
-    });
 
-    function updateVisualSequence(productId, order) {
-        fetch(`{{ url('admin/products') }}/${productId}/reorder-images`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ order: order })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showToast(data.message, 'success');
-            }
-        });
-    }
-
-    function deleteVisual(productId, imageId, btn) {
-        if (!confirm('Remove this visual?')) return;
-
-        fetch(`{{ url('admin/products') }}/${productId}/images/${imageId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                btn.closest('.media-item').remove();
-                showToast(data.message, 'success');
-            }
-        });
-    }
-</script>
-@endsection

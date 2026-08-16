@@ -1,5 +1,3 @@
-@extends('layouts.app')
-
 @section('title', 'Order Details | Partner Dashboard')
 
 @section('styles')
@@ -19,7 +17,7 @@
 </style>
 @endsection
 
-@section('content')
+<x-app-layout>
 @include('partials.partner-nav')
 
 <div class="order-header">
@@ -103,4 +101,4 @@
         Please ensure all pieces are inspected for quality before dispatch. Once shipped, please update the central logistics hub.
     </p>
 </div>
-@endsection
+</x-app-layout>
