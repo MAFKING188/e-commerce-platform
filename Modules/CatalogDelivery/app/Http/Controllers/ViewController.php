@@ -3,81 +3,24 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
+use Modules\CatalogDelivery\Services\CatalogQueryService;
 
 class ViewController extends Controller
 {
-    public function home()
+    public function home(CatalogQueryService $catalog)
     {
-        $latestProducts = Product::with(['images', 'partners'])
-            ->latest()
-            ->take(8)
-            ->get();
-
-        $featuredProducts = Product::with(['images', 'partners'])
-            ->where('stock', '>', 0)
-            ->latest()
-            ->take(6)
-            ->get();
-
-        return view('catalogdelivery::home', [
-            'latestProducts' => $latestProducts,
-            'featuredProducts' => $featuredProducts
-        ]);
+        return view('catalogdelivery::home', $catalog->home());
     }
 
-    public function shop(Request $request)
+    public function shop(Request $request, CatalogQueryService $catalog)
     {
-        $query = Product::with(['category', 'images', 'partners']);
-
-        // Search by name
-        if($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by category
-        if($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
-
-        // Filter by price range
-        if($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
-        }
-
-        // Sorting
-        $sort = $request->get('sort', 'latest');
-        switch ($sort) {
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'latest':
-            default:
-                $query->latest();
-                break;
-        }
-        
-        // 🚀 PRODUCTION SCALE: Use paginate() instead of get()
-        $products = $query->paginate(12)->withQueryString();
-
-        return view('catalogdelivery::shop', compact('products'));
+        return view('catalogdelivery::shop', ['products' => $catalog->shop($request)]);
     }
 
-    public function product($id)
+    public function product($id, CatalogQueryService $catalog)
     {
-        $product = Product::with(['category', 'images', 'partners', 'reviews' => function($query) {
-                $query->where('status', 'approved')->with('user');
-            }])
-            ->findOrFail($id);
-
-        return view('catalogdelivery::product', compact('product'));
+        return view('catalogdelivery::product', $catalog->product($id));
     }
 
     public function about()
