@@ -15,6 +15,8 @@ class CategoryIndexSmokeTest extends TestCase
         $category = \Modules\CatalogDelivery\Models\Category::factory()->create();
         \Modules\CatalogDelivery\Models\Product::factory()->count(2)->create(['category_id' => $category->id]);
 
+        $this->withoutVite();
+
         $response = $this->actingAs($admin)->get(route('admin.categories.index'));
         $response->assertStatus(200);
         $response->assertSee('2 items mapped');
