@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\CatalogDelivery\Http\Controllers\CatalogDeliveryController;
+use Modules\CatalogDelivery\Models\Product;
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('catalogdeliveries', CatalogDeliveryController::class)->names('catalogdelivery');
+Route::get('/catalog', function () {
+    return Product::with(['category', 'images'])->paginate(15);
 });
