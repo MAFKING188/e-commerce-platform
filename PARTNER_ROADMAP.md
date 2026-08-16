@@ -8,25 +8,28 @@
 ## 2. Functional Modules
 
 ### A. Partner Portal (The Dashboard)
-- **Performance Overview:** Real-time metrics on sales, inventory levels, and pending order items.
-- **Inventory Management:**
-    - CRUD interface for Partner products (hardened with validation).
-    - Status tracking (In Stock, Low Stock, Out of Stock).
-- **Order Fulfillment:**
-    - View recent orders containing Partner items.
-    - Status update interface (e.g., "Ready for Shipment").
+- [x] **Performance Overview:** Real-time metrics on sales, inventory levels, and pending order items.
+- [x] **Visual Analytics:** Time-series charts for revenue and fulfillment tracking.
+- [x] **Financial Sovereignty:** Earnings tracking, pending balance visibility, and payout history.
+- [x] **Inventory Management:**
+    - [x] CRUD interface for Partner products (hardened with validation).
+    - [x] Status tracking (In Stock, Low Stock, Out of Stock).
+    - [x] Advanced Media Manager (Multi-image, Drag-and-drop reordering).
+- [x] **Order Fulfillment:**
+    - [x] View recent orders containing Partner items.
+    - [x] Status update interface (e.g., "Ready for Shipment").
 
 ### B. Administrative Command Center
-- **Registry & Approval:** Admin portal to approve, suspend, or reactivate Partner accounts.
-- **Supply Chain Analytics:** Aggregated insights into Partner performance.
-- **Moderation:** Review moderation portal to curate feedback on Partner products.
+- [x] **Registry & Approval:** Admin portal to approve, suspend, or reactivate Partner accounts.
+- [x] **Automated Outreach:** Instant notification on account status changes.
+- [x] **Financial Command:** Disbursement management for partner payouts.
+- [x] **Moderation:** Review moderation portal to curate feedback on Partner products.
 
-### C. Public-Facing Integration
-- **Product Cards:** Display Partner name/link directly on product cards in the shop.
-- **Partner Profile Page:** High-fidelity page for each Partner, showcasing:
-    - Artisan Philosophy/Story.
-    - Official Website link.
-    - Curated inventory collection.
+### D. Profile & Trust Hardening (Pending)
+- [ ] **Data Normalization:** Implement `profiles` table for user metadata.
+- [ ] **Legal Compliance:** Add GDPR/CCPA consent timestamps (`terms_accepted_at`).
+- [ ] **Partner KYC:** Secure storage for legal/tax identification documents.
+- [ ] **Admin Accountability:** Implement system-wide Audit Log for sensitive administrative actions.
 
 ## 3. UI/UX Implementation Plan
 - **Navigation:**

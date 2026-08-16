@@ -1,0 +1,494 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+% -------- COLORS --------
+\definecolor{mainblue}{RGB}{0,102,204}
+\definecolor{darkgray}{RGB}{80,80,80}
+\definecolor{futuregray}{RGB}{120,120,120}
+
+% -------- SECTION STYLE --------
+\titleformat{\section}{\large\bfseries\color{mainblue}}{}{0em}{}
+\titleformat{\subsection}{\bfseries\color{darkgray}}{}{0em}{}
+\titleformat{\subsubsection}{\bfseries\color{futuregray}}{}{0em}{}
+
+% -------- LINKS --------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mainblue,
+    urlcolor=blue
+}
+
+\title{\textcolor{mainblue}{E-Commerce Platform Architecture} \\
+\large From CRUD to Scalable System}
+\author{LUWI Mafuleti}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+% ==================================================
+\section{Project Vision}
+
+The objective is to transform a basic CRUD system into a scalable e-commerce platform.
+
+The system must support product browsing, cart management, order processing, and administrative control while being extensible for future integrations.
+
+% ==================================================
+\section{Actors (System Roles)}
+
+\subsection{Core (Now)}
+\begin{itemize}[noitemsep]
+    \item Guest – browse products
+    \item User – purchase products
+    \item Admin – manage products, orders and users
+\end{itemize}
+
+\subsection{Future Integration}
+\begin{itemize}[noitemsep]
+    \item Partner – multi-seller marketplace
+\end{itemize}
+
+% ==================================================
+\section{System Features}
+
+\subsection{Core Features (Now)}
+\begin{itemize}[noitemsep]
+    \item Product listing and details
+    \item Add to cart
+    \item Checkout system
+    \item Order creation
+    \item Authentication (login / register)
+\end{itemize}
+
+\subsection{Future Features}
+\begin{itemize}[noitemsep]
+    \item Payment gateway integration
+    \item Product reviews and ratings
+    \item Email notifications
+    \item Advanced search and filtering
+    \item Multi-partner support
+\end{itemize}
+
+% ==================================================
+\section{Database Design}
+
+% ==================================================
+\subsection{Conceptual Data Model (MCD)}
+
+The conceptual data model represents the high-level structure of the system, focusing on entities and their relationships without implementation details.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/mcd.png}
+    \caption{Conceptual Data Model (MCD) of the E-Commerce System}
+\end{figure}
+
+% ==================================================
+\subsection{Logical Data Model (MLD)}
+
+The logical data model defines the database structure, including entities, attributes, and relationships.
+
+\subsubsection{Core Entities}
+
+\begin{itemize}[noitemsep]
+
+\item \textbf{USER} (\underline{id}, name, email, password, role, created\_at, updated\_at)
+
+\item \textbf{CATEGORY} (\underline{id}, name, created\_at, updated\_at)
+
+\item \textbf{PRODUCT} (\underline{id}, name, price, description, stock, image, category\_id, created\_at, updated\_at)
+
+\item \textbf{CART} (\underline{id}, user\_id, created\_at, updated\_at)
+
+\item \textbf{CART\_ITEM} (\underline{id}, cart\_id, product\_id, quantity, created\_at, updated\_at)
+
+\item \textbf{ORDER} (\underline{id}, user\_id, total\_price, status, created\_at, updated\_at)
+
+\item \textbf{ORDER\_ITEM} (\underline{id}, order\_id, product\_id, quantity, price)
+
+\end{itemize}
+
+% ==================================================
+\subsubsection{Extended Entities (Scalability Layer)}
+
+\begin{itemize}[noitemsep]
+
+\item \textbf{PRODUCT\_IMAGE} (\underline{id}, product\_id, url, position)
+
+\item \textbf{PRODUCT\_VARIANT} (\underline{id}, product\_id, sku, size, color, stock, price)
+
+\item \textbf{REVIEW} (\underline{id}, user\_id, product\_id, rating, comment, created\_at)
+
+\item \textbf{PAYMENT} (\underline{id}, order\_id, method, status, transaction\_id, amount, created\_at)
+
+\item \textbf{ADDRESS} (\underline{id}, user\_id, line1, line2, city, state, zip, country)
+
+\item \textbf{VENDOR} (\underline{id}, name, contact\_info, created\_at)
+
+\item \textbf{VENDOR\_PRODUCT} (\underline{id}, partner\_id, product\_id)
+
+\end{itemize}
+% ==================================================
+\section{Relationships (MCD)}
+
+\subsection{Core Relationships}
+\begin{itemize}[noitemsep]
+    \item User \textbf{has many} Orders
+    \item Order \textbf{has many} OrderItems
+    \item Product \textbf{belongs to} Category
+    \item Cart \textbf{belongs to} User
+    \item Cart \textbf{has many} CartItems
+    \item OrderItem \textbf{references} Product
+\end{itemize}
+
+\subsection{Future Relationships}
+\begin{itemize}[noitemsep]
+    \item Product \textbf{has many} Images
+    \item Product \textbf{has many} Variants
+    \item User \textbf{has many} Addresses
+    \item Product \textbf{has many} Reviews
+    \item Order \textbf{has one} Payment
+    \item Partner \textbf{has many} Products
+\end{itemize}
+
+\textbf{Conceptual Diagram:}
+\begin{center}
+\begin{tabular}{c}
+User \; $\rightarrow$ Orders $\rightarrow$ OrderItems $\rightarrow$ Product $\rightarrow$ Category \\
+\quad $\downarrow$ \\
+Cart $\rightarrow$ CartItems $\rightarrow$ Product \\
+\quad $\downarrow$ \\
+Addresses
+\end{tabular}
+\end{center}
+
+
+% ==================================================
+\subsection{Use Case Diagram (UML)}
+
+
+The use case diagram illustrates the interactions between users and the system, highlighting key functionalities such as browsing products, managing the cart, and placing orders.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/usecase.png}
+    \caption{Use Case Diagram of the E-Commerce System}
+\end{figure}
+
+\subsection{Actors and Roles}
+
+The system defines three primary actors, each with distinct roles and permissions:
+
+\begin{itemize}[noitemsep]
+
+\item \textbf{Guest:} An unauthenticated user who can browse products, view product details, and access authentication features such as login and registration.
+
+\item \textbf{Customer:} An authenticated user who can interact fully with the platform, including managing a shopping cart, placing orders, and submitting product reviews.
+
+\item \textbf{Admin:} A privileged user responsible for managing system data, including products, categories, users, and orders. The admin has elevated permissions enforced through role-based access control.
+
+\end{itemize}
+% ==================================================
+\section{Business Logic Considerations}
+
+\subsection{Core (Now)}
+\begin{itemize}[noitemsep]
+    \item Add product to cart
+    \item Create order from cart
+    \item Reduce stock after purchase
+    \item Prevent adding out-of-stock items
+\end{itemize}
+
+\subsection{Future Enhancements}
+\begin{itemize}[noitemsep]
+    \item Restore stock on cancellation
+    \item Merge guest cart after login
+    \item Payment verification and refunds
+    \item Low-stock alerts
+    \item Review moderation
+\end{itemize}
+
+% ==================================================
+\section{Order Lifecycle}
+
+\begin{itemize}[noitemsep]
+    \item pending
+    \item paid
+    \item processing
+    \item shipped
+    \item delivered
+    \item cancelled
+\end{itemize}
+
+% ==================================================
+\section{Application Pages}
+
+\subsection{Public Pages}
+\begin{itemize}[noitemsep]
+    \item Home
+    \item Product list
+    \item Product details
+    \item Login / Register
+\end{itemize}
+
+\subsection{User Pages}
+\begin{itemize}[noitemsep]
+    \item Cart
+    \item Checkout
+    \item Order history
+    \item Profile \& address management
+\end{itemize}
+
+\subsection{Admin Pages}
+\begin{itemize}[noitemsep]
+    \item Dashboard
+    \item Manage Products (CRUD, images, variants)
+    \item Manage Orders (status updates, refunds)
+    \item Manage Users \& Roles
+    \item Review moderation
+\end{itemize}
+
+\subsection{Future Pages}
+\begin{itemize}[noitemsep]
+    \item Partner portal
+    \item Advanced search results
+    \item Wishlist
+\end{itemize}
+
+% ==================================================
+\section{Security Considerations}
+
+\subsection{Core}
+\begin{itemize}[noitemsep]
+    \item CSRF protection (Laravel default)
+    \item Password hashing (bcrypt)
+    \item Input validation \& sanitisation
+\end{itemize}
+
+\subsection{Future}
+\begin{itemize}[noitemsep]
+    \item Role-based access control (admin vs. user)
+    \item Authorization policies for resource actions
+    \item Rate limiting on sensitive endpoints
+    \item Secure payment webhook handling
+\end{itemize}
+
+% ==================================================
+\section{Performance Considerations}
+
+\begin{itemize}[nosep]
+    \item Avoid N+1 queries – eager load relationships
+    \item Index frequently queried columns (e.g., product\_name, category\_id)
+    \item Cache product listings / popular items
+    \item Pagination for large result sets
+\end{itemize}
+
+% ==================================================
+\section{Development Roadmap}
+\begin{longtable}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Phase} & \textbf{Tasks} \\
+\hline
+
+Phase 1 &
+\begin{itemize}[leftmargin=*,nosep]
+    \item Core tables \& migrations
+    \item Product listing \& details
+    \item Cart (session + persistent)
+    \item Order creation (basic statuses)
+    \item Basic authentication
+\end{itemize} \\
+\hline
+
+Phase 2 &
+\begin{itemize}[leftmargin=*,nosep]
+    \item Admin panel (CRUD for products, categories, orders)
+    \item Role-based middleware
+    \item Stock management (decrease / restore)
+    \item Email notifications (order confirmation, password reset)
+\end{itemize} \\
+\hline
+
+Phase 3 &
+\begin{itemize}[leftmargin=*,nosep]
+    \item Payment integration (Stripe / PayPal)
+    \item Product images \& variants
+    \item Search \& filtering (name, category, price)
+    \item Reviews \& ratings
+    \item Low-stock alerts
+\end{itemize} \\
+\hline
+
+Phase 4 &
+\begin{itemize}[leftmargin=*,nosep]
+    \item Multi-partner support
+    \item API layer (Laravel Sanctum)
+    \item Front-end SPA (Vue/React) optional
+    \item Advanced analytics dashboard
+\end{itemize} \\
+\hline
+
+\end{longtable}
+% ==================================================
+\section{Technical Specification Layer}
+
+% ---------------- API ----------------
+\subsection{API Design}
+
+\subsubsection{Core Endpoints (Now)}
+
+\begin{longtable}{|p{5cm}|p{9cm}|}
+\hline
+\textbf{Endpoint} & \textbf{Description} \\
+\hline
+GET /products & Retrieve all products (paginated) \\
+\hline
+GET /products/{id} & Retrieve a single product \\
+\hline
+POST /cart/add & Add product to cart \\
+\hline
+GET /cart & View cart items \\
+\hline
+POST /checkout & Create an order from cart \\
+\hline
+POST /login & Authenticate user \\
+\hline
+POST /register & Create new user account \\
+\hline
+\end{longtable}
+
+\subsubsection{Example Request / Response}
+
+\textbf{POST /checkout}
+
+\textbf{Request:}
+\begin{verbatim}
+{
+  "user_id": 1,
+  "cart_items": [
+    {"product_id": 2, "quantity": 1}
+  ]
+}
+\end{verbatim}
+
+\textbf{Response:}
+\begin{verbatim}
+{
+  "order_id": 15,
+  "status": "pending",
+  "total_price": 250
+}
+\end{verbatim}
+
+% ---------------- VALIDATION ----------------
+\subsection{Validation Rules}
+
+\subsubsection{Core (Now)}
+\begin{itemize}[noitemsep]
+\item Product: name (required), price (numeric), stock (integer)
+\item User: email (unique, valid), password (min 6 chars)
+\item Order: must contain at least one item
+\item Cart: quantity must be > 0
+\end{itemize}
+
+\subsubsection{Future Enhancements}
+\begin{itemize}[noitemsep]
+\item Strong password rules
+\item Email verification
+\item Product SKU uniqueness
+\end{itemize}
+
+% ==================================================
+\section{Business Constraints \& Edge Cases}
+
+\subsection{Core Constraints (Now)}
+\begin{itemize}[noitemsep]
+\item Prevent checkout if cart is empty
+\item Prevent adding products with zero stock
+\item Lock product price at time of order
+\end{itemize}
+
+\subsection{Critical Edge Cases}
+\begin{itemize}[noitemsep]
+\item \textbf{Stock Change During Checkout:} re-validate stock before order creation
+\item \textbf{Race Conditions:} use database transactions to avoid overselling
+\item \textbf{Duplicate Orders:} prevent double submission (idempotency)
+\end{itemize}
+
+\subsection{Future Constraints}
+\begin{itemize}[noitemsep]
+\item Payment failure handling (retry / cancel)
+\item Refund logic and stock restoration
+\item Fraud detection mechanisms
+\end{itemize}
+
+% ==================================================
+\section{System Boundaries}
+
+\subsection{Handled by Laravel (Core)}
+\begin{itemize}[noitemsep]
+\item Routing and controllers
+\item Business logic (orders, cart, products)
+\item Authentication and sessions
+\item Database interaction (Eloquent ORM)
+\end{itemize}
+
+\subsection{External Services (Future)}
+\begin{itemize}[noitemsep]
+\item Payment gateway (Stripe / PayPal)
+\item Email service (notifications, verification)
+\item Search engine (Elasticsearch / Algolia)
+\item CDN for product images
+\end{itemize}
+
+% ==================================================
+\section{Deployment Strategy}
+
+\subsection{Environments}
+\begin{itemize}[noitemsep]
+\item Local: development and testing
+\item Staging: pre-production validation
+\item Production: live system
+\end{itemize}
+
+\subsection{Configuration}
+\begin{itemize}[noitemsep]
+\item Use \texttt{.env} for environment variables
+\item Separate database credentials per environment
+\item Debug mode disabled in production
+\end{itemize}
+
+\subsection{Database Management}
+\begin{itemize}[noitemsep]
+\item Use migrations for schema control
+\item Run migrations during deployment
+\item Seed initial data when necessary
+\end{itemize}
+
+\subsection{Future Improvements}
+\begin{itemize}[noitemsep]
+\item CI/CD pipeline (GitHub Actions)
+\item Automated testing before deployment
+\item Containerization (Docker)
+\end{itemize}
+% ==================================================
+\section{Conclusion}
+
+The project evolves from a simple CRUD application into a structured, production-ready e-commerce platform.
+
+By separating core functionality from future extensions, the architecture remains manageable while providing a clear path for scaling, security hardening, and feature growth.
+
+\end{document}

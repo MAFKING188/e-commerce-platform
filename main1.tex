@@ -1,0 +1,2921 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------- PACKAGES ----------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{listings}
+
+% ---------------- COLORS ----------------
+\definecolor{mainblue}{RGB}{0,102,204}
+\definecolor{darkgray}{RGB}{70,70,70}
+\definecolor{codegray}{RGB}{245,245,245}
+
+% ---------------- SECTION STYLE ----------------
+\titleformat{\section}{\Large\bfseries\color{mainblue}}{}{0em}{}
+\titleformat{\subsection}{\bfseries\color{darkgray}}{}{0em}{}
+
+% ---------------- HYPERREF ----------------
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mainblue,
+    urlcolor=blue
+}
+
+% ---------------- TITLE ----------------
+\title{\textcolor{mainblue}{Phase Execution Document}\\
+\large E-Commerce Laravel Architecture Implementation}
+\author{LUWI Mafuleti}
+\date{\today}
+
+% ==================================================
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ==================================================
+\section{Project Initialization Commands}
+
+\subsection{Laravel Installation}
+\begin{verbatim}
+composer create-project laravel/laravel e-commerce-platform
+\end{verbatim}
+
+\subsection{Development Branch Setup}
+\begin{verbatim}
+composer create-project laravel/laravel "E-Commerce Platform Architecture" dev-develop
+\end{verbatim}
+
+% ==================================================
+\section{System Architecture (MCD)}
+
+\subsection{Conceptual Diagram}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{Untitled.png}
+\end{center}
+
+% ==================================================
+\section{Database Schema (Laravel Migration Implementation)}
+
+This section reflects the actual Laravel migration structure implemented in the project using artisan commands and Schema Builder.
+
+% ==================================================
+\subsection{�� CORE TABLES}
+
+% ===================== USERS =====================
+\subsubsection{1. USERS}
+\begin{verbatim}
+php artisan make:migration create_users_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name', 100);
+    $table->string('email', 150)->unique();
+    $table->string('password');
+    $table->string('role')->default('user');
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== CATEGORIES =====================
+\subsubsection{2. CATEGORIES}
+\begin{verbatim}
+php artisan make:migration create_categories_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('categories', function (Blueprint $table) {
+    $table->id();
+    $table->string('name', 100);
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== PRODUCTS =====================
+\subsubsection{3. PRODUCTS}
+\begin{verbatim}
+php artisan make:migration create_products_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('products', function (Blueprint $table) {
+    $table->id();
+    $table->string('name', 150);
+    $table->decimal('price', 10, 2);
+    $table->text('description')->nullable();
+    $table->integer('stock')->default(0);
+    $table->string('image')->nullable();
+
+    $table->foreignId('category_id')->constrained('categories');
+
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== CART =====================
+\subsubsection{4. CART}
+\begin{verbatim}
+php artisan make:migration create_cart_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('cart', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users');
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== CART ITEMS =====================
+\subsubsection{5. CART ITEMS}
+\begin{verbatim}
+php artisan make:migration create_cart_items_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('cart_items', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('cart_id')->constrained('cart');
+    $table->foreignId('product_id')->constrained('products');
+
+    $table->integer('quantity')->default(1);
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== ORDERS =====================
+\subsubsection{6. ORDERS}
+\begin{verbatim}
+php artisan make:migration create_orders_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('orders', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users');
+
+    $table->decimal('total_price', 10, 2);
+    $table->string('status')->default('pending');
+
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== ORDER ITEMS =====================
+\subsubsection{7. ORDER ITEMS}
+\begin{verbatim}
+php artisan make:migration create_order_items_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('order_items', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('order_id')->constrained('orders');
+    $table->foreignId('product_id')->constrained('products');
+
+    $table->integer('quantity');
+    $table->decimal('price', 10, 2);
+});
+\end{verbatim}
+
+% ==================================================
+\subsection{�� ADVANCED (FUTURE LAYER)}
+
+% ===================== PRODUCT IMAGES =====================
+\subsubsection{8. PRODUCT IMAGES}
+\begin{verbatim}
+php artisan make:migration create_product_images_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('product_images', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('product_id')->constrained('products');
+
+    $table->string('url');
+    $table->integer('position')->default(0);
+});
+\end{verbatim}
+
+% ===================== PRODUCT VARIANTS =====================
+\subsubsection{9. PRODUCT VARIANTS}
+\begin{verbatim}
+php artisan make:migration create_product_variants_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('product_variants', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('product_id')->constrained('products');
+
+    $table->string('sku')->nullable();
+    $table->string('size')->nullable();
+    $table->string('color')->nullable();
+
+    $table->integer('stock')->default(0);
+    $table->decimal('price', 10, 2)->nullable();
+});
+\end{verbatim}
+
+% ===================== REVIEWS =====================
+\subsubsection{10. REVIEWS}
+\begin{verbatim}
+php artisan make:migration create_reviews_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('reviews', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('user_id')->constrained('users');
+    $table->foreignId('product_id')->constrained('products');
+
+    $table->integer('rating');
+    $table->text('comment')->nullable();
+
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== PAYMENTS =====================
+\subsubsection{11. PAYMENTS}
+\begin{verbatim}
+php artisan make:migration create_payments_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('payments', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('order_id')->constrained('orders');
+
+    $table->string('method')->nullable();
+    $table->string('status')->nullable();
+    $table->string('transaction_id')->nullable();
+    $table->decimal('amount', 10, 2)->nullable();
+
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== ADDRESSES =====================
+\subsubsection{12. ADDRESSES}
+\begin{verbatim}
+php artisan make:migration create_addresses_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('addresses', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('user_id')->constrained('users');
+
+    $table->string('line1')->nullable();
+    $table->string('line2')->nullable();
+    $table->string('city')->nullable();
+    $table->string('state')->nullable();
+    $table->string('zip')->nullable();
+    $table->string('country')->nullable();
+});
+\end{verbatim}
+
+% ===================== VENDORS =====================
+\subsubsection{13. VENDORS}
+\begin{verbatim}
+php artisan make:migration create_partners_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('partners', function (Blueprint $table) {
+    $table->id();
+    $table->string('name')->nullable();
+    $table->string('contact_info')->nullable();
+    $table->timestamps();
+});
+\end{verbatim}
+
+% ===================== VENDOR PRODUCTS =====================
+\subsubsection{14. VENDOR PRODUCTS}
+\begin{verbatim}
+php artisan make:migration create_partner_products_table
+\end{verbatim}
+
+\begin{verbatim}
+Schema::create('partner_products', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('partner_id')->constrained('partners');
+    $table->foreignId('product_id')->constrained('products');
+});
+\end{verbatim}% ==================================================
+% ==================================================
+\section{Phase Execution}
+
+\subsection{Step 2: Implement Models and Relationships (Eloquent ORM)}
+
+After completing database migrations, the next step is to define Laravel Eloquent models and establish relationships between entities. This allows the application to interact with the database using an Object Relational Mapping (ORM) approach instead of raw SQL queries.
+
+% ==================================================
+\subsubsection{1. Model Creation Commands}
+
+Each database table has a corresponding Eloquent model:
+
+\begin{verbatim}
+php artisan make:model User
+php artisan make:model Category
+php artisan make:model Product
+php artisan make:model Cart
+php artisan make:model CartItem
+php artisan make:model Order
+php artisan make:model OrderItem
+php artisan make:model ProductImage
+php artisan make:model ProductVariant
+php artisan make:model Review
+php artisan make:model Payment
+php artisan make:model Address
+php artisan make:model Partner
+php artisan make:model PartnerProduct
+\end{verbatim}
+
+% ==================================================
+\subsubsection{2. Core Eloquent Relationships}
+
+% ===================== USER =====================
+\paragraph{User Model}
+\begin{verbatim}
+class User extends Authenticatable
+{
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+}
+\end{verbatim}
+
+% ===================== CATEGORY =====================
+\paragraph{Category Model}
+\begin{verbatim}
+class Category extends Model
+{
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+}
+\end{verbatim}
+
+% ===================== PRODUCT =====================
+\paragraph{Product Model}
+\begin{verbatim}
+class Product extends Model
+{
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function partners()
+    {
+        return $this->belongsToMany(Partner::class, 'partner_products');
+    }
+}
+\end{verbatim}
+
+% ===================== CART =====================
+\paragraph{Cart Model}
+\begin{verbatim}
+class Cart extends Model
+{
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+}
+\end{verbatim}
+
+% ===================== CART ITEM =====================
+\paragraph{CartItem Model}
+\begin{verbatim}
+class CartItem extends Model
+{
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+\end{verbatim}
+
+% ===================== ORDER =====================
+\paragraph{Order Model}
+\begin{verbatim}
+class Order extends Model
+{
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+}
+\end{verbatim}
+
+% ===================== ORDER ITEM =====================
+\paragraph{OrderItem Model}
+\begin{verbatim}
+class OrderItem extends Model
+{
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+\end{verbatim}
+
+% ===================== PAYMENT =====================
+\paragraph{Payment Model}
+\begin{verbatim}
+class Payment extends Model
+{
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+}
+\end{verbatim}
+
+% ===================== REVIEW =====================
+\paragraph{Review Model}
+\begin{verbatim}
+class Review extends Model
+{
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+\end{verbatim}
+
+% ===================== VENDOR =====================
+\paragraph{Partner Model}
+\begin{verbatim}
+class Partner extends Model
+{
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'partner_products');
+    }
+}
+\end{verbatim}\
+% ==================================================
+\section{Phase Execution}
+
+\subsection{Step 3: Implement Controllers (MVC Architecture)}
+
+In this phase, controllers are implemented using Laravel's \textbf{MVC architecture}, focusing on server-rendered views (Blade templates) and session-based interactions.
+
+These controllers handle HTTP requests, coordinate business logic, and return \textbf{views instead of JSON responses}.
+
+% ==================================================
+\subsubsection{1. Controller Generation Commands}
+
+All controllers are generated using Artisan:
+
+\begin{verbatim}
+php artisan make:controller UserController
+php artisan make:controller CategoryController
+php artisan make:controller ProductController
+php artisan make:controller CartController
+php artisan make:controller OrderController
+php artisan make:controller PaymentController
+php artisan make:controller ReviewController
+php artisan make:controller AddressController
+php artisan make:controller PartnerController
+\end{verbatim}
+
+% ==================================================
+\subsubsection{2. MVC Controller Design Principles}
+
+All controllers follow these production MVC principles:
+
+\begin{itemize}[noitemsep]
+    \item Controllers return \textbf{Blade views} instead of JSON responses
+    \item Business logic remains minimal inside controllers
+    \item Data is passed using compact() or with()
+    \item Session-based authentication (Auth facade)
+    \item Validation handled using \textbf{Request validation}
+\end{itemize}
+
+% ==================================================
+\subsubsection{3. Example: ProductController (Web MVC)}
+
+\begin{verbatim}
+class ProductController extends Controller
+{
+    public function index()
+    {
+        $products = Product::with('category')->paginate(12);
+
+        return view('products.index', compact('products'));
+    }
+
+    public function create()
+    {
+        $categories = Category::all();
+
+        return view('products.create', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:150',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'stock' => 'nullable|integer'
+        ]);
+
+        Product::create($validated);
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product created successfully');
+    }
+
+    public function show($id)
+    {
+        $product = Product::with(['category', 'images', 'reviews.user'])
+                          ->findOrFail($id);
+
+        return view('products.show', compact('product'));
+    }
+
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+
+        return view('products.edit', compact('product', 'categories'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $product->update($request->all());
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        Product::destroy($id);
+
+        return redirect()
+            ->route('products.index')
+            ->with('success', 'Product deleted successfully');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{4. Example: CartController (Session-Based Logic)}
+
+\begin{verbatim}
+class CartController extends Controller
+{
+    public function index()
+    {
+        $cart = Cart::with('items.product')
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+        return view('cart.index', compact('cart'));
+    }
+
+    public function add(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $cart = Cart::firstOrCreate([
+            'user_id' => auth()->id()
+        ]);
+
+        CartItem::updateOrCreate(
+            [
+                'cart_id' => $cart->id,
+                'product_id' => $request->product_id
+            ],
+            [
+                'quantity' => $request->quantity
+            ]
+        );
+
+        return redirect()
+            ->back()
+            ->with('success', 'Product added to cart');
+    }
+
+    public function remove($id)
+    {
+        CartItem::destroy($id);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Item removed from cart');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{5. Example: OrderController (Checkout Flow)}
+
+\begin{verbatim}
+class OrderController extends Controller
+{
+    public function index()
+    {
+        $orders = Order::where('user_id', auth()->id())
+                       ->latest()
+                       ->get();
+
+        return view('orders.index', compact('orders'));
+    }
+
+    public function store()
+    {
+        $cart = Cart::with('items.product')
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+        if (!$cart || $cart->items->isEmpty()) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cart is empty');
+        }
+
+        $total = 0;
+
+        foreach ($cart->items as $item) {
+            $total += $item->product->price * $item->quantity;
+        }
+
+        $order = Order::create([
+            'user_id' => auth()->id(),
+            'total_price' => $total,
+            'status' => 'pending'
+        ]);
+
+        foreach ($cart->items as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->product->price
+            ]);
+        }
+
+        $cart->items()->delete();
+
+        return redirect()
+            ->route('orders.index')
+            ->with('success', 'Order placed successfully');
+    }
+}
+\end{verbatim}
+% ==================================================
+\subsubsection{6. CategoryController}
+
+\begin{verbatim}
+class CategoryController extends Controller
+{
+    public function index()
+    {
+        $categories = Category::latest()->get();
+        return view('categories.index', compact('categories'));
+    }
+
+    public function create()
+    {
+        return view('categories.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100'
+        ]);
+
+        Category::create($request->all());
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Category created successfully');
+    }
+
+    public function edit($id)
+    {
+        $category = Category::findOrFail($id);
+        return view('categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        $category->update($request->all());
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Category updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        Category::destroy($id);
+
+        return redirect()->back()
+            ->with('success', 'Category deleted');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{7. ReviewController}
+
+\begin{verbatim}
+class ReviewController extends Controller
+{
+    public function store(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'rating' => 'required|integer|min:1|max:5'
+        ]);
+
+        Review::create([
+            'user_id' => auth()->id(),
+            'product_id' => $request->product_id,
+            'rating' => $request->rating,
+            'comment' => $request->comment
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Review submitted');
+    }
+
+    public function destroy($id)
+    {
+        Review::destroy($id);
+
+        return redirect()->back()
+            ->with('success', 'Review deleted');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{8. AddressController}
+
+\begin{verbatim}
+class AddressController extends Controller
+{
+    public function index()
+    {
+        $addresses = Address::where('user_id', auth()->id())->get();
+        return view('addresses.index', compact('addresses'));
+    }
+
+    public function create()
+    {
+        return view('addresses.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'line1' => 'required|string',
+            'city' => 'required|string',
+            'country' => 'required|string'
+        ]);
+
+        Address::create([
+            'user_id' => auth()->id(),
+            'line1' => $request->line1,
+            'line2' => $request->line2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'zip' => $request->zip,
+            'country' => $request->country
+        ]);
+
+        return redirect()->route('addresses.index')
+            ->with('success', 'Address added');
+    }
+
+    public function destroy($id)
+    {
+        Address::destroy($id);
+
+        return redirect()->back()
+            ->with('success', 'Address removed');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{9. PartnerController}
+
+\begin{verbatim}
+class PartnerController extends Controller
+{
+    public function index()
+    {
+        $partners = Partner::all();
+        return view('partners.index', compact('partners'));
+    }
+
+    public function create()
+    {
+        return view('partners.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string'
+        ]);
+
+        Partner::create($request->all());
+
+        return redirect()->route('partners.index')
+            ->with('success', 'Partner created');
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{10. PaymentController}
+
+\begin{verbatim}
+class PaymentController extends Controller
+{
+    public function store(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'method' => 'required|string'
+        ]);
+
+        Payment::create([
+            'order_id' => $request->order_id,
+            'method' => $request->method,
+            'status' => 'paid',
+            'amount' => Order::find($request->order_id)->total_price
+        ]);
+
+        return redirect()->route('orders.index')
+            ->with('success', 'Payment successful');
+    }
+}
+\end{verbatim}
+
+% ============================================================
+% Part 1: Backend Implementations
+% Insert after Section 5.1.10 (PaymentController)
+% ============================================================
+
+\subsection{Refined Routing \& Controller Hardening}
+
+During the alpha-to-stable transition, the backend was hardened by consolidating redundant routes and implementing advanced business logic for inventory management.
+
+\subsubsection{Consolidated Routing Architecture}
+
+To resolve route shadowing and improve maintainability, the \texttt{web.php} structure was reorganized into logical access tiers:
+
+\begin{itemize}
+    \item \textbf{Public Tier}: Product discovery and catalog browsing.
+    \item \textbf{Auth Tier}: Persistent cart management and checkout flows.
+    \item \textbf{Admin Tier}: Secure CRUD operations via \texttt{admin} middleware.
+\end{itemize}
+
+\subsubsection{Order Lifecycle and Stock Restoration}
+
+A robust cancellation mechanism was implemented in the \texttt{OrderController}. Using \texttt{DB::beginTransaction()}, the system ensures data integrity during cancellations by:
+
+\begin{itemize}
+    \item Validating that only \texttt{pending} orders can be cancelled.
+    \item Automatically restoring product \texttt{stock} based on \texttt{order\_items} quantities.
+    \item Updating the order status to \texttt{cancelled} in an atomic operation.
+\end{itemize}
+
+\subsubsection{Discovery Engine: Search and Filtering}
+
+The \texttt{ViewController} was enhanced with a dynamic query-building mechanism using Eloquent’s \texttt{when()} and \texttt{filled()} methods. This allows:
+
+\begin{itemize}
+    \item Keyword-based product search by name.
+    \item Category filtering in combination with search queries.
+    \item Efficient query execution without introducing N+1 performance issues.
+\end{itemize}
+
+
+% ==================================================
+% ==================================================
+\subsubsection{6. Production MVC Best Practices}
+
+\begin{itemize}[noitemsep]
+    \item Blade-based rendering (server-side views)
+    \item Redirect + flash messaging for UX feedback
+    \item Authentication handled via Auth facade
+    \item Clean separation between controller and view logic
+    \item Eloquent relationships used for efficient data loading
+    \item Pagination for large datasets
+    \item Form validation inside controller (or Form Requests in future phase)
+\end{itemize}
+
+% ==================================================
+\subsubsection{7. Next Phase Notes}
+
+\begin{itemize}[noitemsep]
+    \item Build Blade UI templates (layouts, components)
+    \item Implement middleware (auth, admin roles)
+    \item Introduce Form Request validation layer
+    \item Add file upload handling (product images)
+\end{itemize}
+
+% ==================================================
+\section{Next Phase: System Enhancement and Hardening}
+
+\subsection{5.1.12 Production Notes (ReviewController)}
+
+The ReviewController implementation follows standard MVC practices, with additional considerations for production readiness:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{index()} → Typically restricted to \textbf{admin-side usage} for viewing and moderating all reviews.
+    
+    \item \textbf{create(\$productId)} → Ensures that every review is explicitly linked to a specific product, preventing orphan records.
+    
+    \item \textbf{store()} → Uses \textbf{auth()->id()} to securely associate the review with the currently authenticated user, avoiding manual user input and preventing impersonation.
+    
+    \item \textbf{update()} → Uses \textbf{\$request->only()} instead of \textbf{all()} to limit mass assignment and improve data security.
+    
+    \item \textbf{destroy()} → Currently performs direct deletion, but in a production environment should be extended with \textbf{authorization policies} to ensure users can only delete their own reviews or require admin privileges.
+\end{itemize}
+
+% ==================================================
+\section{Phase Execution: Frontend and Application Layer}
+
+\subsection{1. Blade UI Templates (View Layer Implementation)}
+
+In this phase, the application frontend is developed using Laravel Blade templating. The goal is to create a reusable, maintainable UI structure.
+
+\subsubsection{Layout Structure}
+
+\begin{verbatim}
+resources/views/
+│── layouts/
+│   └── app.blade.php
+│── components/
+│── products/
+│── cart/
+│── orders/
+│── users/
+\end{verbatim}
+
+\subsubsection{Main Layout Example}
+
+\begin{verbatim}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-Commerce Platform</title>
+</head>
+<body>
+
+@include('partials.nav')
+
+<div class="container">
+    @yield('content')
+</div>
+
+</body>
+</html>
+\end{verbatim}
+
+% ==================================================
+\subsection{2. Middleware Implementation (Authentication and Roles)}
+
+Middleware is used to restrict access to certain routes based on authentication and user roles.
+
+\subsubsection{Middleware Creation}
+
+\begin{verbatim}
+php artisan make:middleware AdminMiddleware
+\end{verbatim}
+
+\subsubsection{Middleware Logic}
+
+\begin{verbatim}
+public function handle($request, Closure $next)
+{
+    if (auth()->user() && auth()->user()->role === 'admin') {
+        return $next($request);
+    }
+
+    return redirect()->route('home')
+        ->with('error', 'Access denied');
+}
+\end{verbatim}
+
+% ==================================================
+% ============================================================
+% Part 2: Secure Validation (Form Requests)
+% Replace Section 7.3
+% ============================================================
+
+\subsection{Security Layer: Advanced Form Requests}
+
+Validation and authorization concerns were decoupled from controllers using the \texttt{StoreProductRequest} class.
+
+\begin{itemize}
+    \item \textbf{Granular Authorization}: The \texttt{authorize()} method enforces \texttt{auth()->user()->role === 'admin'}, preventing unauthorized product creation at the request level.
+    
+    \item \textbf{Strict Validation Rules}: Enforced constraints include:
+    \begin{itemize}
+        \item \texttt{price}: numeric and required
+        \item \texttt{stock}: integer validation
+        \item \texttt{category\_id}: existence check in categories table
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Controller Usage}
+
+\begin{verbatim}
+public function store(StoreProductRequest $request)
+{
+    Product::create($request->validated());
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{4. File Upload Handling (Product Images)}
+
+File uploads are handled securely using Laravel storage.
+
+\subsubsection{Upload Implementation}
+
+\begin{verbatim}
+public function store(Request $request)
+{
+    $path = $request->file('image')->store('products', 'public');
+
+    Product::create([
+        'name' => $request->name,
+        'image' => $path
+    ]);
+}
+\end{verbatim}
+
+\subsubsection{Display in Blade}
+
+\begin{verbatim}
+<img src="{{ asset('storage/' . $product->image) }}">
+\end{verbatim}
+
+% ==================================================
+\subsection{5. Production Considerations}
+
+\begin{itemize}[noitemsep]
+    \item Separation of concerns between controllers, validation, and views
+    \item Secure authentication and role-based access control
+    \item Reusable UI components for scalability
+    \item Proper file storage and access handling
+\end{itemize}
+
+% ==================================================
+
+% ==================================================
+\subsection{Transition to Full Application Layer}
+
+At this stage, the system evolves from a backend-structured application into a complete full-stack solution. Emphasis shifts toward:
+
+\begin{itemize}[noitemsep]
+    \item User experience (UI/UX)
+    \item Security and access control
+    \item Codebase modularity and maintainability
+    \item Scalability and production deployment readiness
+\end{itemize}
+
+% ==================================================
+\section{Blade UI System Implementation}
+
+\subsection{1. View Architecture Overview}
+
+The frontend layer is implemented using Laravel Blade templating. The structure is designed for reusability, maintainability, and scalability.
+
+\begin{verbatim}
+resources/views/
+│── layouts/
+│   └── app.blade.php
+│── partials/
+│   ├── nav.blade.php
+│   └── footer.blade.php
+│── components/
+│   └── product-card.blade.php
+│── products/
+│   ├── index.blade.php
+│   └── show.blade.php
+│── cart/
+│── orders/
+│── dashboard/
+│── home.blade.php
+\end{verbatim}
+
+% ==================================================
+\subsection{2. Main Layout (Master Template)}
+
+All views extend a central layout to ensure consistency.
+
+\begin{verbatim}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title', 'E-Commerce')</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
+<body>
+
+@include('partials.nav')
+
+<div class="container">
+    @yield('content')
+</div>
+
+@include('partials.footer')
+
+</body>
+</html>
+\end{verbatim}
+
+% ==================================================
+\subsection{3. Navigation Bar (Reusable Partial)}
+
+\begin{verbatim}
+<nav>
+    <a href="{{ route('home') }}">Home</a>
+    <a href="{{ route('shop') }}">Shop</a>
+
+    @auth
+        <a href="{{ route('cart.index') }}">Cart</a>
+        <a href="{{ route('orders.index') }}">Orders</a>
+    @endauth
+
+    @guest
+        <a href="{{ route('login') }}">Login</a>
+    @endguest
+</nav>
+\end{verbatim}
+
+% ==================================================
+\subsection{4. Product Listing View (Grid System)}
+
+\begin{verbatim}
+@extends('layouts.app')
+
+@section('content')
+<h1>Products</h1>
+
+<div class="grid">
+    @foreach($products as $product)
+        @include('components.product-card', ['product' => $product])
+    @endforeach
+</div>
+
+{{ $products->links() }}
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsection{5. Product Card Component (Reusable UI)}
+
+\begin{verbatim}
+<div class="product-card">
+    <img src="{{ asset('storage/' . $product->image) }}">
+
+    <h3>{{ $product->name }}</h3>
+    <p>${{ $product->price }}</p>
+
+    <a href="{{ route('products.show', $product->id) }}">
+        View Details
+    </a>
+</div>
+\end{verbatim}
+
+% ==================================================
+\subsection{6. Product Detail Page}
+
+\begin{verbatim}
+@extends('layouts.app')
+
+@section('content')
+<h1>{{ $product->name }}</h1>
+
+<img src="{{ asset('storage/' . $product->image) }}">
+
+<p>{{ $product->description }}</p>
+<p>Price: ${{ $product->price }}</p>
+
+<form method="POST" action="{{ route('cart.add') }}">
+    @csrf
+    <input type="hidden" name="product_id" value="{{ $product->id }}">
+    <button type="submit">Add to Cart</button>
+</form>
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsection{7. Dashboard Structure}
+
+\begin{verbatim}
+@extends('layouts.app')
+
+@section('content')
+<h1>Dashboard</h1>
+
+<ul>
+    <li><a href="{{ route('products.index') }}">Manage Products</a></li>
+    <li><a href="{{ route('orders.index') }}">View Orders</a></li>
+    <li><a href="{{ route('users.index') }}">Manage Users</a></li>
+</ul>
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsection{8. Blade Concepts Used}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{@extends} → Inherits a layout template
+    \item \textbf{@section / @yield} → Defines and injects content
+    \item \textbf{@include} → Reuses partial views
+    \item \textbf{@foreach} → Iterates over collections
+    \item \textbf{@auth / @guest} → Conditional rendering based on authentication
+    \item \textbf{\{\{ \}\}} → Outputs escaped data
+    \item \textbf{@csrf} → Protects forms from CSRF attacks
+\end{itemize}
+
+% ==================================================
+\subsection{9. Production UI Best Practices}
+
+\begin{itemize}[noitemsep]
+    \item Centralized layout for consistent design
+    \item Reusable components to reduce duplication
+    \item Separation between UI and business logic
+    \item Pagination for performance optimization
+    \item Secure form handling using CSRF protection
+\end{itemize}
+
+% ==================================================
+
+% ==================================================
+\section{Routing Architecture (web.php)}
+
+\subsection{1. Overview}
+
+Routing defines how HTTP requests are mapped to controller actions. In this project, routes are structured using Laravel's \textbf{web.php} file and follow a clean, modular MVC approach.
+
+Key objectives:
+\begin{itemize}[noitemsep]
+    \item Maintain readability and organization
+    \item Group related routes logically
+    \item Apply middleware for access control
+    \item Use named routes for maintainability
+\end{itemize}
+
+% ==================================================
+\subsection{2. Basic Route Structure}
+
+\begin{verbatim}
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{
+    ViewController,
+    ProductController,
+    CartController,
+    OrderController,
+    UserController
+};
+\end{verbatim}
+
+% ==================================================
+\subsection{3. Public Routes (Frontend Pages)}
+
+\begin{verbatim}
+Route::get('/', [ViewController::class, 'home'])->name('home');
+Route::get('/shop', [ViewController::class, 'shop'])->name('shop');
+Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.show');
+
+Route::get('/about', [ViewController::class, 'about'])->name('about');
+Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
+\end{verbatim}
+
+% ==================================================
+\subsection{4. Authentication-Protected Routes}
+
+\begin{verbatim}
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+
+});
+\end{verbatim}
+
+% ==================================================
+\subsection{5. Admin Routes (Role-Based Access)}
+
+\begin{verbatim}
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    Route::resource('products', ProductController::class);
+    Route::resource('users', UserController::class);
+});
+\end{verbatim}
+
+% ==================================================
+\subsection{6. Resource Controllers}
+
+Laravel resource routing automatically generates CRUD routes.
+
+\begin{verbatim}
+Route::resource('categories', CategoryController::class);
+\end{verbatim}
+
+This creates:
+\begin{itemize}[noitemsep]
+    \item index
+    \item create
+    \item store
+    \item show
+    \item edit
+    \item update
+    \item destroy
+\end{itemize}
+
+% ==================================================
+\subsection{7. Named Routes}
+
+Named routes improve maintainability and readability.
+
+\begin{verbatim}
+route('products.index')
+route('cart.add')
+\end{verbatim}
+
+Advantages:
+\begin{itemize}[noitemsep]
+    \item Avoid hardcoded URLs
+    \item Easier refactoring
+    \item Cleaner Blade templates
+\end{itemize}
+
+% ==================================================
+\subsection{8. Middleware Usage}
+
+Middleware is applied to protect routes and control access.
+
+\begin{itemize}[noitemsep]
+    \item \textbf{auth} → Ensures user is logged in
+    \item \textbf{admin} → Restricts access to administrators
+\end{itemize}
+
+\begin{verbatim}
+Route::middleware(['auth'])->group(function () {
+    // Protected routes
+});
+\end{verbatim}
+
+% ==================================================
+\subsection{9. Production Routing Best Practices}
+
+\begin{itemize}[noitemsep]
+    \item Group routes by functionality
+    \item Use prefixes for admin sections
+    \item Apply middleware consistently
+    \item Use resource controllers for CRUD
+    \item Always use named routes
+\end{itemize}
+
+% ==================================================
+
+% ==================================================
+\section{Authorization Policies (Access Control Layer)}
+
+\subsection{1. Overview}
+
+Authorization policies are used to control user permissions within the application. They ensure that only authorized users can perform specific actions such as updating or deleting resources.
+
+This introduces a critical \textbf{security layer} that operates between controllers and models.
+
+% ==================================================
+\subsection{2. Policy Creation}
+
+Policies are generated using Artisan:
+
+\begin{verbatim}
+php artisan make:policy ProductPolicy --model=Product
+php artisan make:policy ReviewPolicy --model=Review
+\end{verbatim}
+
+% ==================================================
+\subsection{3. ProductPolicy Implementation}
+
+\begin{verbatim}
+class ProductPolicy
+{
+    public function update(User $user, Product $product)
+    {
+        return $user->role === 'admin';
+    }
+
+    public function delete(User $user, Product $product)
+    {
+        return $user->role === 'admin';
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{4. ReviewPolicy Implementation}
+
+\begin{verbatim}
+class ReviewPolicy
+{
+    public function update(User $user, Review $review)
+    {
+        return $user->id === $review->user_id;
+    }
+
+    public function delete(User $user, Review $review)
+    {
+        return $user->id === $review->user_id
+            || $user->role === 'admin';
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{5. Policy Registration}
+
+Policies must be registered in the AuthServiceProvider:
+
+\begin{verbatim}
+protected $policies = [
+    Product::class => ProductPolicy::class,
+    Review::class => ReviewPolicy::class,
+];
+\end{verbatim}
+
+% ==================================================
+\subsection{6. Using Policies in Controllers}
+
+Policies are enforced using the \textbf{authorize()} method.
+
+\begin{verbatim}
+public function update(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
+
+    $this->authorize('update', $product);
+
+    $product->update($request->all());
+}
+\end{verbatim}
+
+\begin{verbatim}
+public function destroy($id)
+{
+    $review = Review::findOrFail($id);
+
+    $this->authorize('delete', $review);
+
+    $review->delete();
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{7. Blade Authorization}
+
+Policies can also be applied in Blade templates:
+
+\begin{verbatim}
+@can('update', $product)
+    <a href="{{ route('products.edit', $product->id) }}">
+        Edit
+    </a>
+@endcan
+\end{verbatim}
+
+% ==================================================
+\subsection{8. Security Benefits}
+
+\begin{itemize}[noitemsep]
+    \item Prevent unauthorized data modification
+    \item Enforce ownership rules (user-specific resources)
+    \item Centralize access control logic
+    \item Improve maintainability and scalability
+\end{itemize}
+
+% ==================================================
+\subsection{9. Production Best Practices}
+
+\begin{itemize}[noitemsep]
+    \item Always validate authorization before critical actions
+    \item Avoid placing authorization logic directly in controllers
+    \item Use policies for all user-owned resources
+    \item Combine policies with middleware for layered security
+\end{itemize}
+
+% ==================================================
+
+% ==================================================
+\section{System Architecture Summary}
+
+\subsection{1. Overview}
+
+The E-Commerce platform is designed using a layered \textbf{MVC (Model-View-Controller)} architecture provided by Laravel. The system separates concerns across multiple layers to ensure scalability, maintainability, and security.
+
+The architecture follows a structured flow:
+
+\begin{center}
+User Interface (Blade Views) $\rightarrow$ Controllers $\rightarrow$ Models (Eloquent ORM) $\rightarrow$ Database
+\end{center}
+
+% ==================================================
+\subsection{2. Architectural Layers}
+
+\subsubsection{2.1 Presentation Layer (View)}
+
+Implemented using Laravel Blade templating, this layer is responsible for rendering the user interface.
+
+\begin{itemize}[noitemsep]
+    \item Dynamic pages using Blade templates
+    \item Reusable layouts and components
+    \item User interaction through forms and navigation
+\end{itemize}
+
+\subsubsection{2.2 Application Layer (Controllers)}
+
+Controllers handle incoming HTTP requests and coordinate application logic.
+
+\begin{itemize}[noitemsep]
+    \item Process user input
+    \item Interact with models
+    \item Return views or redirects
+\end{itemize}
+
+\subsubsection{2.3 Domain Layer (Models)}
+
+The domain layer is implemented using Laravel Eloquent ORM.
+
+\begin{itemize}[noitemsep]
+    \item Represents database entities
+    \item Defines relationships (One-to-Many, Many-to-Many)
+    \item Encapsulates data access logic
+\end{itemize}
+
+\subsubsection{2.4 Data Layer (Database)}
+
+The database layer is defined through migrations and schema design.
+
+\begin{itemize}[noitemsep]
+    \item Structured relational schema
+    \item Foreign key constraints for integrity
+    \item Optimized for transactional operations (orders, payments)
+\end{itemize}
+
+% ==================================================
+\subsection{3. Cross-Cutting Concerns}
+
+\subsubsection{3.1 Routing}
+
+Defines how requests are mapped to controllers using \textbf{web.php}.
+
+\subsubsection{3.2 Middleware}
+
+Handles request filtering and access control.
+
+\begin{itemize}[noitemsep]
+    \item Authentication (auth)
+    \item Role-based access (admin)
+\end{itemize}
+
+\subsubsection{3.3 Validation Layer}
+
+Implemented using Form Request classes to ensure data integrity and clean controller logic.
+
+\subsubsection{3.4 Authorization}
+
+Policies enforce permissions and ownership rules across the system.
+
+% ==================================================
+\subsection{4. Data Flow Execution}
+
+A typical request follows this lifecycle:
+
+\begin{enumerate}[noitemsep]
+    \item User sends request via browser
+    \item Route maps request to a controller
+    \item Middleware validates access permissions
+    \item Controller processes request
+    \item Model interacts with database
+    \item Response returned as a Blade view
+\end{enumerate}
+
+% ==================================================
+\subsection{5. Security Architecture}
+
+Security is enforced at multiple levels:
+
+\begin{itemize}[noitemsep]
+    \item Authentication using Laravel Auth system
+    \item Authorization via policies
+    \item CSRF protection for all forms
+    \item Input validation using Form Requests
+\end{itemize}
+
+% ==================================================
+\subsection{6. Scalability and Maintainability}
+
+The system is designed with future growth in mind:
+
+\begin{itemize}[noitemsep]
+    \item Modular controller structure
+    \item Reusable Blade components
+    \item Separation of concerns across layers
+    \item Extendable database schema
+\end{itemize}
+
+% ==================================================
+\subsection{7. Final System Perspective}
+
+The application has evolved from a basic backend structure into a complete full-stack system:
+
+\begin{itemize}[noitemsep]
+    \item Backend: Database, Models, Controllers
+    \item Frontend: Blade UI system
+    \item Security: Middleware and Policies
+    \item Infrastructure: Routing and Validation layers
+\end{itemize}
+
+This layered architecture ensures that the system is production-ready, maintainable, and scalable for future enhancements.
+
+
+% ==================================================
+\section{Database Seeding and Test Data Initialization}
+
+\subsection{1. Seeding Strategy (Modular Approach)}
+
+To ensure maintainability and scalability, data seeding is implemented using a modular approach. Instead of placing all logic in a single file, multiple seeders are created for each domain.
+
+\begin{verbatim}
+php artisan make:seeder UserSeeder
+php artisan make:seeder CategorySeeder
+php artisan make:seeder ProductSeeder
+php artisan make:seeder ReviewSeeder
+php artisan make:seeder OrderSeeder
+\end{verbatim}
+
+This approach improves organization and allows selective data generation.
+
+% ==================================================
+\subsection{2. DatabaseSeeder (Main Entry Point)}
+
+The \textbf{DatabaseSeeder} class serves as the central execution point for all seeders.
+
+\begin{verbatim}
+public function run()
+{
+    $this->call([
+        UserSeeder::class,
+        CategorySeeder::class,
+        ProductSeeder::class,
+        ReviewSeeder::class,
+        OrderSeeder::class,
+    ]);
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{3. UserSeeder (Role-Based Data)}
+
+Users are seeded with different roles to support authentication and authorization testing.
+
+\begin{verbatim}
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+public function run()
+{
+    User::create([
+        'name' => 'Admin User',
+        'email' => 'admin@test.com',
+        'password' => Hash::make('password'),
+        'role' => 'admin'
+    ]);
+
+    User::create([
+        'name' => 'John Doe',
+        'email' => 'user1@test.com',
+        'password' => Hash::make('password'),
+        'role' => 'user'
+    ]);
+
+    User::create([
+        'name' => 'Jane Doe',
+        'email' => 'user2@test.com',
+        'password' => Hash::make('password'),
+        'role' => 'user'
+    ]);
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{4. CategorySeeder}
+
+\begin{verbatim}
+use App\Models\Category;
+
+public function run()
+{
+    $categories = [
+        'Electronics',
+        'Clothing',
+        'Books',
+        'Home & Kitchen'
+    ];
+
+    foreach ($categories as $category) {
+        Category::create(['name' => $category]);
+    }
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{5. ProductSeeder}
+
+\begin{verbatim}
+use App\Models\Product;
+
+public function run()
+{
+    Product::create([
+        'name' => 'Laptop',
+        'price' => 1200,
+        'category_id' => 1,
+        'stock' => 10,
+        'description' => 'High performance laptop'
+    ]);
+
+    Product::create([
+        'name' => 'T-Shirt',
+        'price' => 25,
+        'category_id' => 2,
+        'stock' => 50
+    ]);
+
+    Product::create([
+        'name' => 'Cooking Book',
+        'price' => 15,
+        'category_id' => 3,
+        'stock' => 30
+    ]);
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{6. ReviewSeeder (Policy Testing Data)}
+
+\begin{verbatim}
+use App\Models\Review;
+
+public function run()
+{
+    Review::create([
+        'user_id' => 2,
+        'product_id' => 1,
+        'rating' => 5,
+        'comment' => 'Excellent product'
+    ]);
+
+    Review::create([
+        'user_id' => 3,
+        'product_id' => 1,
+        'rating' => 4,
+        'comment' => 'Very good'
+    ]);
+}
+\end{verbatim}
+
+This setup ensures:
+\begin{itemize}[noitemsep]
+    \item Different users own different reviews
+    \item Authorization policies can be properly tested
+\end{itemize}
+
+% ==================================================
+\subsection{7. OrderSeeder}
+
+\begin{verbatim}
+use App\Models\Order;
+use App\Models\OrderItem;
+
+public function run()
+{
+    $order = Order::create([
+        'user_id' => 2,
+        'total_price' => 1200,
+        'status' => 'completed'
+    ]);
+
+    OrderItem::create([
+        'order_id' => $order->id,
+        'product_id' => 1,
+        'quantity' => 1,
+        'price' => 1200
+    ]);
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{8. Running Seeders}
+
+\begin{verbatim}
+php artisan migrate:fresh --seed
+\end{verbatim}
+
+This command:
+\begin{itemize}[noitemsep]
+    \item Drops all existing tables
+    \item Re-runs all migrations
+    \item Executes all seeders
+\end{itemize}
+
+% ==================================================
+
+% ==================================================
+
+% ==================================================
+
+% ==================================================
+\section{E-Commerce Platform: Final Configuration and Bug Fixes}
+
+\subsection{1. Problem Identification}
+
+Although the core database migrations and models are correctly implemented, several issues prevent the system from functioning as expected:
+
+\begin{itemize}[noitemsep]
+    \item Controllers are not retrieving data from the database
+    \item Blade views lack iteration logic for displaying collections
+    \item Missing directory structure for administrative views
+    \item Certain controller methods contain incomplete logic
+\end{itemize}
+
+These issues result in empty views, broken navigation, and improper system behavior.
+
+% ==================================================
+\subsection{2. Solutions and Implementation}
+
+\subsubsection{2.1 Data Retrieval in ViewController}
+
+The \texttt{shop()} and \texttt{product()} methods must retrieve data from the database and pass it to the views.
+
+\begin{verbatim}
+// File: app/Http/Controllers/ViewController.php
+
+public function shop()
+{
+    $products = \App\Models\Product::with('category')->get();
+    return view('shop', compact('products'));
+}
+
+public function product($id)
+{
+    $product = \App\Models\Product::with(['category', 'images'])
+                ->findOrFail($id);
+
+    return view('product', compact('product'));
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{2.2 Implementing the Shop View}
+
+The shop view must iterate over the product collection using Blade syntax.
+
+\begin{verbatim}
+<!-- File: resources/views/shop.blade.php -->
+
+@extends('layouts.app')
+
+@section('content')
+    <h1>Shop Catalog</h1>
+
+    <div class="product-grid">
+        @foreach($products as $product)
+            <div class="product-card">
+                <h3>{{ $product->name }}</h3>
+                <p>Price: ${{ number_format($product->price, 2) }}</p>
+
+                <a href="{{ route('product.show', $product->id) }}">
+                    View Details
+                </a>
+            </div>
+        @endforeach
+    </div>
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsubsection{2.3 Fixing ProductController Logic}
+
+The \texttt{edit()} method must return a view instead of a redirect to allow user interaction.
+
+\begin{verbatim}
+// File: app/Http/Controllers/ProductController.php
+
+public function edit($id)
+{
+    $product = Product::findOrFail($id);
+    $categories = Category::all();
+
+    return view('products.edit', compact('product', 'categories'));
+}
+\end{verbatim}
+
+% ==================================================
+\subsubsection{2.4 Administrative View Structure}
+
+Laravel expects views to follow a structured directory convention. Ensure the following files exist:
+
+\begin{itemize}[noitemsep]
+    \item \texttt{resources/views/products/index.blade.php}
+    \item \texttt{resources/views/products/create.blade.php}
+    \item \texttt{resources/views/products/edit.blade.php}
+\end{itemize}
+
+% ==================================================
+\subsection{3. Critical Observations}
+
+\subsubsection{3.1 Middleware Configuration}
+
+The \texttt{admin} middleware must be properly registered to avoid access errors.
+
+\begin{verbatim}
+// File: bootstrap/app.php OR app/Http/Kernel.php
+
+'admin' => \App\Http\Middleware\AdminMiddleware::class,
+\end{verbatim}
+
+\subsubsection{3.2 Model Relationship Correction}
+
+The \texttt{Product} model relationship for reviews must reflect a one-to-many relationship.
+
+\begin{verbatim}
+// File: app/Models/Product.php
+
+public function reviews()
+{
+    return $this->hasMany(Review::class);
+}
+\end{verbatim}
+
+% ==================================================
+\subsection{4. Outcome}
+
+After applying these fixes:
+
+\begin{itemize}[noitemsep]
+    \item Products are correctly retrieved and displayed
+    \item Views render dynamic data using Blade
+    \item Administrative routes function properly
+    \item Controller logic aligns with MVC principles
+\end{itemize}
+
+The system now operates as a functional and consistent e-commerce application.
+
+% ==================================================
+\section{Frontend Enhancement and Feature Expansion Plan}
+
+This section defines the progressive enhancement strategy for the E-Commerce platform, moving from basic UI structure to a fully interactive and production-ready interface.
+
+The implementation is divided into three incremental phases to ensure structured development and maintainability.
+
+% ==================================================
+\subsection{Option A — User Interface (UI) Improvements}
+
+The first phase focuses on improving the visual and structural quality of the application.
+
+\begin{itemize}[noitemsep]
+    \item Integration of product images into product cards
+    \item Enhancement of product card styling (spacing, alignment, shadows)
+    \item Implementation of responsive grid layout for mobile, tablet, and desktop views
+\end{itemize}
+
+\textbf{Goal:} Improve user experience and visual presentation without modifying core business logic.
+
+% ==================================================
+\subsection{Option B — Functional Feature Enhancements}
+
+The second phase introduces core user-facing functionalities that improve usability and navigation.
+
+\begin{itemize}[noitemsep]
+    \item Implementation of search bar for product filtering
+    \item Category-based filtering system
+    \item Pagination for product listings to improve performance and usability
+\end{itemize}
+
+\textbf{Goal:} Improve data accessibility and navigation efficiency within the platform.
+
+% ==================================================
+\subsection{Option C — Advanced Production-Level Features}
+
+The final phase introduces advanced e-commerce functionalities that align the system with production-grade platforms.
+
+\begin{itemize}[noitemsep]
+    \item Hero banner carousel for homepage marketing sections
+    \item Discount and promotional pricing system
+    \item Featured product flag stored in database for dynamic homepage control
+\end{itemize}
+
+\textbf{Goal:} Transform the system into a scalable and market-ready e-commerce solution.
+
+% ==================================================
+\subsection{Authentication Module Adaptation (Legacy Integration)}
+
+The authentication system is adapted from a previous project and refactored to integrate with the current architecture.
+
+% ==================================================
+\subsubsection{Login Interface}
+
+\begin{verbatim}
+@extends('layouts.app')
+
+@section('title')
+  Login
+@endsection
+
+@section('content')
+
+<div class="limiter">
+    <form method="POST" action="{{ url('/accessaccount') }}">
+        @csrf
+
+        <span>Log in</span>
+
+        <div>
+            <input type="text" name="email" placeholder="Email">
+        </div>
+
+        <div>
+            <input type="password" name="password" placeholder="Password">
+        </div>
+
+        <div>
+            <input id="remember" type="checkbox" name="remember">
+            <label>Remember me</label>
+        </div>
+
+        <div>
+            <button type="submit">Login</button>
+        </div>
+
+        <div>
+            <a href="#">Forgot Password?</a>
+        </div>
+
+        <div>
+            <a href="{{ url('/signup') }}">Create Account</a>
+        </div>
+    </form>
+</div>
+
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsubsection{Sign Up Interface}
+
+\begin{verbatim}
+@extends('layouts.app')
+
+@section('title')
+    Sign Up
+@endsection
+
+@section('content')
+
+@if (Session::has('status'))
+    <div class="alert alert-success">
+        {{ Session::get('status') }}
+    </div>
+@endif
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+<div class="limiter">
+    <form action="{{ url('/createaccount') }}" method="POST">
+        @csrf
+
+        <span>Sign Up</span>
+
+        <div>
+            <input type="text" name="name" placeholder="Name">
+        </div>
+
+        <div>
+            <input type="text" name="email" placeholder="Email">
+        </div>
+
+        <div>
+            <input type="password" name="password" placeholder="Password">
+        </div>
+
+        <div>
+            <button type="submit">Sign Up</button>
+        </div>
+    </form>
+</div>
+
+@endsection
+\end{verbatim}
+
+% ==================================================
+\subsection{Implementation Strategy}
+
+The development will follow a sequential execution model:
+
+\begin{enumerate}[noitemsep]
+    \item UI improvements (visual structure and responsiveness)
+    \item Functional features (search, filtering, pagination)
+    \item Advanced production features (carousel, discounts, featured system)
+    \item Authentication system integration and refinement
+\end{enumerate}
+
+
+% ==================================================
+\section{Authentication System Completion and Validation}
+
+\subsection{1. Problem Identification}
+
+The authentication layer is partially implemented through Blade interfaces (Login and Sign Up views), but lacks the necessary backend logic and routing to function correctly. This results in broken form submissions and incomplete user session handling.
+
+% ==================================================
+\subsection{2. Required Fixes and Implementation}
+
+\subsubsection{2.1 Missing Authentication Controller}
+
+There is currently no controller responsible for handling authentication logic.
+
+\textbf{Required Actions:}
+\begin{itemize}[noitemsep]
+    \item Create an \texttt{AuthController}
+    \item Implement the following methods:
+    \begin{itemize}
+        \item \texttt{register()} – validate input, hash password, create user, log user in
+        \item \texttt{login()} – authenticate using \texttt{Auth::attempt()}
+        \item \texttt{logout()} – terminate user session
+    \end{itemize}
+\end{itemize}
+
+\textbf{Impact:} Without this controller, authentication forms cannot be processed.
+
+% ==================================================
+\subsubsection{2.2 Password Hashing Verification}
+
+User passwords must be securely hashed before being stored in the database.
+
+\textbf{Verification Required:}
+\begin{itemize}[noitemsep]
+    \item Ensure password hashing is implemented using \texttt{Hash::make()}
+    \item Alternatively, define proper casting or mutators in the \texttt{User} model
+\end{itemize}
+
+\textbf{Impact:} Storing plain-text passwords introduces critical security vulnerabilities.
+
+% ==================================================
+\subsubsection{2.3 Missing POST Routes}
+
+The application currently defines only GET routes for authentication views.
+
+\textbf{Required Routes:}
+
+\begin{verbatim}
+Route::post('/createaccount', [AuthController::class, 'register']);
+Route::post('/accessaccount', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+\end{verbatim}
+
+\textbf{Impact:} Form submissions will fail without corresponding POST route handlers.
+
+% ==================================================
+\subsubsection{2.4 Role Management Strategy}
+
+The system includes role-based access control through \texttt{AdminMiddleware}, but role assignment during registration is not clearly defined.
+
+\textbf{Verification Required:}
+\begin{itemize}[noitemsep]
+    \item Ensure the \texttt{users} table contains a \texttt{role} column
+    \item Confirm a default value (e.g., \texttt{'user'}) is assigned
+\end{itemize}
+
+\textbf{Impact:} Incorrect role assignment may break authorization logic.
+
+% ==================================================
+\subsubsection{2.5 Layout Adaptation for Authentication State}
+
+The main layout must dynamically adapt based on authentication status.
+
+\textbf{Required Behavior:}
+\begin{itemize}[noitemsep]
+    \item Show \texttt{Login} and \texttt{Register} links for guests
+    \item Show \texttt{Logout}, \texttt{Cart}, and user-specific links for authenticated users
+\end{itemize}
+
+\textbf{Impact:} Improves user experience and ensures proper navigation flow.
+
+% ==================================================
+\subsubsection{2.6 Session and Validation Feedback}
+
+The frontend already supports error and session messages, but backend validation must be properly implemented.
+
+\textbf{Required Actions:}
+\begin{itemize}[noitemsep]
+    \item Use \texttt{\$request->validate()} in controller methods
+    \item Return validation errors to Blade views
+\end{itemize}
+
+\textbf{Impact:} Ensures users receive meaningful feedback on failed actions (e.g., invalid input, duplicate email).
+
+% ==================================================
+\subsection{3. Outcome}
+
+After implementing these fixes:
+
+\begin{itemize}[noitemsep]
+    \item Authentication system becomes fully functional
+    \item User registration and login are securely handled
+    \item Role-based access control is enforced
+    \item UI dynamically adapts to user state
+    \item Error handling improves usability and reliability
+\end{itemize}
+
+The system now supports a complete and secure authentication workflow aligned with production standards.
+
+
+% ==================================================
+\section{Implementation Progress: Authentication and User Lifecycle Management}
+
+\subsection{Completed Milestones}
+
+The authentication system and user management infrastructure are now fully operational. The implementation follows standard security protocols for modern Laravel applications, including secure credential handling, session management, and role-based access control.
+
+% ==================================================
+\subsubsection{1. Authentication Controller (AuthController)}
+
+A centralized controller manages the full authentication lifecycle:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Registration:} Validates user input, creates user records with a default \texttt{'user'} role, and automatically logs the user into the system.
+    \item \textbf{Login:} Authenticates users using \texttt{Auth::attempt()} and regenerates sessions to prevent session fixation attacks.
+    \item \textbf{Logout:} Safely terminates user sessions, invalidates session data, and regenerates CSRF tokens.
+    \item \textbf{Remember Me Support:} Persistent login functionality implemented using session-based token storage.
+\end{itemize}
+
+% ==================================================
+\subsubsection{2. Secure Data Handling and Model Configuration}
+
+The \texttt{User} model and database schema have been aligned with Laravel security standards:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Mass Assignment Protection:} The \texttt{role} attribute has been added to the \texttt{fillable} array to allow controlled assignment during user creation.
+    \item \textbf{Password Security:} Password hashing is handled automatically via the \texttt{hashed} cast, eliminating the risk of plain-text storage or double hashing.
+    \item \textbf{Hidden Attributes:} Sensitive fields such as passwords are excluded from serialized outputs.
+    \item \textbf{Schema Consistency:} The \texttt{users} table includes a \texttt{role} column with a default value of \texttt{'user'}, supporting role-based authorization.
+\end{itemize}
+
+% ==================================================
+\subsubsection{3. Routing and Middleware Architecture}
+
+The routing layer has been structured into clear access tiers:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Guest Routes:} Login and signup pages are accessible without authentication and use named routes for redirection.
+    \item \textbf{Authenticated Routes:} Cart and order operations are protected using the \texttt{auth} middleware.
+    \item \textbf{Administrative Routes:} Product and user management routes are grouped under an \texttt{admin} prefix and protected by custom middleware.
+\end{itemize}
+
+\textbf{Middleware Implementation:}
+\begin{itemize}[noitemsep]
+    \item A custom \texttt{AdminMiddleware} validates user roles.
+    \item Middleware is registered in \texttt{bootstrap/app.php} using alias mapping.
+\end{itemize}
+
+% ==================================================
+\subsubsection{4. Dynamic Layout and Session Awareness}
+
+The main layout system has been enhanced to reflect authentication state:
+
+\begin{itemize}[noitemsep]
+    \item Conditional rendering using Blade directives (\texttt{@auth}, \texttt{@guest})
+    \item Dynamic navigation displaying login/register or user/logout options
+    \item Integration of session feedback messages for user actions
+\end{itemize}
+
+% ==================================================
+\subsubsection{5. Backend Integration for Product Display}
+
+The \texttt{ViewController} has been refactored to support dynamic data rendering:
+
+\begin{itemize}[noitemsep]
+    \item Product listings are retrieved using Eloquent ORM
+    \item Relationships such as \texttt{category}, \texttt{images}, and \texttt{reviews} are eagerly loaded
+    \item Product detail pages now display structured and relational data instead of static placeholders
+\end{itemize}
+
+% ==================================================
+\subsubsection{6. Database Seeding and Testing Infrastructure}
+
+A modular seeding strategy has been implemented to support development and testing:
+
+\begin{itemize}[noitemsep]
+    \item Separate seeders for users, categories, products, reviews, and orders
+    \item Predefined roles (admin/user) for testing authorization logic
+    \item Relational data ensures realistic testing scenarios (e.g., user-owned reviews)
+    \item Database reset and seeding handled via \texttt{php artisan migrate:fresh --seed}
+\end{itemize}
+
+% ==================================================
+\subsubsection{7. Error Handling and Validation Layer}
+
+Robust validation and feedback mechanisms have been integrated:
+
+\begin{itemize}[noitemsep]
+    \item Input validation handled using \texttt{\$request->validate()}
+    \item Validation errors propagated to Blade views
+    \item Session-based success and error messaging implemented
+\end{itemize}
+
+% ==================================================
+\subsection{System Status}
+
+At this stage, the application has transitioned from a structural backend implementation to a fully functional system with:
+
+\begin{itemize}[noitemsep]
+    \item Secure authentication and session management
+    \item Role-based access control (RBAC)
+    \item Dynamic product data rendering
+    \item Modular database seeding for testing
+    \item Structured routing and middleware enforcement
+\end{itemize}
+
+% ==================================================
+\subsection{Remaining Implementation Scope}
+
+The following components remain to achieve full production readiness:
+
+\begin{itemize}[noitemsep]
+    \item Cart and checkout workflow completion
+    \item Order lifecycle management (creation, status tracking)
+    \item Review system enforcement using policies
+    \item UI enhancement (responsive design and layout improvements)
+    \item Advanced features (search, filtering, pagination)
+\end{itemize}
+
+% ==================================================
+% ==================================================
+% ==================================================
+
+% ==================================================
+\section{Cart and Checkout System Implementation}
+
+\subsection{1. Overview}
+
+The cart and checkout system enables users to manage selected products and convert them into orders. This module integrates tightly with authentication, product inventory, and order management.
+
+% ==================================================
+\subsection{2. Cart Management Logic}
+
+The cart system is designed to support persistent user-specific storage and dynamic item management.
+
+\subsubsection{Core Behaviors}
+
+\begin{itemize}[noitemsep]
+    \item Add products to cart
+    \item Automatically increase quantity if product already exists in cart
+    \item Remove items from cart
+    \item Display total cart value
+\end{itemize}
+
+\subsubsection{Cart Initialization (Critical)}
+
+To prevent null reference errors, a cart instance is created dynamically if it does not exist:
+
+\begin{verbatim}
+$cart = auth()->user()->cart ?? Cart::create([
+    'user_id' => auth()->id()
+]);
+\end{verbatim}
+
+\textbf{Purpose:} Ensures every authenticated user always has an associated cart.
+
+% ==================================================
+\subsection{3. Checkout and Order Creation}
+
+The checkout process converts cart data into a structured order.
+
+\subsubsection{Checkout Flow}
+
+\begin{enumerate}[noitemsep]
+    \item User initiates checkout
+    \item System validates cart contents
+    \item Order record is created
+    \item Cart items are transferred to order items
+    \item Cart is cleared after successful transaction
+\end{enumerate}
+
+\subsubsection{Order Creation Logic}
+
+\begin{verbatim}
+$order = Order::create([
+    'user_id' => auth()->id(),
+    'total_price' => $total,
+    'status' => 'pending'
+]);
+\end{verbatim}
+
+\textbf{Purpose:} Establishes a persistent order record tied to the authenticated user.
+
+% ==================================================
+\subsection{4. Data Integrity and Validation}
+
+To ensure system reliability, several validation mechanisms are implemented.
+
+\subsubsection{Stock Protection}
+
+\begin{verbatim}
+if ($product->stock < $request->quantity) {
+    return back()->withErrors('Not enough stock');
+}
+\end{verbatim}
+
+\textbf{Purpose:} Prevents overselling of products beyond available inventory.
+
+\subsubsection{Empty Cart Prevention}
+
+\begin{verbatim}
+if ($cart->items->isEmpty()) {
+    return back()->withErrors('Cart is empty');
+}
+\end{verbatim}
+
+\textbf{Purpose:} Ensures that orders cannot be created without valid items.
+
+% ==================================================
+\subsection{5. System Integration}
+
+The cart and checkout module integrates with:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Authentication:} Only logged-in users can access cart and checkout features
+    \item \textbf{Products:} Cart items reference valid product records
+    \item \textbf{Orders:} Cart transitions into order lifecycle management
+\end{itemize}
+
+% ==================================================
+\subsection{6. Outcome}
+
+At this stage, the system supports:
+
+\begin{itemize}[noitemsep]
+    \item Persistent user-specific carts
+    \item Dynamic product quantity handling
+    \item Secure checkout process
+    \item Order creation with relational integrity
+\end{itemize}
+
+The platform now includes a complete transactional flow from product selection to order generation.
+
+
+% ==================================================
+\section{Shopping Cart and Order Processing System}
+
+\subsection{Overview}
+At this stage, the application transitions from static product display to a fully interactive e-commerce workflow. Users can now add products to a cart, manage quantities, and complete a checkout process that generates persistent orders.
+
+% ==================================================
+\subsection{Cart Management Implementation}
+
+The cart system is designed to maintain a one-to-one relationship between a user and their active cart session.
+
+\subsubsection{Core Features}
+\begin{itemize}[noitemsep]
+    \item Add products to cart
+    \item Prevent duplicate entries by increasing quantity
+    \item Remove items from cart
+    \item Display cart contents dynamically
+\end{itemize}
+
+\subsubsection{Cart Initialization Logic}
+To prevent runtime errors caused by missing carts, a fallback mechanism ensures a cart is always available:
+
+\begin{verbatim}
+$cart = auth()->user()->cart ?? Cart::create([
+    'user_id' => auth()->id()
+]);
+\end{verbatim}
+
+This guarantees that cart operations never fail due to null references.
+
+\subsubsection{Stock Protection}
+Before adding items to the cart, the system validates available inventory:
+
+\begin{verbatim}
+if ($product->stock < $request->quantity) {
+    return back()->withErrors('Not enough stock');
+}
+\end{verbatim}
+
+This prevents users from reserving unavailable quantities.
+
+% ==================================================
+\subsection{Order Processing (Checkout Flow)}
+
+The checkout process converts cart data into a structured order while maintaining data integrity.
+
+\subsubsection{Checkout Workflow}
+\begin{itemize}[noitemsep]
+    \item User initiates checkout
+    \item Total price is calculated
+    \item Order record is created
+    \item Cart items are transferred to order items
+    \item Product stock is updated
+    \item Cart is cleared
+\end{itemize}
+
+\subsubsection{Order Creation}
+\begin{verbatim}
+$order = Order::create([
+    'user_id' => auth()->id(),
+    'total_price' => $total,
+    'status' => 'pending'
+]);
+\end{verbatim}
+
+\subsubsection{Data Migration (Cart → Order)}
+Each cart item is transformed into a persistent order item:
+
+\begin{verbatim}
+OrderItem::create([
+    'order_id' => $order->id,
+    'product_id' => $item->product_id,
+    'quantity' => $item->quantity,
+    'price' => $item->product->price
+]);
+\end{verbatim}
+
+\subsubsection{Stock Update}
+\begin{verbatim}
+$item->product->decrement('stock', $item->quantity);
+\end{verbatim}
+
+\subsubsection{Cart Cleanup}
+\begin{verbatim}
+$cart->items()->delete();
+\end{verbatim}
+
+% ==================================================
+\subsection{Data Integrity and Transaction Safety}
+
+To ensure consistency, the checkout process is wrapped in a database transaction:
+
+\begin{verbatim}
+DB::transaction(function () {
+    // Order logic
+});
+\end{verbatim}
+
+This guarantees:
+\begin{itemize}[noitemsep]
+    \item No partial orders are created
+    \item Stock levels remain accurate
+    \item Failures rollback automatically
+\end{itemize}
+
+% ==================================================
+\subsection{User Experience Considerations}
+
+\begin{itemize}[noitemsep]
+    \item Users receive feedback messages for all actions (add/remove/checkout)
+    \item Empty cart protection prevents invalid orders
+    \item Product availability is enforced at both cart and checkout levels
+\end{itemize}
+
+% ==================================================
+\subsection{System Readiness}
+
+At this stage, the application supports:
+\begin{itemize}[noitemsep]
+    \item Complete shopping workflow
+    \item Persistent order storage
+    \item Inventory-aware transactions
+    \item Secure user-bound operations
+\end{itemize}
+
+This marks the transition from a structural prototype to a functionally complete e-commerce backend.
+% ==================================================
+% ==================================================
+\section{Controller Methods and Laravel Terminology}
+
+This section explains key Laravel functions and patterns used throughout controller implementation.
+
+\subsection{Core Helper Functions}
+
+\paragraph{redirect()}
+Used to navigate the user to another route or page after an action.
+Commonly used after form submission.
+
+\begin{verbatim}
+return redirect()->route('products.index');
+\end{verbatim}
+
+\paragraph{view()}
+Returns a Blade template (UI page) with optional data.
+
+\begin{verbatim}
+return view('products.index', compact('products'));
+\end{verbatim}
+
+\paragraph{compact()}
+A PHP helper that converts variables into an associative array.
+
+\begin{verbatim}
+compact('products')
+\end{verbatim}
+
+\subsection{Eloquent ORM Methods}
+
+\paragraph{create()}
+Inserts a new record into the database using mass assignment.
+
+\begin{verbatim}
+Product::create($data);
+\end{verbatim}
+
+\paragraph{update()}
+Updates an existing database record.
+
+\begin{verbatim}
+$product->update($request->all());
+\end{verbatim}
+
+\paragraph{destroy()}
+Deletes a record by ID.
+
+\begin{verbatim}
+Product::destroy($id);
+\end{verbatim}
+
+\paragraph{findOrFail()}
+Retrieves a record or throws a 404 error if not found.
+
+\begin{verbatim}
+Product::findOrFail($id);
+\end{verbatim}
+
+\paragraph{with()}
+Eager loads relationships to improve performance.
+
+\begin{verbatim}
+Product::with('category')->get();
+\end{verbatim}
+
+\subsection{Request Handling}
+
+\paragraph{Request}
+Handles HTTP input data from forms.
+
+\paragraph{validate()}
+Validates incoming request data before processing.
+
+\begin{verbatim}
+$request->validate([
+    'name' => 'required|string'
+]);
+\end{verbatim}
+
+\subsection{Authentication}
+
+\paragraph{auth()->id()}
+Returns the currently authenticated user's ID.
+
+\begin{verbatim}
+$userId = auth()->id();
+\end{verbatim}
+
+\subsection{Session Flash Messages}
+
+\paragraph{with()}
+Stores temporary session data (e.g., success messages).
+
+\begin{verbatim}
+->with('success', 'Operation completed');
+\end{verbatim}
+
+\subsection{Routing Integration}
+
+\paragraph{route()}
+Generates URLs based on named routes.
+
+\begin{verbatim}
+route('products.index');
+\end{verbatim}
+
+% ==================================================
+
+% ============================================================
+% Part 3: UI Implementation Summary
+% Insert before Conclusion (Section 13)
+% ============================================================
+
+\section{Professional UI/UX Implementation Summary}
+
+The frontend was transformed from a basic prototype into a high-end editorial interface. This phase emphasized visual hierarchy, fault tolerance, and production-grade UI patterns.
+
+\subsection{Core Design System}
+
+\begin{itemize}
+    \item \textbf{Typography}: Adoption of \textit{Plus Jakarta Sans} to achieve a modern premium aesthetic.
+    \item \textbf{Glassmorphism}: Implementation of backdrop blur effects (\texttt{blur(12px)}) and translucent surfaces across navigation and filtering components.
+    \item \textbf{Layout Stability}: Use of aspect-ratio locked containers to prevent layout shifts during image loading.
+\end{itemize}
+
+\subsection{Robust Image \& Asset Handling}
+
+To resolve image visibility issues and ensure graceful degradation:
+
+\begin{itemize}
+    \item \textbf{Path Standardization}: All assets use \texttt{asset('storage/...')} aligned with Laravel’s \texttt{php artisan storage:link} configuration.
+    
+    \item \textbf{Fault Tolerance}: All image components implement an \texttt{onerror} handler to replace missing assets with high-quality placeholders.
+\end{itemize}
+
+\subsection{Enhanced Component Lifecycle}
+
+\begin{itemize}
+    \item \textbf{Multi-Angle Product Gallery}: Interactive main image stage with thumbnail navigation for multiple product views.
+    
+    \item \textbf{Persistent Cart UI}: Split-grid cart layout with sticky order summary to improve checkout usability.
+    
+    \item \textbf{Order History Visualization}: High-contrast status indicators (e.g., \texttt{status-pending}, \texttt{status-completed}) for rapid interpretation.
+\end{itemize}
+
+% ============================================================
+% Implementation Note
+% ============================================================
+
+\noindent \textbf{Implementation Note:}  
+The backend logic (transaction handling, stock restoration, and secure validation layers) demonstrates mastery of Laravel’s architectural principles. The frontend implementation follows modern UI/UX standards to deliver a production-ready, conversion-optimized user experience.
+
+
+\subsection{Luxury-Tier UI Finalization}
+
+To elevate the platform from a functional prototype to a high-end commercial interface, a final sweep was conducted to apply \textit{Tier 3} design principles across all secondary and administrative views.
+
+\subsubsection{Public Storytelling and Support}
+
+The \texttt{about} and \texttt{contact} pages were transformed into brand-building assets:
+
+\begin{itemize}
+    \item \textbf{About View}: Implemented a cinematic editorial layout, featuring a manifesto section and a grid-based presentation of brand values.
+    \item \textbf{Contact View}: Created a dual-pane layout separating physical concierge information from a high-contrast client inquiry form.
+\end{itemize}
+
+\subsubsection{Executive Administrative Dashboard}
+
+The administrative layer was overhauled to provide an "Executive Command Center" experience:
+
+\begin{itemize}
+    \item \textbf{Command Dashboard}: Replaced basic links with elevated action cards, each containing descriptive metadata and hover-state transitions.
+    \item \textbf{Inventory Ledger}: Redesigned the product index as a professional management table, including semantic \texttt{status-pills} (e.g., \textit{Low Stock}, \textit{Out of Stock}) and interactive image previews.
+    \item \textbf{Asset Curation}: The \texttt{create} and \texttt{edit} forms were re-engineered into a centered "Editor's Stage," featuring drag-and-drop imagery zones and structured data fields.
+\end{itemize}
+
+\subsubsection{UI Stability and Grid Logic}
+
+Critical refinements were applied to the Discovery section on the home page:
+
+\begin{itemize}
+    \item \textbf{Grid Overlap Resolution}: Fixed layout collisions in the "Latest Drops" section by enforcing strict CSS grid constraints and overflow management.
+    \item \textbf{Semantic Phrasing}: Updated filtering interactions to use the customer-requested "Apply Filters" nomenclature, improving UX clarity.
+\end{itemize}
+
+% ==================================================
+\section{Conclusion}
+This document represents the **execution layer** of the system design.
+Each section will be progressively expanded as implementation continues, moving from architecture → database → API → full system deployment.
+
+\end{document}

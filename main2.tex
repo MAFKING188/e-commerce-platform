@@ -1,0 +1,253 @@
+\documentclass[10pt]{beamer}
+
+% --- Theme ---
+\usetheme{metropolis}
+\metroset{block=fill, progressbar=frametitle}
+
+% --- Packages ---
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, chains}
+
+% --- Colors (Junior's Palette) ---
+\definecolor{DeepBlue}{RGB}{0,41,82}
+\definecolor{TechCyan}{RGB}{0,153,204}
+\definecolor{SoftGray}{RGB}{240,240,240}
+
+\setbeamercolor{palette primary}{fg=white,bg=DeepBlue}
+\setbeamercolor{block title}{fg=white,bg=DeepBlue}
+\setbeamercolor{block body}{bg=SoftGray}
+
+% --- Metadata ---
+\title{SmartShop E-Commerce Platform}
+\subtitle{Scalable Transactional Architecture \& System Design}
+\author{LUWI Mafuleti}
+\institute{Software Engineering Division}
+\date{\today}
+
+\begin{document}
+
+% ================= TITLE =================
+{
+\setbeamercolor{background canvas}{bg=DeepBlue}
+\begin{frame}
+    \centering
+    {\Huge \color{white} SmartShop Platform}
+
+    \vspace{0.4cm}
+    {\large \color{TechCyan} E-Commerce System Architecture Project}
+
+    \vspace{0.8cm}
+    {\small \color{white} From CRUD Operations to Scalable Transactional Design}
+
+    \vspace{1.2cm}
+    {\color{white}\textbf{LUWI Mafuleti}}
+
+    \vspace{0.2cm}
+    {\small \color{white} Software Engineering \& System Design}
+
+    \vspace{0.2cm}
+    {\small \color{white} \today}
+\end{frame}
+}
+
+% ================= OBJECTIVES =================
+\begin{frame}{Strategic Project Objectives}
+
+\begin{block}{Architectural Vision}
+To engineer a high-integrity e-commerce engine capable of managing full transactional lifecycles in a scalable and secure environment.
+\end{block}
+
+\begin{itemize}
+    \item \textbf{Transactional Flow:} Browse → Cart → Checkout → Order
+    \item \textbf{Data Modeling:} Normalized relational structure (MLD)
+    \item \textbf{Actor Separation:} Guest, Client, Admin, Server
+    \item \textbf{Business Integrity:} Stock validation and atomic transactions
+    \item \textbf{Security Layer:} Role-Based Access Control (RBAC)
+\end{itemize}
+
+\end{frame}
+
+% ================= ACTORS =================
+\begin{frame}{Stakeholder Ecosystem}
+
+\begin{columns}[T]
+
+\column{0.23\textwidth}
+\begin{exampleblock}{Guest}
+\scriptsize
+\begin{itemize}
+\item Browse products
+\item View details
+\item Authentication access
+\end{itemize}
+\end{exampleblock}
+
+\column{0.23\textwidth}
+\begin{exampleblock}{Client}
+\scriptsize
+\begin{itemize}
+\item Cart management
+\item Checkout
+\item Orders
+\item Reviews
+\end{itemize}
+\end{exampleblock}
+
+\column{0.23\textwidth}
+\begin{alertblock}{Admin}
+\scriptsize
+\begin{itemize}
+\item Product CRUD
+\item Order control
+\item Users management
+\item Stock control
+\end{itemize}
+\end{alertblock}
+
+\column{0.23\textwidth}
+\begin{block}{Server}
+\scriptsize
+\begin{itemize}
+\item Business logic
+\item Transactions
+\item Stock sync
+\item Validation
+\end{itemize}
+\end{block}
+
+\end{columns}
+
+\end{frame}
+
+% ================= FUNCTIONALITIES (UPDATED - LAYERED) =================
+\begin{frame}{System Functionalities (Layered Architecture)}
+
+\begin{columns}[T]
+
+\column{0.5\textwidth}
+\textbf{Frontend Layer}
+\begin{itemize}
+    \item Product browsing
+    \item Product details view
+    \item Cart interaction
+    \item Checkout interface
+    \item Order tracking
+\end{itemize}
+
+\textbf{Business Logic Layer}
+\begin{itemize}
+    \item Cart validation
+    \item Stock verification
+    \item Order creation
+    \item Price calculation
+\end{itemize}
+
+\column{0.5\textwidth}
+
+\textbf{Backend Layer}
+\begin{itemize}
+    \item Product management (CRUD)
+    \item Category management
+    \item User management
+    \item Order processing
+\end{itemize}
+
+\textbf{Security Layer}
+\begin{itemize}
+    \item Authentication (login/register)
+    \item Role-based access
+    \item Session handling
+    \item Protected routes
+\end{itemize}
+
+\end{columns}
+
+\end{frame}
+
+% ================= USE CASE PLACEHOLDER =================
+\begin{frame}{Use Case Diagram}
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{UseCaseDiagram5.png}
+\end{center}
+\end{frame}
+
+% ================= MCD =================
+\begin{frame}{Conceptual Data Model (MCD)}
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{Untitled.png}
+\end{center}
+\end{frame}
+% ================= MLD =================
+ \begin{frame}{Logical Data Model (MLD)}
+    
+     \begin{block}{Core Tables}
+     \footnotesize
+     \begin{itemize}
+     \item \textbf{USER} (\underline{id}, name, email, password, role)
+     \item \textbf{PRODUCT} (\underline{id}, name, price, stock, \#category\_id)
+     \item \textbf{CATEGORY} (\underline{id}, name)
+     \item \textbf{CART} (\underline{id}, \#user\_id)
+    \item \textbf{CART\_ITEM} (\underline{id}, \#cart\_id, \#product\_id, quantity)
+    \item \textbf{ORDER} (\underline{id}, \#user\_id, total\_price, status)
+    \item \textbf{ORDER\_ITEM} (\underline{id}, \#order\_id, \#product\_id, quantity, price)
+    \end{itemize}
+    \end{block}
+   
+    \end{frame}
+   
+    % ================= EXTENDED MLD =================
+    \begin{frame}{MLD Extension (Scalability Layer)}
+
+    \begin{itemize}
+    \item \textbf{PRODUCT\_IMAGE} (\underline{id}, \#product\_id, url, position)
+    \item \textbf{PRODUCT\_VARIANT} (\underline{id}, \#product\_id, size, color, stock, price)
+    \item \textbf{REVIEW} (\underline{id}, \#user\_id, \#product\_id, rating, comment)
+    \item \textbf{PAYMENT} (\underline{id}, \#order\_id, method, status, transaction\_id, amount)
+    \item \textbf{ADDRESS} (\underline{id}, \#user\_id, city, country)
+    \item \textbf{VENDOR} (\underline{id}, name, contact\_info)
+    \item \textbf{VENDOR\_PRODUCT} (\underline{id}, \#partner\_id, \#product\_id)
+    \end{itemize}
+    \end{frame}
+\end{frame}
+
+% ================= BUSINESS LOGIC =================
+\begin{frame}{Business Logic Rules}
+
+\begin{itemize}
+\item Prevent checkout if cart is empty
+\item Validate stock before order creation
+\item Deduct stock after purchase
+\item Prevent duplicate cart items (increment quantity)
+\item Ensure atomic transactions
+\end{itemize}
+
+\end{frame}
+
+% ================= CONCLUSION =================
+\begin{frame}{Conclusion}
+
+\begin{itemize}
+\item Clean scalable architecture
+\item Strong relational database design
+\item Clear separation of actors and system logic
+\item Ready for real-world deployment extension
+\end{itemize}
+
+\end{frame}
+
+% ================= END =================
+{
+\setbeamercolor{background canvas}{bg=DeepBlue}
+\begin{frame}
+\centering
+{\Huge \color{white} Thank You}
+
+\vspace{0.5cm}
+{\color{TechCyan} Questions \& Discussion}
+\end{frame}
+}
+
+\end{document}
