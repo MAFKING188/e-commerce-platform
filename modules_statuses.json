@@ -1,1 +1,7 @@
-[]
+{
+    "IdentityAccess": true,
+    "CatalogDelivery": true,
+    "MarketplacePipeline": true,
+    "PartnerHub": true,
+    "TelemetryPipeline": true
+}

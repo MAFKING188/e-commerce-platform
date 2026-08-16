@@ -1,0 +1,11 @@
+{
+    "name": "PartnerHub",
+    "alias": "partnerhub",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PartnerHub\\Providers\\PartnerHubServiceProvider"
+    ],
+    "files": []
+}

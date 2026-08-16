@@ -1,0 +1,11 @@
+{
+    "name": "MarketplacePipeline",
+    "alias": "marketplacepipeline",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MarketplacePipeline\\Providers\\MarketplacePipelineServiceProvider"
+    ],
+    "files": []
+}

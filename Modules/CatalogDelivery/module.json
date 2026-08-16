@@ -1,0 +1,11 @@
+{
+    "name": "CatalogDelivery",
+    "alias": "catalogdelivery",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\CatalogDelivery\\Providers\\CatalogDeliveryServiceProvider"
+    ],
+    "files": []
+}
