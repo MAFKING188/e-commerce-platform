@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use Modules\IdentityAccess\Models\User;
 use App\Models\Product;
-use App\Models\Wishlist;
+use Modules\IdentityAccess\Models\Wishlist;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

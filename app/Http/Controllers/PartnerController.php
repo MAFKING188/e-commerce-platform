@@ -23,7 +23,7 @@ class PartnerController extends Controller
 
     public function create()
     {
-        $users = \App\Models\User::all();
+        $users = \Modules\IdentityAccess\Models\User::all();
         return view('admin.partners.create', compact('users'));
     }
 

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace Modules\IdentityAccess\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Address;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Models\Review;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,12 +18,17 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected static function newFactory(): UserFactory
+    {
+        return UserFactory::new();
+    }
+
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
-        'status'
+        'status',
     ];
 
     protected $hidden = [

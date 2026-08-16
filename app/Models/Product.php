@@ -77,7 +77,7 @@ class Product extends Model
         // --- YOUR TASK START ---
         // Write the Eloquent query to check if a record exists in wishlists 
         // table for this product and this user.
-        return \App\Models\Wishlist::where('product_id', $this->id)->where('user_id', $userId)->exists();
+        return \Modules\IdentityAccess\Models\Wishlist::where('product_id', $this->id)->where('user_id', $userId)->exists();
         // --- YOUR TASK END ---
     }
 }
