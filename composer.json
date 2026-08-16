@@ -46,7 +46,12 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Modules\\CatalogDelivery\\Tests\\": "Modules/CatalogDelivery/tests/",
+            "Modules\\IdentityAccess\\Tests\\": "Modules/IdentityAccess/tests/",
+            "Modules\\MarketplacePipeline\\Tests\\": "Modules/MarketplacePipeline/tests/",
+            "Modules\\PartnerHub\\Tests\\": "Modules/PartnerHub/tests/",
+            "Modules\\TelemetryPipeline\\Tests\\": "Modules/TelemetryPipeline/tests/"
         }
     },
     "scripts": {
@@ -88,6 +93,9 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "merge-plugin": {
+            "include": ["Modules/*/composer.json"]
         }
     },
     "config": {
