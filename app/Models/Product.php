@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use HasFactory;
     /**
      * Centralized Image Resolution Logic
      * Handles: Absolute URLs, Local Storage, and Semantic Fallbacks

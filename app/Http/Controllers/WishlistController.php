@@ -14,10 +14,10 @@ class WishlistController extends Controller
      */
     public function index()
     {
-        // TODO: Retrieve all products in the user's wishlist.
-        // Hint: Auth::user()->wishlists()->with('product')->get()
-        $items = []; 
-        $items = Auth::user()->wishlist()->with('product')-get();
+        $items = Wishlist::with('product')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
 
         return view('wishlist', compact('items'));
     }
@@ -27,40 +27,34 @@ class WishlistController extends Controller
      */
     public function toggle(Request $request)
     {
-        $productId = $request->product_id;
+        $productId = $request->integer('product_id');
         $user = Auth::user();
 
-        // Check if product exists
-        $product = Product::findOrFail($productId);
+        Product::findOrFail($productId);
 
-        // --- YOUR TASK START ---
-        // 1. Check if the product is already in the user's wishlist.
-        $existing = Whishlist::where('user_id',$user->id)->where('Product_id',$productId)->first();
-        // 2. If it IS: Delete the record (remove from archive).
-        if($existing)
-            {
-                $existing->delete();
-                $action = 'removed';
-                $message = 'Removed from Archive'
-            }
-            else{
-                // 3. If it IS NOT: Create the record (save to archive).
-        
-        $action = 'added'; // or 'removed'
-        $message = 'Saved to Archive'; // or 'Removed from Archive'
+        $existing = Wishlist::where('user_id', $user->id)
+            ->where('product_id', $productId)
+            ->first();
 
-            }
-        
-        
-        // Write your logic here...
+        if ($existing) {
+            $existing->delete();
 
+            return response()->json([
+                'status' => 'success',
+                'action' => 'removed',
+                'message' => 'Removed from Archive',
+            ]);
+        }
 
-        // --- YOUR TASK END ---
+        Wishlist::create([
+            'user_id' => $user->id,
+            'product_id' => $productId,
+        ]);
 
         return response()->json([
             'status' => 'success',
-            'action' => $action,
-            'message' => $message
+            'action' => 'added',
+            'message' => 'Saved to Archive',
         ]);
     }
 }
