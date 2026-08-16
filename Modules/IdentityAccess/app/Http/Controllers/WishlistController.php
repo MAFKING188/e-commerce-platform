@@ -20,7 +20,7 @@ class WishlistController extends Controller
             ->latest()
             ->get();
 
-        return view('wishlist', compact('items'));
+        return view('identityaccess::wishlist', compact('items'));
     }
 
     /**

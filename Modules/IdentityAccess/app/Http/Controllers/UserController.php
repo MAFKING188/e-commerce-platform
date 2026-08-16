@@ -22,19 +22,19 @@ class UserController extends Controller
         }
 
         $users = $query->latest()->paginate(10);
-        return view('users.index', compact('users'));
+        return view('identityaccess::users.index', compact('users'));
     }
 
    public function show()
 {
     $user = Auth::user()->load(['orders', 'addresses']);
-    return view('users.show', compact('user'));
+    return view('identityaccess::users.show', compact('user'));
 }
 
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('users.edit', compact('user'));
+        return view('identityaccess::users.edit', compact('user'));
     }
 
     /**

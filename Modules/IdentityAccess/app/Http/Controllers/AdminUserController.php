@@ -30,7 +30,7 @@ class AdminUserController extends Controller
         }
 
         $users = $query->latest()->paginate(15);
-        return view('admin.users.index', compact('users'));
+        return view('identityaccess::admin.users.index', compact('users'));
     }
 
     /**
