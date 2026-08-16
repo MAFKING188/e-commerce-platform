@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\CatalogDelivery\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\CatalogDelivery\Models\Review;
 use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class ReviewController extends Controller
                          ->latest()
                          ->paginate(10);
 
-        return view('admin.reviews.index', compact('reviews'));
+        return view('catalogdelivery::admin.reviews.index', compact('reviews'));
     }
 
     public function create($productId)

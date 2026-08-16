@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Policies;
+namespace Modules\CatalogDelivery\Policies;
 
-use Modules\CatalogDelivery\Models\Review;
+use Modules\CatalogDelivery\Models\Product;
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ReviewPolicy
+class ProductPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class ReviewPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Review $review): bool
+    public function view(User $user, Product $product): bool
     {
         return false;
     }
@@ -35,24 +35,23 @@ class ReviewPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Review $review): bool
+    public function update(User $user, Product $product): bool
     {
-        return $user->id === $review->user_id;
+        return $user->role === 'admin';
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Review $review): bool
+    public function delete(User $user, Product $product): bool
     {
-        return $user->id === $review->user_id
-                || $user->role === 'admin';
+        return $user->role === 'admin';
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Review $review): bool
+    public function restore(User $user, Product $product): bool
     {
         return false;
     }
@@ -60,7 +59,7 @@ class ReviewPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Review $review): bool
+    public function forceDelete(User $user, Product $product): bool
     {
         return false;
     }

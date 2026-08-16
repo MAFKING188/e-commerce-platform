@@ -4,14 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AdminOrderController,
     CartController,
-    CategoryController,
     OrderController,
     PaymentController,
-    ProductController,
-    ReviewController,
-    PartnerController,
-    ViewController
+    PartnerController
 };
+use Modules\CatalogDelivery\Http\Controllers\ViewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('paypal.cancel');
 
     /* Reviews */
-    Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/reviews', [\Modules\CatalogDelivery\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
 });
 
 /*
@@ -64,9 +61,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
-    Route::post('/products/{product}/reorder-images', [\App\Http\Controllers\ProductController::class, 'reorderImages'])->name('products.reorder-images');
-    Route::delete('/products/{product}/images/{image}', [\App\Http\Controllers\ProductController::class, 'deleteImage'])->name('products.delete-image');
-    Route::resource('products', \App\Http\Controllers\ProductController::class)->except(['show'])->names([
+    Route::post('/products/{product}/reorder-images', [\Modules\CatalogDelivery\Http\Controllers\ProductController::class, 'reorderImages'])->name('products.reorder-images');
+    Route::delete('/products/{product}/images/{image}', [\Modules\CatalogDelivery\Http\Controllers\ProductController::class, 'deleteImage'])->name('products.delete-image');
+    Route::resource('products', \Modules\CatalogDelivery\Http\Controllers\ProductController::class)->except(['show'])->names([
         'index' => 'products.index',
         'create' => 'products.create',
         'store' => 'products.store',
@@ -74,7 +71,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
         'update' => 'products.update',
         'destroy' => 'products.destroy',
     ]);
-    Route::resource('categories', \App\Http\Controllers\CategoryController::class)->names([
+    Route::resource('categories', \Modules\CatalogDelivery\Http\Controllers\CategoryController::class)->names([
         'index' => 'categories.index',
         'create' => 'categories.create',
         'store' => 'categories.store',
@@ -93,10 +90,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     ]);
     
     /* Community Moderation */
-    Route::get('/reviews', [\App\Http\Controllers\ReviewController::class, 'index'])->name('reviews.index');
-    Route::post('/reviews/{id}/approve', [\App\Http\Controllers\ReviewController::class, 'approve'])->name('reviews.approve');
-    Route::post('/reviews/{id}/reject', [\App\Http\Controllers\ReviewController::class, 'reject'])->name('reviews.reject');
-    Route::delete('/reviews/{id}', [\App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::get('/reviews', [\Modules\CatalogDelivery\Http\Controllers\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{id}/approve', [\Modules\CatalogDelivery\Http\Controllers\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{id}/reject', [\Modules\CatalogDelivery\Http\Controllers\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{id}', [\Modules\CatalogDelivery\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     /* Payout Management */
     Route::get('/payouts', [\App\Http\Controllers\AdminPayoutController::class, 'index'])->name('payouts.index');
@@ -114,10 +111,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::middleware(['auth', 'partner'])->prefix('partner')->as('partner.')->group(function () {
         Route::get('dashboard', [\App\Http\Controllers\PartnerDashboardController::class, 'index'])->name('dashboard');
         
-        Route::post('inventory/bulk-action', [\App\Http\Controllers\PartnerInventoryController::class, 'bulkAction'])->name('inventory.bulk-action');
-        Route::post('inventory/{product}/reorder-images', [\App\Http\Controllers\PartnerInventoryController::class, 'reorderImages'])->name('inventory.reorder-images');
-        Route::delete('inventory/{product}/images/{image}', [\App\Http\Controllers\PartnerInventoryController::class, 'deleteImage'])->name('inventory.delete-image');
-        Route::resource('inventory', \App\Http\Controllers\PartnerInventoryController::class);
+        Route::post('inventory/bulk-action', [\Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController::class, 'bulkAction'])->name('inventory.bulk-action');
+        Route::post('inventory/{product}/reorder-images', [\Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController::class, 'reorderImages'])->name('inventory.reorder-images');
+        Route::delete('inventory/{product}/images/{image}', [\Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController::class, 'deleteImage'])->name('inventory.delete-image');
+        Route::resource('inventory', \Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController::class);
         Route::get('payouts', [\App\Http\Controllers\PartnerPayoutController::class, 'index'])->name('payouts.index');
         Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
     });

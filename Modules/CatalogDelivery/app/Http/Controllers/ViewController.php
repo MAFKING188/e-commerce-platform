@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\CatalogDelivery\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,7 @@ class ViewController extends Controller
             ->take(6)
             ->get();
 
-        return view('home', [
+        return view('catalogdelivery::home', [
             'latestProducts' => $latestProducts,
             'featuredProducts' => $featuredProducts
         ]);
@@ -66,7 +67,7 @@ class ViewController extends Controller
         // 🚀 PRODUCTION SCALE: Use paginate() instead of get()
         $products = $query->paginate(12)->withQueryString();
 
-        return view('shop', compact('products'));
+        return view('catalogdelivery::shop', compact('products'));
     }
 
     public function product($id)
@@ -76,17 +77,17 @@ class ViewController extends Controller
             }])
             ->findOrFail($id);
 
-        return view('product', compact('product'));
+        return view('catalogdelivery::product', compact('product'));
     }
 
     public function about()
     {
-        return view('about');
+        return view('catalogdelivery::about');
     }
 
     public function contact()
     {
-        return view('contact');
+        return view('catalogdelivery::contact');
     }
 
     public function partnerProfile($id)

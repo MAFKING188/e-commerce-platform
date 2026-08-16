@@ -1,6 +1,6 @@
 <?php
-use App\Policies\ProductPolicy;
-use App\Policies\ReviewPolicy;
+use Modules\CatalogDelivery\Policies\ProductPolicy;
+use Modules\CatalogDelivery\Policies\ReviewPolicy;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\Review;
 

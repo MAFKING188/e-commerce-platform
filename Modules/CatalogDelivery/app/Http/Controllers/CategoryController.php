@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\CatalogDelivery\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\CatalogDelivery\Models\Category;
 use Illuminate\Http\Request;
 
@@ -10,13 +11,13 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::latest()->get();
-        return view('categories.index', compact('categories'));
+        return view('catalogdelivery::admin.categories.index', compact('categories'));
     }
 
 
     public function create()
     {
-        return view('categories.create');
+        return view('catalogdelivery::admin.categories.create');
     }
     public function store(Request $request)
     {
@@ -31,7 +32,7 @@ class CategoryController extends Controller
     public function edit($id)
     {
         $category = Category::findOrFail($id);
-        return view('categories.edit', compact('category'));
+        return view('catalogdelivery::admin.categories.edit', compact('category'));
     }
 
     public function update(Request $request, $id)

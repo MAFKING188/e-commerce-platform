@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\CatalogDelivery\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\Category;
@@ -13,16 +14,16 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->paginate(12);
-        return view('products.index', compact('products'));
+        return view('catalogdelivery::admin.products.index', compact('products'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('products.create', compact('categories'));
+        return view('catalogdelivery::admin.products.create', compact('categories'));
     }
 
-    public function store(\App\Http\Requests\StoreProductRequest $request)
+    public function store(\Modules\CatalogDelivery\Http\Requests\StoreProductRequest $request)
     {
         $product = Product::create($request->validated());
 
@@ -51,10 +52,10 @@ class ProductController extends Controller
     {
         $product = Product::with('images')->findOrFail($id);
         $categories = Category::all();
-        return view('products.edit', compact('product', 'categories'));
+        return view('catalogdelivery::admin.products.edit', compact('product', 'categories'));
     }
 
-    public function update(\App\Http\Requests\UpdateProductRequest $request, $id)
+    public function update(\Modules\CatalogDelivery\Http\Requests\UpdateProductRequest $request, $id)
     {
         $product = Product::findOrFail($id);
         $product->update($request->validated());

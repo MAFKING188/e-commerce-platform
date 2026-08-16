@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\CatalogDelivery\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\Category;
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
+use Modules\CatalogDelivery\Http\Requests\StoreProductRequest;
+use Modules\CatalogDelivery\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\ProductImage;
@@ -22,7 +23,7 @@ class PartnerInventoryController extends Controller
     {
         $partner = $this->getPartner();
         $products = $partner->products()->paginate(12);
-        return view('partner.inventory.index', compact('products'));
+        return view('catalogdelivery::partner.inventory.index', compact('products'));
     }
 
     public function bulkAction(Request $request)
@@ -51,7 +52,7 @@ class PartnerInventoryController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('partner.inventory.create', compact('categories'));
+        return view('catalogdelivery::partner.inventory.create', compact('categories'));
     }
 
     public function store(StoreProductRequest $request)
@@ -89,7 +90,7 @@ class PartnerInventoryController extends Controller
         $partner = $this->getPartner();
         $product = $partner->products()->with('images')->findOrFail($id);
         $categories = Category::all();
-        return view('partner.inventory.edit', compact('product', 'categories'));
+        return view('catalogdelivery::partner.inventory.edit', compact('product', 'categories'));
     }
 
     public function update(UpdateProductRequest $request, $id)
