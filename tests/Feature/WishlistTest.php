@@ -44,6 +44,8 @@ class WishlistTest extends TestCase
         $product = Product::factory()->create(['stock' => 5]);
         Wishlist::create(['user_id' => $user->id, 'product_id' => $product->id]);
 
+        $this->withoutVite();
+
         $this->actingAs($user)
             ->get('/archive')
             ->assertOk()
