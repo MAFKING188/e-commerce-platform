@@ -75,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
     /* Wishlist System */
     Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    /* Reviews */
+    Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
 });
 
 /*

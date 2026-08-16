@@ -29,14 +29,15 @@ class ReviewController extends Controller
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string'
+            'comment' => 'required|string|min:3|max:1000'
         ]);
 
         Review::create([
             'user_id' => auth()->id(),
             'product_id' => $request->product_id,
             'rating' => $request->rating,
-            'comment' => $request->comment
+            'comment' => $request->comment,
+            'status' => 'pending',
         ]);
 
         return redirect()->back()

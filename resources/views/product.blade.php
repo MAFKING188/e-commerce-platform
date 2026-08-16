@@ -229,6 +229,29 @@
         <h2 style="font-size: 2.5rem; font-weight: 800; color: var(--text-900);">The Archive Reviews.</h2>
     </div>
 
+    @auth
+        <div class="review-form-panel">
+            <h3>Share your perspective</h3>
+            <form method="POST" action="{{ route('reviews.store') }}" class="review-form">
+                @csrf
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                <label for="rating">Rating</label>
+                <select name="rating" id="rating" required>
+                    <option value="5">5 — Exceptional</option>
+                    <option value="4">4 — Excellent</option>
+                    <option value="3">3 — Good</option>
+                    <option value="2">2 — Fair</option>
+                    <option value="1">1 — Poor</option>
+                </select>
+                <label for="comment">Comment</label>
+                <textarea name="comment" id="comment" rows="4" placeholder="What makes this piece special?"></textarea>
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+    @else
+        <p><a href="{{ route('login') }}">Sign in</a> to share your perspective.</p>
+    @endauth
+
     @if($product->reviews->isEmpty())
         <div style="padding: 4rem; background: var(--surface-100); border-radius: 2rem; border: 1px dashed var(--border); text-align: center;">
             <p style="color: var(--text-400); font-weight: 600;">No testimonials recorded for this piece yet.</p>
