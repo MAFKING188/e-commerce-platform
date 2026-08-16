@@ -27,28 +27,29 @@ class AdminOrderController extends Controller
             \DB::transaction(function () use ($order) {
                 $order->update(['status' => 'completed']);
 
-                // Calculate payouts for each partner involved in this order
+                // Calculate payouts for each partner involved in this order.
+                // A product's line value is split equally among its partners.
                 $partnerItems = [];
                 foreach ($order->items as $item) {
-                    foreach ($item->product->partners as $partner) {
-                        if (!isset($partnerItems[$partner->id])) {
-                            $partnerItems[$partner->id] = 0;
-                        }
-                        $partnerItems[$partner->id] += ($item->price * $item->quantity);
+                    $partners = $item->product->partners;
+                    if ($partners->isEmpty()) {
+                        continue;
+                    }
+                    $lineValue = $item->price * $item->quantity;
+                    $share = $lineValue / $partners->count();
+                    foreach ($partners as $partner) {
+                        $partnerItems[$partner->id] = ($partnerItems[$partner->id] ?? 0) + $share;
                     }
                 }
 
                 foreach ($partnerItems as $partnerId => $grossAmount) {
-                    // Platform takes 10% commission
-                    $netAmount = $grossAmount * 0.90;
+                    // Platform takes commission_rate (default 10%) commission
+                    $netAmount = $grossAmount * (1 - config('shop.commission_rate'));
 
-                    \App\Models\Payout::firstOrCreate([
-                        'order_id' => $order->id,
-                        'partner_id' => $partnerId
-                    ], [
-                        'amount' => $netAmount,
-                        'status' => 'pending'
-                    ]);
+                    \App\Models\Payout::updateOrCreate(
+                        ['order_id' => $order->id, 'partner_id' => $partnerId],
+                        ['amount' => $netAmount, 'status' => 'pending']
+                    );
                 }
             });
 
