@@ -1,18 +1,33 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
+import { collectModuleAssetsPaths } from './vite-module-loader';
 
-export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
-        }),
-        tailwindcss(),
-    ],
-    server: {
-        watch: {
-            ignored: ['**/storage/framework/views/**'],
+async function getModulePaths() {
+    const paths = [];
+    await collectModuleAssetsPaths(paths, 'Modules');
+    return paths;
+}
+
+export default defineConfig(async () => {
+    const modulePaths = await getModulePaths();
+
+    return {
+        plugins: [
+            laravel({
+                input: [
+                    'resources/css/app.css',
+                    'resources/js/app.js',
+                    ...modulePaths,
+                ],
+                refresh: true,
+            }),
+            tailwindcss(),
+        ],
+        server: {
+            watch: {
+                ignored: ['**/storage/framework/views/**'],
+            },
         },
-    },
+    };
 });
