@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\PartnerHub\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -54,6 +55,6 @@ class PartnerDashboardController extends Controller
             'values' => $salesData->pluck('total')
         ];
 
-        return view('partner.dashboard', compact('partner', 'inventoryCount', 'recentOrders', 'totalRevenue', 'itemsSold', 'pendingPayout', 'chartData'));
+        return view('partnerhub::partner.dashboard', compact('partner', 'inventoryCount', 'recentOrders', 'totalRevenue', 'itemsSold', 'pendingPayout', 'chartData'));
     }
 }

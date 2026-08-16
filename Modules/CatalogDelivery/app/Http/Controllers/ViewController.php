@@ -35,11 +35,4 @@ class ViewController extends Controller
     {
         return view('catalogdelivery::contact');
     }
-
-    public function partnerProfile($id)
-    {
-        // dd('DEBUG: Reached partnerProfile with id: ' . $id);
-        $partner = \Modules\PartnerHub\Models\Partner::with('products.images')->findOrFail($id);
-        return view('partner_profile', compact('partner'));
-    }
 }

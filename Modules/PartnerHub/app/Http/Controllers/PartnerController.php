@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\PartnerHub\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
-use App\Http\Requests\StorePartnerRequest;
-use App\Http\Requests\UpdatePartnerRequest;
+use Modules\IdentityAccess\Models\User;
+use Modules\PartnerHub\Http\Requests\StorePartnerRequest;
+use Modules\PartnerHub\Http\Requests\UpdatePartnerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,13 +20,13 @@ class PartnerController extends Controller
     public function index()
     {
         $partners = Partner::withCount('products')->latest()->get();
-        return view('admin.partners.index', compact('partners'));
+        return view('partnerhub::admin.partners.index', compact('partners'));
     }
 
     public function create()
     {
-        $users = \Modules\IdentityAccess\Models\User::all();
-        return view('admin.partners.create', compact('users'));
+        $users = User::all();
+        return view('partnerhub::admin.partners.create', compact('users'));
     }
 
     /**
@@ -46,7 +48,7 @@ class PartnerController extends Controller
     public function edit($id)
     {
         $partner = Partner::findOrFail($id);
-        return view('admin.partners.edit', compact('partner'));
+        return view('partnerhub::admin.partners.edit', compact('partner'));
     }
 
     /**
@@ -96,7 +98,7 @@ class PartnerController extends Controller
             $q->where('partner_id', $id);
         })->get();
 
-        return view('admin.partners.show', compact('partner', 'availableProducts'));
+        return view('partnerhub::admin.partners.show', compact('partner', 'availableProducts'));
     }
 
     /**
