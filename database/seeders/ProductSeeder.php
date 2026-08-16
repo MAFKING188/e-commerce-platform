@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\Category;
+use Modules\CatalogDelivery\Models\Category;
+use Modules\CatalogDelivery\Models\Product;
+use Modules\CatalogDelivery\Models\ProductImage;
 
 class ProductSeeder extends Seeder
 {

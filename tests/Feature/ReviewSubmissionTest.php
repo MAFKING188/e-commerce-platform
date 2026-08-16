@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

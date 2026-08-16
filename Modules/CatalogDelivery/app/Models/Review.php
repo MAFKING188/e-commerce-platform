@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace Modules\CatalogDelivery\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\IdentityAccess\Models\User;
 
 class Review extends Model
 {

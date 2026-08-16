@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Review;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Review;
+use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller

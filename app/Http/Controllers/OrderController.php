@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderCancelled;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use App\Models\Payment;
 
 class OrderController extends Controller

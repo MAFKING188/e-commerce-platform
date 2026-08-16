@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 
 // 🎯 MISSION 7: THE BRIDGE (API LAYER)
 

@@ -146,7 +146,7 @@
             <label style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem; display: block; color: var(--text-400);">Collection</label>
             <select name="category" class="filter-input">
                 <option value="">All Categories</option>
-                @foreach(\App\Models\Category::all() as $category)
+                @foreach(\Modules\CatalogDelivery\Models\Category::all() as $category)
                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                         {{ $category->name }}
                     </option>

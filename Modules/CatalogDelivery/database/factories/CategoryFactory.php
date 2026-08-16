@@ -1,9 +1,9 @@
 <?php
 
-namespace Database\Factories;
+namespace Modules\CatalogDelivery\Database\Factories;
 
-use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\CatalogDelivery\Models\Category;
 
 class CategoryFactory extends Factory
 {

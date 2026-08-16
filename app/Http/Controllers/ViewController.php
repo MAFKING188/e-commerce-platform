@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
 
 class ViewController extends Controller

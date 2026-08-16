@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Partner;

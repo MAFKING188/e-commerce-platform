@@ -1,13 +1,22 @@
 <?php
 
-namespace App\Models;
+namespace Modules\CatalogDelivery\Models;
 
+use App\Models\CartItem;
+use App\Models\OrderItem;
+use App\Models\Partner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\CatalogDelivery\Database\Factories\ProductFactory;
 
 class Product extends Model
 {
     use HasFactory;
+
+    protected static function newFactory(): ProductFactory
+    {
+        return ProductFactory::new();
+    }
     /**
      * Centralized Image Resolution Logic
      * Handles: Absolute URLs, Local Storage, and Semantic Fallbacks

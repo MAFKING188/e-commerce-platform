@@ -3,8 +3,8 @@
 namespace Modules\IdentityAccess\Services;
 
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\Review;
+use Modules\CatalogDelivery\Models\Product;
+use Modules\CatalogDelivery\Models\Review;
 use Modules\IdentityAccess\Models\User;
 
 class GovernanceService

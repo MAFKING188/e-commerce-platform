@@ -1,10 +1,10 @@
 <?php
 
-namespace Database\Factories;
+namespace Modules\CatalogDelivery\Database\Factories;
 
-use App\Models\Category;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\CatalogDelivery\Models\Category;
+use Modules\CatalogDelivery\Models\Product;
 
 class ProductFactory extends Factory
 {

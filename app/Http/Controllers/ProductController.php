@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductImage;
+use Modules\CatalogDelivery\Models\Category;
+use Modules\CatalogDelivery\Models\Product;
+use Modules\CatalogDelivery\Models\ProductImage;
 
 class ProductController extends Controller
 {

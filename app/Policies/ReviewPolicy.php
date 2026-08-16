@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Review;
+use Modules\CatalogDelivery\Models\Review;
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Auth\Access\Response;
 

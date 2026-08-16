@@ -154,7 +154,7 @@
                     <label class="form-label">Collection / Category</label>
                     <select name="category_id" class="auth-input" required>
                         <option value="">Select Collection</option>
-                        @foreach(\App\Models\Category::all() as $category)
+                        @foreach(\Modules\CatalogDelivery\Models\Category::all() as $category)
                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
                             </option>

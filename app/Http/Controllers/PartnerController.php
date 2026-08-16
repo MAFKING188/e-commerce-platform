@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use App\Http\Requests\StorePartnerRequest;
 use App\Http\Requests\UpdatePartnerRequest;
 use Illuminate\Http\Request;

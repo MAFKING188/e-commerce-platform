@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
-use App\Models\Product;
-use App\Models\Category;
+use Modules\CatalogDelivery\Models\Product;
+use Modules\CatalogDelivery\Models\Category;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\ProductImage;
+use Modules\CatalogDelivery\Models\ProductImage;
 
 class PartnerInventoryController extends Controller
 {

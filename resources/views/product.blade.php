@@ -278,7 +278,7 @@
 
 {{-- PHASE 8: THE SUGGESTION (RELATED ITEMS) --}}
 @php
-    $relatedProducts = \App\Models\Product::where('category_id', $product->category_id)
+    $relatedProducts = \Modules\CatalogDelivery\Models\Product::where('category_id', $product->category_id)
         ->where('id', '!=', $product->id)
         ->take(4)
         ->get();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\CatalogDelivery\Models\Product;
 
 class Partner extends Model
 {

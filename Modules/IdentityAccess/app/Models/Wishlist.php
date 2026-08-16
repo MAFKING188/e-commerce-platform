@@ -2,7 +2,7 @@
 
 namespace Modules\IdentityAccess\Models;
 
-use App\Models\Product;
+use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 
 class Wishlist extends Model
