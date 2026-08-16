@@ -95,11 +95,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 
     Route::post('/products/{product}/reorder-images', [\App\Http\Controllers\ProductController::class, 'reorderImages'])->name('products.reorder-images');
     Route::delete('/products/{product}/images/{image}', [\App\Http\Controllers\ProductController::class, 'deleteImage'])->name('products.delete-image');
-    Route::resource('products', \App\Http\Controllers\ProductController::class)->names([
+    Route::resource('products', \App\Http\Controllers\ProductController::class)->except(['show'])->names([
         'index' => 'products.index',
         'create' => 'products.create',
         'store' => 'products.store',
-        'show' => 'products.show',
         'edit' => 'products.edit',
         'update' => 'products.update',
         'destroy' => 'products.destroy',
