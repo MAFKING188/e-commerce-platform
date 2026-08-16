@@ -1,0 +1,168 @@
+// ============================================================
+// PartnerHub module styles
+// Extracted from moved blades (Task 4.4). Each section is scoped
+// to the view it came from with a comment header.
+// ============================================================
+
+// ---------- admin/partners/index ----------
+.admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+.admin-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }
+
+.partner-table-wrap {
+    background: var(--surface-100);
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.partner-table { width: 100%; border-collapse: collapse; }
+.partner-table th {
+    text-align: left;
+    padding: 1.5rem 2rem;
+    background: var(--surface-300);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-600);
+    letter-spacing: 0.1em;
+}
+
+.partner-table td { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+.partner-info { display: flex; align-items: center; gap: 1rem; }
+.partner-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.product-count {
+    background: var(--surface-300);
+    color: var(--text-600);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+// ---------- admin/partners/create ----------
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--surface-100);
+    padding: 4rem;
+    border-radius: 3rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+}
+.form-group { margin-bottom: 2.5rem; }
+.form-group label { display: block; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: var(--text-400); margin-bottom: 1rem; letter-spacing: 0.1em; }
+.form-control { width: 100%; padding: 1.25rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--surface-200); color: var(--text-900); font-family: inherit; font-size: 1rem; }
+.form-control:focus { outline: none; border-color: var(--brand-accent); background: var(--surface-100); }
+
+// ---------- admin/partners/edit ----------
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--surface-100);
+    padding: 4rem;
+    border-radius: 3rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+}
+.form-group { margin-bottom: 2.5rem; }
+.form-group label { display: block; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: var(--text-400); margin-bottom: 1rem; letter-spacing: 0.1em; }
+.form-control { width: 100%; padding: 1.25rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--surface-200); color: var(--text-900); font-family: inherit; font-size: 1rem; }
+.form-control:focus { outline: none; border-color: var(--brand-accent); background: var(--surface-100); }
+
+// ---------- admin/partners/show ----------
+.partner-profile-header {
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 3rem;
+    padding: 4rem;
+    margin-bottom: 4rem;
+    display: flex;
+    gap: 4rem;
+    align-items: center;
+}
+
+.partner-visual {
+    width: 120px;
+    height: 120px;
+    background: var(--brand-accent);
+    color: white;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.partner-meta h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); margin-bottom: 0.5rem; }
+.partner-meta p { color: var(--text-600); max-width: 600px; margin-bottom: 2rem; }
+
+.inventory-section { margin-top: 6rem; }
+.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+
+.mapping-card {
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    border-radius: 2rem;
+    transition: all 0.3s ease;
+}
+.mapping-card:hover { border-color: var(--brand-accent); transform: translateY(-5px); }
+
+// ---------- partner/dashboard ----------
+.partner-header { margin-bottom: 4rem; }
+.partner-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.stat-card {
+    background: var(--surface-100);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+}
+
+.chart-container {
+    background: var(--surface-100);
+    padding: 2.5rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    margin-bottom: 4rem;
+    height: 400px;
+}
+
+// ---------- partner/profile/edit ----------
+.form-feedback {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    background: var(--surface-100);
+    border: 1px solid var(--success);
+    color: var(--success);
+    font-weight: 700;
+}
+
+.form-feedback-error {
+    border-color: var(--error);
+    color: var(--error);
+}

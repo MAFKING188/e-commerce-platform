@@ -1,49 +1,5 @@
 @section('title', $partner->name . ' | Partner Profile')
 
-@section('styles')
-<style>
-    .partner-profile-header {
-        background: var(--surface-100);
-        border: 1px solid var(--border);
-        border-radius: 3rem;
-        padding: 4rem;
-        margin-bottom: 4rem;
-        display: flex;
-        gap: 4rem;
-        align-items: center;
-    }
-
-    .partner-visual {
-        width: 120px;
-        height: 120px;
-        background: var(--brand-accent);
-        color: white;
-        border-radius: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
-
-    .partner-meta h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); margin-bottom: 0.5rem; }
-    .partner-meta p { color: var(--text-600); max-width: 600px; margin-bottom: 2rem; }
-
-    .inventory-section { margin-top: 6rem; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
-
-    .mapping-card {
-        background: var(--surface-100);
-        border: 1px solid var(--border);
-        padding: 2rem;
-        border-radius: 2rem;
-        transition: all 0.3s ease;
-    }
-    .mapping-card:hover { border-color: var(--brand-accent); transform: translateY(-5px); }
-</style>
-@endsection
-
 <x-app-layout>
 <div style="margin-bottom: 2rem;">
     <a href="{{ route('admin.partners.index') }}" style="color: var(--text-400); font-weight: 700;">← Back to Ecosystem</a>

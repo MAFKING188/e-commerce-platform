@@ -1,56 +1,5 @@
 @section('title', 'Partner Ecosystem | LUWI Admin')
 
-@section('styles')
-<style>
-    .admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
-    .admin-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }
-
-    .partner-table-wrap {
-        background: var(--surface-100);
-        border-radius: 2rem;
-        border: 1px solid var(--border);
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-    }
-
-    .partner-table { width: 100%; border-collapse: collapse; }
-    .partner-table th {
-        text-align: left;
-        padding: 1.5rem 2rem;
-        background: var(--surface-300);
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--text-600);
-        letter-spacing: 0.1em;
-    }
-
-    .partner-table td { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    
-    .partner-info { display: flex; align-items: center; gap: 1rem; }
-    .partner-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--brand-accent-soft);
-        color: var(--brand-accent);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-    }
-
-    .product-count {
-        background: var(--surface-300);
-        color: var(--text-600);
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.7rem;
-        font-weight: 700;
-    }
-</style>
-@endsection
-
 <x-app-layout>
 @include('partials.admin-nav')
 

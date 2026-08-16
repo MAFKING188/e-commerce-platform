@@ -3,4 +3,5 @@
     <a href="{{ route('partner.orders.index') }}" class="btn {{ request()->routeIs('partner.orders.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Orders</a>
     <a href="{{ route('partner.inventory.index') }}" class="btn {{ request()->routeIs('partner.inventory.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Inventory</a>
     <a href="{{ route('partner.payouts.index') }}" class="btn {{ request()->routeIs('partner.payouts.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Earnings</a>
+    <a href="{{ route('partner.profile.edit') }}" class="btn {{ request()->routeIs('partner.profile.edit') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Profile</a>
 </div>
