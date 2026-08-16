@@ -55,7 +55,7 @@
 @else
     <div class="catalog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 3rem;">
         @foreach($items as $item)
-            @include('components.product-card', ['product' => $item->product])
+            @include('catalogdelivery::components.product-card', ['product' => $item->product])
         @endforeach
     </div>
 @endif

@@ -1,26 +1,7 @@
 @section('title', 'Edit Product | Partner Dashboard')
 
-@section('styles')
-<style>
-    .form-container { background: var(--surface-100); border-radius: 2rem; border: 1px solid var(--border); padding: 3rem; max-width: 800px; margin: 0 auto; }
-    .form-group { margin-bottom: 2rem; }
-    .form-group label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-600); }
-    .form-control { width: 100%; padding: 1rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--surface-200); font-family: inherit; font-size: 1rem; transition: 0.2s; }
-    .form-control:focus { outline: none; border-color: var(--brand-accent); box-shadow: 0 0 0 4px var(--brand-accent-soft); }
-    
-    @media (max-width: 768px) {
-        .form-container { padding: 1.5rem; }
-    }
-
-    .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
-    .media-item { position: relative; border-radius: 1rem; overflow: hidden; border: 1px solid var(--border); background: var(--surface-200); aspect-ratio: 1; cursor: move; }
-    .media-item img { width: 100%; height: 100%; object-fit: cover; }
-    .media-actions { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem; }
-    .media-btn { background: rgba(255, 255, 255, 0.9); border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ef4444; font-size: 0.8rem; box-shadow: var(--shadow-sm); }
-</style>
 <!-- Include SortableJS for drag and drop reordering -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-@endsection
 
 @section('scripts')
 <script>
@@ -76,9 +57,9 @@
 <x-app-layout>
 @include('partials.partner-nav')
 
-<div style="margin-bottom: 4rem; text-align: center;">
+<div class="inventory-form-head">
     <span class="cat-badge">Inventory Refinement</span>
-    <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Refine Piece.</h1>
+    <h1 class="inventory-title">Refine Piece.</h1>
 </div>
 
 <div class="form-container">
@@ -91,7 +72,7 @@
             <input type="text" name="name" id="name" class="form-control" value="{{ $product->name }}" required>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div class="inventory-form-grid">
             <div class="form-group">
                 <label for="price">Price (USD)</label>
                 <input type="number" name="price" id="price" class="form-control" step="0.01" value="{{ $product->price }}" required>
@@ -139,17 +120,17 @@
             <input type="file" name="images[]" id="images" class="form-control" multiple>
         </div>
 
-        <div style="margin-top: 3rem; display: flex; gap: 1.5rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 2;">Save Refinements</button>
-            <a href="{{ route('partner.inventory.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+        <div class="inventory-form-actions">
+            <button type="submit" class="btn btn-primary inventory-form-submit">Save Refinements</button>
+            <a href="{{ route('partner.inventory.index') }}" class="btn btn-ghost inventory-form-cancel">Cancel</a>
         </div>
     </form>
     
-    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center;">
+    <div class="inventory-danger-zone">
         <form action="{{ route('partner.inventory.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Archive this piece permanently?')">
             @csrf
             @method('DELETE')
-            <button type="submit" style="background: none; border: none; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.9rem;">
+            <button type="submit" class="inventory-archive-btn">
                 Permanently Archive Piece
             </button>
         </form>

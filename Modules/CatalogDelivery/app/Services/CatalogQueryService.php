@@ -2,10 +2,15 @@
 
 namespace Modules\CatalogDelivery\Services;
 
+use Modules\CatalogDelivery\Models\Category;
 use Modules\CatalogDelivery\Models\Product;
 
 class CatalogQueryService
 {
+    public function categories(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Category::all();
+    }
     public function home(): array
     {
         $latestProducts = Product::with(['images', 'partners'])

@@ -15,7 +15,10 @@ class ViewController extends Controller
 
     public function shop(Request $request, CatalogQueryService $catalog)
     {
-        return view('catalogdelivery::shop', ['products' => $catalog->shop($request)]);
+        return view('catalogdelivery::shop', [
+            'products' => $catalog->shop($request),
+            'categories' => $catalog->categories(),
+        ]);
     }
 
     public function product($id, CatalogQueryService $catalog)

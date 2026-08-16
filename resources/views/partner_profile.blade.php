@@ -13,7 +13,7 @@
     <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Collection</h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
         @foreach($partner->products as $product)
-            @include('components.product-card', ['product' => $product])
+            @include('catalogdelivery::components.product-card', ['product' => $product])
         @endforeach
     </div>
 </div>

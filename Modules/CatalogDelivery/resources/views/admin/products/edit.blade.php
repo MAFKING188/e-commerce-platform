@@ -1,59 +1,6 @@
 @section('title', 'Refine Product | LUWI Admin')
 
-@section('styles')
-<style>
-    .editor-stage {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .editor-header {
-        margin-bottom: 4rem;
-        text-align: center;
-    }
-
-    .editor-header h1 {
-        font-size: 3rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-    }
-
-    .editor-card {
-        background: white;
-        padding: 4rem;
-        border-radius: var(--radius-lg);
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .field-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-    }
-
-    @media (max-width: 768px) {
-        .field-grid { grid-template-columns: 1fr; }
-        .editor-card { padding: 2rem; }
-        .editor-header h1 { font-size: 2.5rem; }
-    }
-
-    .field-full {
-        grid-column: span 2;
-    }
-
-    @media (max-width: 768px) {
-        .field-full { grid-column: span 1; }
-    }
-
-    .media-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
-    .media-item { position: relative; border-radius: 1rem; overflow: hidden; border: 1px solid var(--border); background: var(--surface-200); aspect-ratio: 1; cursor: move; }
-    .media-item img { width: 100%; height: 100%; object-fit: cover; }
-    .media-actions { position: absolute; top: 0.5rem; right: 0.5rem; display: flex; gap: 0.5rem; }
-    .media-btn { background: rgba(255, 255, 255, 0.9); border: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #ef4444; font-size: 0.8rem; box-shadow: var(--shadow-sm); }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-@endsection
 
 @section('scripts')
 <script>
@@ -148,7 +95,7 @@
 
                 <div class="form-group field-full">
                     <label class="form-label">Description</label>
-                    <textarea name="description" class="auth-input" rows="6" style="resize: none;">{{ old('description', $product->description) }}</textarea>
+                    <textarea name="description" class="auth-input no-resize" rows="6">{{ old('description', $product->description) }}</textarea>
                 </div>
 
                 <div class="form-group field-full">
@@ -167,13 +114,13 @@
 
                 <div class="form-group field-full">
                     <label class="form-label">Add Narrative Visuals</label>
-                    <input type="file" name="images[]" class="auth-input" style="background: white;" multiple>
+                    <input type="file" name="images[]" class="auth-input editor-input-plain" multiple>
                 </div>
             </div>
 
-            <div style="margin-top: 3rem; display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 2; padding: 1.25rem;">Update Product Details</button>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+            <div class="edit-actions">
+                <button type="submit" class="btn btn-primary editor-submit-sm">Update Product Details</button>
+                <a href="{{ route('admin.products.index') }}" class="btn btn-ghost editor-cancel-sm">Cancel</a>
             </div>
         </form>
     </div>
