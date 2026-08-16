@@ -16,7 +16,7 @@
         <div class="category-card">
             <div>
                 <h3 class="category-name">{{ $category->name }}</h3>
-                <span class="category-count">{{ $category->products()->count() }} items mapped</span>
+                <span class="category-count">{{ $category->products_count }} items mapped</span>
             </div>
             <div class="category-actions">
                 <a href="{{ route('admin.categories.edit', $category->id) }}" class="category-edit">Edit</a>
