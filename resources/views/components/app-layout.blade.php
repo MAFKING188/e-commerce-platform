@@ -16,7 +16,7 @@
     
     <!-- Google Fonts: Geist or Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(array_merge(['resources/css/app.css', 'resources/js/app.js'], $moduleAssets ?? []))
+    @vite(array_merge(['resources/css/app.css'], $moduleAssets ?? []))
     @yield('styles')
     <script>
         // Check for saved theme or default to light

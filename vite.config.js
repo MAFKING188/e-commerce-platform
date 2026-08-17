@@ -17,7 +17,6 @@ export default defineConfig(async () => {
             laravel({
                 input: [
                     'resources/css/app.css',
-                    'resources/js/app.js',
                     ...modulePaths,
                 ],
                 refresh: true,
