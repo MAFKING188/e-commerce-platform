@@ -1,7 +1,28 @@
-<div style="background: var(--surface-100); border: 1px solid var(--border); border-radius: 1.5rem; padding: 0.5rem; display: flex; gap: 0.5rem; margin-bottom: 3rem; overflow-x: auto; white-space: nowrap;">
-    <a href="{{ route('partner.dashboard') }}" class="btn {{ request()->routeIs('partner.dashboard') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Dashboard</a>
-    <a href="{{ route('partner.orders.index') }}" class="btn {{ request()->routeIs('partner.orders.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Orders</a>
-    <a href="{{ route('partner.inventory.index') }}" class="btn {{ request()->routeIs('partner.inventory.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Inventory</a>
-    <a href="{{ route('partner.payouts.index') }}" class="btn {{ request()->routeIs('partner.payouts.*') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Earnings</a>
-    <a href="{{ route('partner.profile.edit') }}" class="btn {{ request()->routeIs('partner.profile.edit') ? 'btn-primary' : 'btn-ghost' }}" style="padding: 0.75rem 1.5rem;">Profile</a>
-</div>
+@section('styles')
+@vite('resources/css/partner.css')
+@endsection
+
+<nav class="pc-nav" aria-label="Partner console">
+    <a href="{{ route('partner.dashboard') }}" class="pc-nav__tab {{ request()->routeIs('partner.dashboard') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+        Dashboard
+    </a>
+    <a href="{{ route('partner.orders.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.orders.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M6 2h12v20l-2-1.5L14 22l-2-1.5L10 22l-2-1.5L6 22V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
+        Orders
+    </a>
+    <a href="{{ route('partner.inventory.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.inventory.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>
+        Inventory
+    </a>
+    <a href="{{ route('partner.payouts.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.payouts.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M15.5 9.5a3.5 3.5 0 0 0-3.5-2.5c-2 0-3.5 1.2-3.5 2.5s1.5 2.5 3.5 2.5 3.5 1.2 3.5 2.5-1.5 2.5-3.5 2.5a3.5 3.5 0 0 1-3.5-2.5"/></svg>
+        Earnings
+    </a>
+    <a href="{{ route('partner.profile.edit') }}" class="pc-nav__tab {{ request()->routeIs('partner.profile.edit') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+        Profile
+    </a>
+</nav>
+
+@include('partials.partner.confirm-modal')

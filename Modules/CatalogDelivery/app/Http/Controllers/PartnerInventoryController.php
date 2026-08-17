@@ -20,10 +20,20 @@ class PartnerInventoryController extends Controller
         return Partner::where('user_id', auth()->id())->firstOrFail();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $partner = $this->getPartner();
-        $products = $partner->products()->paginate(12);
+
+        $search = mb_substr(trim((string) $request->query('search', '')), 0, 60);
+        $stockFilter = $request->query('stock');
+
+        $products = $partner->products()
+            ->when($search !== '', fn ($q) => $q->where('products.name', 'like', '%' . $search . '%'))
+            ->when($stockFilter === 'low', fn ($q) => $q->where('products.stock', '<', 5))
+            ->when($stockFilter === 'in', fn ($q) => $q->where('products.stock', '>=', 5))
+            ->paginate(12)
+            ->withQueryString();
+
         return view('catalogdelivery::partner.inventory.index', compact('products'));
     }
 

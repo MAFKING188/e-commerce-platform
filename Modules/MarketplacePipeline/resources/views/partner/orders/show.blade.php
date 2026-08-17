@@ -1,74 +1,83 @@
-@section('title', 'Order Details | Partner Dashboard')
+@section('title', 'Order #' . $order->id . ' | Partner Dashboard')
+
+@section('scripts')
+@vite('resources/js/partner.js')
+@endsection
 
 <x-app-layout>
 @include('partials.partner-nav')
 
-<div class="order-header">
-    <a href="{{ route('partner.orders.index') }}" class="btn btn-ghost" style="margin-bottom: 2rem;">← Back to All Orders</a>
-    <span class="cat-badge">Order Fulfillment</span>
-    <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Order #{{ $order->id }}</h1>
+<a href="{{ route('partner.orders.index') }}" class="pc-back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    Back to All Orders
+</a>
+
+<div class="pc-header">
+    <div>
+        <span class="pc-eyebrow">Order Fulfillment</span>
+        <h1 class="pc-title">Order #{{ $order->id }}</h1>
+    </div>
+    @include('partials.partner.status-badge', ['status' => $order->status])
 </div>
 
-<div class="order-meta-grid">
-    <div class="meta-card">
-        <label>Placement Date</label>
-        <div class="value">{{ $order->created_at->format('M d, Y') }}</div>
+<div class="pc-meta-grid">
+    <div class="pc-card pc-meta">
+        <span class="pc-meta__label">Placement Date</span>
+        <div class="pc-meta__value">{{ $order->created_at->format('M d, Y') }}</div>
     </div>
-    <div class="meta-card">
-        <label>Fulfillment Status</label>
-        <div class="value">
-            <span style="color: {{ $order->status === 'completed' ? 'var(--success)' : 'var(--brand-accent)' }}">
-                {{ ucfirst($order->status) }}
-            </span>
-        </div>
+    <div class="pc-card pc-meta">
+        <span class="pc-meta__label">Fulfillment Status</span>
+        <div class="pc-meta__value">@include('partials.partner.status-badge', ['status' => $order->status])</div>
     </div>
-    <div class="meta-card">
-        <label>Client Reference</label>
-        <div class="value">{{ $order->user->name }}</div>
+    <div class="pc-card pc-meta">
+        <span class="pc-meta__label">Client Reference</span>
+        <div class="pc-meta__value">{{ $order->user->name }}</div>
     </div>
 </div>
 
-<div class="items-table-wrap">
-    <h3 style="padding: 1.5rem; border-bottom: 1px solid var(--border); font-size: 1.25rem; font-weight: 800;">Items to Fulfill</h3>
-    <table class="items-table">
-        <thead>
-            <tr>
-                <th>Piece</th>
-                <th>Quantity</th>
-                <th>Price Each</th>
-                <th style="text-align: right;">Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($partnerItems as $item)
+<div class="pc-card">
+    <div class="pc-card__head">
+        <h2 class="pc-section-title">Items to Fulfill</h2>
+    </div>
+    <div class="pc-table-wrap pc-table-wrap--flush">
+        <table class="pc-table">
+            <thead>
                 <tr>
-                    <td>
-                        <div class="product-info">
-                            <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img">
-                            <div>
-                                <div style="font-weight: 700;">{{ $item->product->name }}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-400);">{{ $item->product->category->name ?? 'Collection' }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td style="font-weight: 600;">{{ $item->quantity }}</td>
-                    <td>${{ number_format($item->price, 2) }}</td>
-                    <td style="text-align: right; font-weight: 700;">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                    <th>Piece</th>
+                    <th>Quantity</th>
+                    <th>Price Each</th>
+                    <th class="is-right">Total</th>
                 </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" style="text-align: right; padding: 2rem; font-weight: 700; color: var(--text-600);">Partner Subtotal:</td>
-                <td style="text-align: right; padding: 2rem; font-size: 1.5rem; font-weight: 800; color: var(--brand-accent);">${{ number_format($partnerSubtotal, 2) }}</td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($partnerItems as $item)
+                    <tr>
+                        <td>
+                            <div class="pc-product">
+                                <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="pc-product__img">
+                                <div>
+                                    <div class="pc-product__name">{{ $item->product->name }}</div>
+                                    <div class="pc-product__cat">{{ $item->product->category->name ?? 'Collection' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="is-numeric">{{ $item->quantity }}</td>
+                        <td class="is-muted">${{ number_format($item->price, 2) }}</td>
+                        <td class="is-right is-numeric">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <div class="pc-totals">
+        <span class="pc-totals__label">Partner Subtotal:</span>
+        <span class="pc-totals__value">${{ number_format($partnerSubtotal, 2) }}</span>
+    </div>
 </div>
 
-<div style="margin-top: 4rem; background: var(--brand-accent-soft); border: 1px solid var(--brand-accent); border-radius: 1.5rem; padding: 2rem;">
-    <h4 style="color: var(--brand-accent); font-weight: 800; margin-bottom: 1rem;">Logistics Note</h4>
-    <p style="font-size: 0.95rem; color: var(--brand-accent); opacity: 0.8;">
+<div class="pc-note">
+    <h4 class="pc-note__title">Logistics Note</h4>
+    <p class="pc-note__text">
         Please ensure all pieces are inspected for quality before dispatch. Once shipped, please update the central logistics hub.
     </p>
 </div>

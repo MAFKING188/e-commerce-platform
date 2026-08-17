@@ -35,9 +35,8 @@ class Partner extends Model
 
     public function orders()
     {
-        return $this->belongsToMany(Order::class, 'order_items', 'product_id', 'order_id')
-                    ->join('partner_products', 'order_items.product_id', '=', 'partner_products.product_id')
-                    ->where('partner_products.partner_id', $this->id)
-                    ->distinct();
+        return Order::whereHas('items.product.partners', function ($q) {
+            $q->where('partners.id', $this->id);
+        });
     }
 }

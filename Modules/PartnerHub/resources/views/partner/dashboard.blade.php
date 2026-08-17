@@ -3,68 +3,80 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @vite('Modules/PartnerHub/resources/assets/js/dashboard.js')
+@vite('resources/js/partner.js')
 @endsection
+
 <x-app-layout>
 @include('partials.partner-nav')
 
-<div class="partner-header">
-    <span class="cat-badge">Partner Dashboard</span>
-    <h1>Welcome, {{ $partner->name }}.</h1>
-</div>
-
-<div class="stats-grid">
-    <div class="stat-card">
-        <label>Active Inventory</label>
-        <div class="value" style="font-size: 2.5rem; font-weight: 800; color: var(--text-900);">{{ $inventoryCount }}</div>
-        <a href="{{ route('partner.inventory.index') }}" style="font-size: 0.8rem; color: var(--brand-accent); font-weight: 700;">Manage Portfolio →</a>
-    </div>
-    <div class="stat-card">
-        <label>Pending Payout</label>
-        <div class="value" style="font-size: 2.5rem; font-weight: 800; color: var(--text-900);">${{ number_format($pendingPayout, 2) }}</div>
-        <a href="{{ route('partner.payouts.index') }}" style="font-size: 0.8rem; color: var(--brand-accent); font-weight: 700;">Earnings History →</a>
-    </div>
-    <div class="stat-card">
-        <label>Total Revenue</label>
-        <div class="value" style="font-size: 2.5rem; font-weight: 800; color: var(--brand-accent);">${{ number_format($totalRevenue, 2) }}</div>
-        <div style="font-size: 0.8rem; color: var(--text-400);">Gross lifecycle value</div>
+<div class="pc-header">
+    <div>
+        <span class="pc-eyebrow">Partner Dashboard</span>
+        <h1 class="pc-title">Welcome, {{ $partner->name }}.</h1>
     </div>
 </div>
 
-<div class="chart-container">
-    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 2rem;">Sales Performance (Last 30 Days)</h3>
-    <canvas id="salesChart" data-labels="{{ json_encode($chartData['labels']) }}" data-values="{{ json_encode($chartData['values']) }}"></canvas>
+<div class="pc-stats">
+    @include('partials.partner.stat-card', [
+        'label' => 'Active Inventory',
+        'value' => $inventoryCount,
+        'footnoteLink' => route('partner.inventory.index'),
+        'footnoteLinkLabel' => 'Manage Portfolio',
+    ])
+    @include('partials.partner.stat-card', [
+        'label' => 'Pending Payout',
+        'value' => '$' . number_format($pendingPayout, 2),
+        'footnoteLink' => route('partner.payouts.index'),
+        'footnoteLinkLabel' => 'Earnings History',
+    ])
+    @include('partials.partner.stat-card', [
+        'label' => 'Total Revenue',
+        'value' => '$' . number_format($totalRevenue, 2),
+        'accent' => true,
+        'footnote' => 'Gross lifecycle value',
+    ])
 </div>
 
-<div class="recent-activity" style="background: var(--surface-100); border-radius: 2rem; border: 1px solid var(--border); padding: 3rem;">
-...
+<div class="pc-card pc-chart">
+    <div class="pc-chart__head">
+        <h2 class="pc-chart__title">Sales Performance</h2>
+        <span class="pc-stat__foot">Last 30 days</span>
+    </div>
+    <div class="pc-chart__canvas">
+        <canvas id="salesChart" data-labels="{{ json_encode($chartData['labels']) }}" data-values="{{ json_encode($chartData['values']) }}"></canvas>
+    </div>
+</div>
 
-    <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 2rem;">Recent Partner Orders</h2>
-    
-    @if($recentOrders->isEmpty())
-        <p style="color: var(--text-400);">No orders containing your items yet.</p>
+<div class="pc-card">
+    <div class="pc-card__head">
+        <h2 class="pc-section-title">Recent Partner Orders</h2>
+        <a href="{{ route('partner.orders.index') }}" class="pc-section-link">View all orders</a>
+    </div>
+    @if ($recentOrders->isEmpty())
+        @include('partials.partner.empty-state', [
+            'icon' => 'receipt',
+            'title' => 'No orders yet',
+            'text' => 'Orders containing your items will appear here once customers start purchasing your pieces.',
+        ])
     @else
-        <div class="inventory-table-wrap" style="border: none;">
-            <table class="inventory-table" style="width: 100%; border-collapse: collapse;">
+        <div class="pc-table-wrap pc-table-wrap--flush">
+            <table class="pc-table">
                 <thead>
                     <tr>
-                        <th style="padding: 1rem; text-align: left; color: var(--text-600); font-size: 0.8rem; text-transform: uppercase;">Order ID</th>
-                        <th style="padding: 1rem; text-align: left; color: var(--text-600); font-size: 0.8rem; text-transform: uppercase;">Date</th>
-                        <th style="padding: 1rem; text-align: left; color: var(--text-600); font-size: 0.8rem; text-transform: uppercase;">Status</th>
-                        <th style="padding: 1rem; text-align: right; color: var(--text-600); font-size: 0.8rem; text-transform: uppercase;">Action</th>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th class="is-right">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($recentOrders as $order)
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 1.5rem; font-weight: 700;">#{{ $order->id }}</td>
-                            <td style="padding: 1.5rem; color: var(--text-600);">{{ $order->created_at->diffForHumans() }}</td>
-                            <td style="padding: 1.5rem;">
-                                <span class="cat-badge" style="background: var(--brand-accent-soft); color: var(--brand-accent);">
-                                    {{ ucfirst($order->status) }}
-                                </span>
-                            </td>
-                            <td style="padding: 1.5rem; text-align: right;">
-                                <a href="{{ route('partner.orders.show', $order->id) }}" style="color: var(--brand-accent); font-weight: 700;">Details</a>
+                    @foreach ($recentOrders as $order)
+                        <tr>
+                            <td class="is-numeric">#{{ $order->id }}</td>
+                            <td class="is-muted">{{ $order->created_at->diffForHumans() }}</td>
+                            <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
+                            <td class="is-right">
+                                <a href="{{ route('partner.orders.show', $order->id) }}" class="pc-section-link">Details</a>
                             </td>
                         </tr>
                     @endforeach

@@ -3,6 +3,11 @@
 const salesCanvas = document.getElementById('salesChart');
 
 if (salesCanvas) {
+    const styles = getComputedStyle(document.documentElement);
+    const accent = styles.getPropertyValue('--brand-accent').trim() || '#3b82f6';
+    const textMuted = styles.getPropertyValue('--text-400').trim() || '#94a3b8';
+    const grid = styles.getPropertyValue('--border').trim() || 'rgba(0,0,0,0.05)';
+
     const ctx = salesCanvas.getContext('2d');
     new Chart(ctx, {
         type: 'line',
@@ -11,30 +16,46 @@ if (salesCanvas) {
             datasets: [{
                 label: 'Daily Revenue ($)',
                 data: JSON.parse(salesCanvas.dataset.values),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 3,
+                borderColor: accent,
+                backgroundColor: (context) => {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, context.chart.height);
+                    gradient.addColorStop(0, accent + '26');
+                    gradient.addColorStop(1, accent + '00');
+                    return gradient;
+                },
+                borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#3b82f6'
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointBackgroundColor: accent
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: styles.getPropertyValue('--surface-100').trim() || '#ffffff',
+                    titleColor: styles.getPropertyValue('--text-900').trim() || '#0f172a',
+                    bodyColor: styles.getPropertyValue('--text-600').trim() || '#475569',
+                    borderColor: grid,
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: false
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                    ticks: { font: { weight: '600' } }
+                    grid: { color: grid },
+                    ticks: { color: textMuted, font: { weight: '600' }, padding: 8 }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: { font: { weight: '600' } }
+                    ticks: { color: textMuted, font: { weight: '600' }, maxTicksLimit: 10 }
                 }
             }
         }

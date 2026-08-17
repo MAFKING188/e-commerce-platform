@@ -1,18 +1,21 @@
 @section('title', 'Edit Public Profile | Partner Dashboard')
 
+@section('scripts')
+@vite('resources/js/partner.js')
+@endsection
+
 <x-app-layout>
 @include('partials.partner-nav')
 
-<div class="inventory-form-head">
-    <span class="cat-badge">Artisan Portal</span>
-    <h1 class="inventory-title">Edit Public Profile.</h1>
+<div class="pc-header">
+    <div>
+        <span class="pc-eyebrow">Artisan Portal</span>
+        <h1 class="pc-title">Edit Public Profile.</h1>
+    </div>
 </div>
 
 @if (session('status'))
-    <div class="form-feedback">{{ session('status') }}</div>
-@endif
-@if ($errors->any())
-    <div class="form-feedback form-feedback-error">{{ $errors->first() }}</div>
+    <div class="pc-flash pc-flash--success">✓ {{ session('status') }}</div>
 @endif
 
 <div class="form-container">
@@ -20,24 +23,30 @@
         @csrf
         @method('PUT')
 
-        <div class="form-group">
-            <label for="name">Business name</label>
-            <input id="name" name="name" class="form-control" value="{{ old('name', $partner->name) }}" required>
+        <div class="pc-field">
+            <label for="name" class="pc-field__label">Business name</label>
+            <input id="name" name="name" class="pc-field__input {{ $errors->has('name') ? 'pc-field__input--invalid' : '' }}" value="{{ old('name', $partner->name) }}" required>
+            @error('name')<p class="pc-field__error">{{ $message }}</p>@enderror
         </div>
 
-        <div class="form-group">
-            <label for="description">Bio</label>
-            <textarea id="description" name="description" class="form-control" rows="4">{{ old('description', $partner->description) }}</textarea>
+        <div class="pc-field">
+            <label for="description" class="pc-field__label">Bio</label>
+            <textarea id="description" name="description" class="pc-field__input {{ $errors->has('description') ? 'pc-field__input--invalid' : '' }}" rows="4">{{ old('description', $partner->description) }}</textarea>
+            <p class="pc-field__hint">Shown on your public storefront profile to help customers understand your craft.</p>
+            @error('description')<p class="pc-field__error">{{ $message }}</p>@enderror
         </div>
 
-        <div class="form-group">
-            <label for="website">Website</label>
-            <input id="website" name="website" class="form-control" value="{{ old('website', $partner->website) }}">
-        </div>
-
-        <div class="form-group">
-            <label for="contact_info">Contact info</label>
-            <input id="contact_info" name="contact_info" class="form-control" value="{{ old('contact_info', $partner->contact_info) }}">
+        <div class="pc-form-grid">
+            <div class="pc-field">
+                <label for="website" class="pc-field__label">Website</label>
+                <input id="website" name="website" class="pc-field__input {{ $errors->has('website') ? 'pc-field__input--invalid' : '' }}" value="{{ old('website', $partner->website) }}">
+                @error('website')<p class="pc-field__error">{{ $message }}</p>@enderror
+            </div>
+            <div class="pc-field">
+                <label for="contact_info" class="pc-field__label">Contact info</label>
+                <input id="contact_info" name="contact_info" class="pc-field__input {{ $errors->has('contact_info') ? 'pc-field__input--invalid' : '' }}" value="{{ old('contact_info', $partner->contact_info) }}">
+                @error('contact_info')<p class="pc-field__error">{{ $message }}</p>@enderror
+            </div>
         </div>
 
         <div class="inventory-form-actions">

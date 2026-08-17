@@ -1,39 +1,71 @@
 @section('title', 'My Orders | Partner Dashboard')
 
+@section('scripts')
+@vite('resources/js/partner.js')
+@endsection
+
 <x-app-layout>
 @include('partials.partner-nav')
 
-<div style="margin-bottom: 4rem;">
-    <span class="cat-badge">Order Fulfillment</span>
-    <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">My Orders.</h1>
+<div class="pc-header">
+    <div>
+        <span class="pc-eyebrow">Order Fulfillment</span>
+        <h1 class="pc-title">My Orders.</h1>
+    </div>
 </div>
 
-<div class="inventory-table-wrap">
-    <table class="inventory-table">
+<form action="{{ route('partner.orders.index') }}" method="GET" class="pc-filter">
+    <input type="text" name="search" class="pc-filter__input" placeholder="Search order #" value="{{ request('search') }}" inputmode="numeric">
+    <select name="status" class="pc-filter__select">
+        <option value="">All statuses</option>
+        @foreach ($statuses as $status)
+            <option value="{{ $status }}" {{ request('status') === $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
+        @endforeach
+    </select>
+    <button type="submit" class="btn btn-primary pc-btn-sm">Apply</button>
+    @if (request()->hasAny(['search', 'status']))
+        <a href="{{ route('partner.orders.index') }}" class="pc-filter__reset">Clear filters</a>
+    @endif
+</form>
+
+<div class="pc-table-wrap">
+    <table class="pc-table">
         <thead>
             <tr>
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Status</th>
-                <th style="text-align: right;">View</th>
+                <th class="is-right">Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($orders as $order)
+            @forelse ($orders as $order)
                 <tr>
-                    <td>#{{ $order->id }}</td>
-                    <td>{{ $order->created_at->format('M d, Y') }}</td>
-                    <td>{{ ucfirst($order->status) }}</td>
-                    <td style="text-align: right;">
-                        <a href="{{ route('partner.orders.show', $order->id) }}" class="btn btn-ghost">View Details</a>
+                    <td class="is-numeric">#{{ $order->id }}</td>
+                    <td class="is-muted">{{ $order->created_at->format('M d, Y') }}</td>
+                    <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
+                    <td class="is-right">
+                        <a href="{{ route('partner.orders.show', $order->id) }}" class="pc-section-link">View Details</a>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="4">
+                        @include('partials.partner.empty-state', [
+                            'icon' => request()->hasAny(['search', 'status']) ? 'search' : 'receipt',
+                            'title' => request()->hasAny(['search', 'status']) ? 'No matching orders' : 'No orders yet',
+                            'text' => request()->hasAny(['search', 'status'])
+                                ? 'Try adjusting your search or clearing the filters to see all orders.'
+                                : 'Orders containing your items will appear here once customers start purchasing your pieces.',
+                        ])
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
 
-<div style="margin-top: 3rem;">
+<div class="pagination-wrap">
     {{ $orders->links() }}
 </div>
 </x-app-layout>
