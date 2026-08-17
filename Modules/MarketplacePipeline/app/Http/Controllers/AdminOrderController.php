@@ -3,8 +3,9 @@
 namespace Modules\MarketplacePipeline\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
+use Modules\MarketplacePipeline\Models\Order;
+use Modules\MarketplacePipeline\Services\PayoutService;
 
 class AdminOrderController extends Controller
 {
@@ -20,43 +21,19 @@ class AdminOrderController extends Controller
         return view('marketplacepipeline::admin.orders.show', compact('order'));
     }
 
-    public function complete($id)
+    public function complete($id, PayoutService $payouts)
     {
         $order = Order::with('items.product.partners')->findOrFail($id);
-        
+
         if ($order->status === 'paid') {
-            \DB::transaction(function () use ($order) {
+            \DB::transaction(function () use ($order, $payouts) {
                 $order->update(['status' => 'completed']);
-
-                // Calculate payouts for each partner involved in this order.
-                // A product's line value is split equally among its partners.
-                $partnerItems = [];
-                foreach ($order->items as $item) {
-                    $partners = $item->product->partners;
-                    if ($partners->isEmpty()) {
-                        continue;
-                    }
-                    $lineValue = $item->price * $item->quantity;
-                    $share = $lineValue / $partners->count();
-                    foreach ($partners as $partner) {
-                        $partnerItems[$partner->id] = ($partnerItems[$partner->id] ?? 0) + $share;
-                    }
-                }
-
-                foreach ($partnerItems as $partnerId => $grossAmount) {
-                    // Platform takes commission_rate (default 10%) commission
-                    $netAmount = $grossAmount * (1 - config('shop.commission_rate'));
-
-                    \Modules\MarketplacePipeline\Models\Payout::updateOrCreate(
-                        ['order_id' => $order->id, 'partner_id' => $partnerId],
-                        ['amount' => $netAmount, 'status' => 'pending']
-                    );
-                }
+                $payouts->settle($order);
             });
 
             return back()->with('status', 'Order marked as completed and payouts generated.');
         }
-        
+
         return back()->withErrors('Only paid orders can be marked as completed.');
     }
 }

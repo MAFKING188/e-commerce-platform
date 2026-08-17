@@ -1,15 +1,15 @@
 <?php
 
-namespace Tests\Feature;
+namespace Modules\MarketplacePipeline\Tests\Feature;
 
-use Modules\IdentityAccess\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\CatalogDelivery\Models\Product;
+use Modules\IdentityAccess\Models\User;
 use Modules\MarketplacePipeline\Models\Order;
 use Modules\MarketplacePipeline\Models\OrderItem;
-use Modules\PartnerHub\Models\Partner;
 use Modules\MarketplacePipeline\Models\Payout;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Modules\MarketplacePipeline\Tests\TestCase;
+use Modules\PartnerHub\Models\Partner;
 
 class PayoutSplitTest extends TestCase
 {
