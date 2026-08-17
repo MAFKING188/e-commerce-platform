@@ -14,11 +14,8 @@
         @if($product->images->count() > 1)
             <div class="thumbnails">
                 @foreach($product->images as $image)
-                    @php
-                        $url = str_starts_with($image->url, 'http') ? $image->url : asset('storage/' . str_replace('storage/', '', ltrim($image->url, '/')));
-                    @endphp
-                    <div class="thumbnail {{ $loop->first ? 'active' : '' }}" onclick="updateMainImage(this, '{{ $url }}')">
-                        <img src="{{ $url }}" alt="Thumbnail">
+                    <div class="thumbnail {{ $loop->first ? 'active' : '' }}" onclick="updateMainImage(this, '{{ $image->resolved_url }}')">
+                        <img src="{{ $image->resolved_url }}" alt="Thumbnail">
                     </div>
                 @endforeach
             </div>

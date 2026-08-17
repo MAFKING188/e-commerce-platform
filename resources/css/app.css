@@ -536,3 +536,506 @@ footer {
     color: var(--brand-accent);
     font-weight: 700;
 }
+
+/* ============================================================
+   AUTH PAGES (moved from identityaccess auth/login + signup)
+   ============================================================ */
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem 0;
+}
+
+.auth-card {
+    background: var(--surface-100);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid var(--border);
+}
+
+.auth-card--narrow {
+    max-width: 400px;
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-900);
+    text-align: center;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: var(--text-600);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-400);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-200);
+    color: var(--text-900);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--brand-accent);
+    background: var(--surface-100);
+    box-shadow: 0 0 0 4px var(--brand-accent-soft);
+}
+
+.auth-button {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--brand-primary);
+    color: var(--surface-100);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.auth-button:hover {
+    background: var(--text-600);
+}
+
+.switch-auth {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-600);
+}
+
+.switch-auth a {
+    color: var(--brand-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-600);
+    cursor: pointer;
+}
+
+.remember-me input {
+    accent-color: var(--brand-accent);
+}
+
+.forgot-password {
+    color: var(--brand-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ============================================================
+   MEMBER PROFILE (moved from identityaccess users/show)
+   ============================================================ */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 5rem;
+    align-items: start;
+}
+
+.settings-card {
+    background: var(--surface-100);
+    padding: 3rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 8rem;
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: var(--brand-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+}
+
+.profile-grid .form-group {
+    margin-bottom: 2rem;
+}
+
+.profile-grid .form-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.profile-grid .form-input {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+}
+
+.profile-grid .form-input:focus {
+    border-color: var(--brand-accent);
+    outline: none;
+    background: var(--surface-100);
+}
+
+.history-section h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-900);
+    margin-bottom: 3rem;
+}
+
+.order-item-lite {
+    background: var(--surface-100);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.order-item-lite:hover {
+    transform: translateX(10px);
+    border-color: var(--brand-accent);
+}
+
+/* ============================================================
+   MEMBER EDITOR (moved from identityaccess users/edit)
+   ============================================================ */
+
+.editor-container {
+    max-width: 600px;
+    margin: 4rem auto;
+}
+
+.editor-card {
+    background: var(--surface-100);
+    padding: 3rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+.editor-container .form-group {
+    margin-bottom: 2rem;
+}
+
+.editor-container .form-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+
+.editor-container .form-input {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+}
+
+/* ============================================================
+   USER DIRECTORIES (moved from identityaccess users/index + admin/users/index)
+   ============================================================ */
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.admin-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-900);
+}
+
+.user-table-wrap {
+    background: var(--surface-100);
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    box-shadow: var(--shadow-md);
+}
+
+.user-table-wrap--scroll .user-table {
+    min-width: 900px;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th {
+    text-align: left;
+    padding: 1.5rem 2rem;
+    background: var(--surface-300);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-600);
+    letter-spacing: 0.1em;
+}
+
+.user-table td {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.role-pill {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.role-admin {
+    background: var(--brand-primary);
+    color: var(--surface-100);
+}
+
+.role-user {
+    background: var(--surface-300);
+    color: var(--text-600);
+}
+
+.status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-suspended {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.role-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-400);
+}
+
+/* ============================================================
+   ADMIN COMMAND CENTER (moved from identityaccess admin/dashboard)
+   ============================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.stat-card {
+    background: var(--surface-100);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-400);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+}
+
+.stat-card .value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-900);
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.action-panel {
+    background: var(--surface-100);
+    padding: 3rem;
+    border-radius: 2rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 300px;
+}
+
+.action-panel:hover {
+    transform: translateY(-10px);
+    border-color: var(--brand-accent);
+    box-shadow: var(--shadow-lg);
+}
+
+.action-panel h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-900);
+}
+
+.action-panel p {
+    color: var(--text-600);
+    margin-top: 1rem;
+    max-width: 300px;
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+/* ============================================================
+   WISHLIST / ARCHIVE (moved from identityaccess wishlist)
+   ============================================================ */
+
+.archive-header {
+    margin-bottom: 5rem;
+    text-align: center;
+}
+
+.archive-header h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: var(--text-900);
+    margin-bottom: 1rem;
+}
+
+.archive-header p {
+    color: var(--text-600);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 8rem 2rem;
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 3rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.empty-state h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-900);
+    margin-bottom: 1rem;
+}
+
+/* ============================================================
+   RESPONSIVE (moved from module blades)
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}

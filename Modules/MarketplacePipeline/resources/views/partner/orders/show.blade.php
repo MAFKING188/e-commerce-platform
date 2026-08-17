@@ -40,33 +40,21 @@
             </tr>
         </thead>
         <tbody>
-            @php 
-                $partnerItems = $order->items->filter(function($item) {
-                    return $item->product->partners->contains(auth()->user()->id); 
-                    // Note: This logic assumes partner ID is linked to user ID. 
-                    // Let's refine this to use the actual Partner model in the controller or here.
-                });
-                $partnerSubtotal = 0;
-            @endphp
-            
-            @foreach($order->items as $item)
-                @if($item->product->partners->where('user_id', auth()->id())->first())
-                    @php $partnerSubtotal += ($item->price * $item->quantity); @endphp
-                    <tr>
-                        <td>
-                            <div class="product-info">
-                                <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img">
-                                <div>
-                                    <div style="font-weight: 700;">{{ $item->product->name }}</div>
-                                    <div style="font-size: 0.85rem; color: var(--text-400);">{{ $item->product->category->name ?? 'Collection' }}</div>
-                                </div>
+            @foreach($partnerItems as $item)
+                <tr>
+                    <td>
+                        <div class="product-info">
+                            <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" class="product-img">
+                            <div>
+                                <div style="font-weight: 700;">{{ $item->product->name }}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-400);">{{ $item->product->category->name ?? 'Collection' }}</div>
                             </div>
-                        </td>
-                        <td style="font-weight: 600;">{{ $item->quantity }}</td>
-                        <td>${{ number_format($item->price, 2) }}</td>
-                        <td style="text-align: right; font-weight: 700;">${{ number_format($item->price * $item->quantity, 2) }}</td>
-                    </tr>
-                @endif
+                        </div>
+                    </td>
+                    <td style="font-weight: 600;">{{ $item->quantity }}</td>
+                    <td>${{ number_format($item->price, 2) }}</td>
+                    <td style="text-align: right; font-weight: 700;">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                </tr>
             @endforeach
         </tbody>
         <tfoot>

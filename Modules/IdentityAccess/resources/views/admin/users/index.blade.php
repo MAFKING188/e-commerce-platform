@@ -1,51 +1,5 @@
 @section('title', 'Member Registry | Admin')
 
-@section('styles')
-<style>
-    .admin-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; gap: 2rem; flex-wrap: wrap; }
-    .admin-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }
-
-    .user-table-wrap {
-        background: var(--surface-100);
-        border-radius: 2rem;
-        border: 1px solid var(--border);
-        overflow-x: auto;
-        box-shadow: var(--shadow-md);
-    }
-
-    .user-table { width: 100%; border-collapse: collapse; min-width: 900px; }
-    .user-table th {
-        text-align: left;
-        padding: 1.5rem 2rem;
-        background: var(--surface-300);
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--text-600);
-        letter-spacing: 0.1em;
-    }
-
-    .user-table td { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    
-    .status-pill {
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.65rem;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
-    .status-active { background: #dcfce7; color: #166534; }
-    .status-pending { background: #fef3c7; color: #92400e; }
-    .status-suspended { background: #fee2e2; color: #991b1b; }
-
-    .role-badge {
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: var(--text-400);
-    }
-</style>
-@endsection
-
 <x-app-layout>
 @include('partials.admin-nav')
 
@@ -66,7 +20,7 @@
     </form>
 </div>
 
-<div class="user-table-wrap">
+<div class="user-table-wrap user-table-wrap--scroll">
     <table class="user-table">
         <thead>
             <tr>

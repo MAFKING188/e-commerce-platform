@@ -1,35 +1,5 @@
 @section('title', 'Edit Member | SmartShop Admin')
 
-@section('styles')
-<style>
-    .editor-container { max-width: 600px; margin: 4rem auto; }
-    .editor-card {
-        background: var(--surface-100);
-        padding: 3rem;
-        border-radius: 2rem;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-lg);
-    }
-    .form-group { margin-bottom: 2rem; }
-    .form-label {
-        display: block;
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--text-400);
-        margin-bottom: 0.75rem;
-    }
-    .form-input {
-        width: 100%;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: var(--surface-200);
-        color: var(--text-900);
-    }
-</style>
-@endsection
-
 <x-app-layout>
 <div class="editor-container">
     <div class="editor-card">

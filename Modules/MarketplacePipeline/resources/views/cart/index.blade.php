@@ -10,12 +10,7 @@
     <div class="cart-grid">
         <!-- Main List -->
         <div class="cart-items-list">
-            @php $total = 0; @endphp
             @foreach($cart->items as $item)
-                @php
-                    $subtotal = $item->product->price * $item->quantity;
-                    $total += $subtotal;
-                @endphp
                 <div class="cart-item">
                     <div class="cart-item-img">
                         <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}">
@@ -28,7 +23,7 @@
                     </div>
 
                     <div class="cart-item-actions">
-                        <span class="subtotal-val">@money($subtotal)</span>
+                        <span class="subtotal-val">@money($item->product->price * $item->quantity)</span>
                         <form method="POST" action="{{ route('cart.remove', $item->id) }}" style="margin: 0;">
                             @csrf
                             @method('DELETE')

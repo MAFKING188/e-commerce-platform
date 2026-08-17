@@ -28,7 +28,8 @@ class UserController extends Controller
    public function show()
 {
     $user = Auth::user()->load(['orders', 'addresses']);
-    return view('identityaccess::users.show', compact('user'));
+    $address = $user->addresses->first();
+    return view('identityaccess::users.show', compact('user', 'address'));
 }
 
     public function edit($id)

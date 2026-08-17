@@ -1,89 +1,5 @@
 @section('title', 'Member Profile | LUWI')
 
-@section('styles')
-<style>
-    .profile-grid {
-        display: grid;
-        grid-template-columns: 350px 1fr;
-        gap: 5rem;
-        align-items: start;
-    }
-
-    .settings-card {
-        background: var(--surface-100);
-        padding: 3rem;
-        border-radius: 2rem;
-        border: 1px solid var(--border);
-        box-shadow: var(--shadow-md);
-        position: sticky;
-        top: 8rem;
-    }
-
-    .avatar-circle {
-        width: 100px;
-        height: 100px;
-        background: var(--brand-primary);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 2rem;
-    }
-
-    .form-group { margin-bottom: 2rem; }
-    .form-label {
-        display: block;
-        font-size: 0.7rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--text-400);
-        margin-bottom: 0.75rem;
-        letter-spacing: 0.1em;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: var(--surface-200);
-        color: var(--text-900);
-        font-family: inherit;
-        transition: all 0.3s ease;
-    }
-
-    .form-input:focus { border-color: var(--brand-accent); outline: none; background: var(--surface-100); }
-
-    .history-section h2 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--text-900);
-        margin-bottom: 3rem;
-    }
-
-    .order-item-lite {
-        background: var(--surface-100);
-        padding: 2rem;
-        border-radius: 1.5rem;
-        border: 1px solid var(--border);
-        margin-bottom: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: transform 0.3s ease;
-    }
-
-    .order-item-lite:hover { transform: translateX(10px); border-color: var(--brand-accent); }
-
-    @media (max-width: 1024px) {
-        .profile-grid { grid-template-columns: 1fr; gap: 4rem; }
-    }
-</style>
-@endsection
-
 <x-app-layout>
 <div class="profile-grid">
     <!-- Left: Settings -->
@@ -129,7 +45,6 @@
 
             <div style="margin-bottom: 3rem;">
                 <span class="cat-badge">Primary Residence</span>
-                @php $address = auth()->user()->addresses->first(); @endphp
                 
                 <div class="form-group" style="margin-top: 1rem;">
                     <label class="form-label">Street Address</label>
