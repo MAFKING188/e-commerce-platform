@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Feature;
+namespace Modules\IdentityAccess\Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\IdentityAccess\Models\Wishlist;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Modules\IdentityAccess\Tests\TestCase;
 
 class WishlistTest extends TestCase
 {

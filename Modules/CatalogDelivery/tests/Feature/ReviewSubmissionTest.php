@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+namespace Modules\CatalogDelivery\Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
 use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Modules\CatalogDelivery\Tests\TestCase;
 
 class ReviewSubmissionTest extends TestCase
 {

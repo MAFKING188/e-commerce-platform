@@ -603,8 +603,8 @@ Every rendered page and the backend it exercises:
 - **Customer review submission** (see §10 #2)
 
 ### 12.3 Git state
-- Branch `main`, synced with origin. Last commit `43df829 fix(ui): admin-nav on payouts + mobile responsiveness`.
-- **Uncommitted working tree:** modified `PARTNER_ROADMAP.md`, `SESSION_HANDOVER.md`, `WishlistController.php`; untracked `COLLABORATION_GUIDE.md`, `main*.tex`, `resources/views/partner/orders/show.blade.php`.
+- Branch `main`, working tree clean. Modular monolith migration complete (phases 0–7, see §15): all models/controllers/services/views/routes/migrations/seeders/tests live in `Modules/`; module ownership map in `MODULE_OWNERSHIP.md`.
+- **Uncommitted working tree:** none.
 
 ---
 
@@ -655,6 +655,8 @@ Phase C (Section D trust): profiles table, KYC, GDPR consent timestamps, audit l
 ## 15. Modular Monolith Proposal
 
 > Analysis requested by the project owner: migrate from the current role-organized monolith to a **modular monolith** to support scaling to many users and many partners. This section is the design analysis — nothing has been changed in the codebase.
+
+> **STATUS (Task 7.3):** migration **complete** — phases 0–7 all done. Five modules (IdentityAccess, CatalogDelivery, MarketplacePipeline, PartnerHub, TelemetryPipeline) own their models/controllers/services/views/routes/migrations/seeders/tests; root `tests/` keeps only `ExampleTest`; per-module suites run green (`php artisan test Modules/<M>/tests`). The authoritative ownership map is **`MODULE_OWNERSHIP.md`** (repo root).
 
 ### 15.1 Why the current structure won't scale
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Feature;
+namespace Modules\CatalogDelivery\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Modules\CatalogDelivery\Tests\TestCase;
 
 class CategoryIndexSmokeTest extends TestCase
 {
