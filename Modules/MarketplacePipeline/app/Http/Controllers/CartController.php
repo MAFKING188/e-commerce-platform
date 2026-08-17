@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Cart;
 use Modules\MarketplacePipeline\Models\CartItem;
 use Modules\CatalogDelivery\Models\Product;
@@ -22,7 +23,7 @@ class CartController extends Controller
 
     $cart->load('items.product');
 
-    return view('cart.index', compact('cart'));
+    return view('marketplacepipeline::cart.index', compact('cart'));
 }
 
     public function add(Request $request)

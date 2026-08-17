@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use Modules\MarketplacePipeline\Models\Payout;
 use Illuminate\Http\Request;
@@ -18,6 +19,6 @@ class PartnerPayoutController extends Controller
             'pending_payout' => $partner->payouts()->where('status', 'pending')->sum('amount')
         ];
 
-        return view('partner.payouts.index', compact('payouts', 'stats'));
+        return view('marketplacepipeline::partner.payouts.index', compact('payouts', 'stats'));
     }
 }

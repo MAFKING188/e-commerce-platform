@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Payout;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,7 @@ class AdminPayoutController extends Controller
     public function index()
     {
         $payouts = Payout::with(['partner', 'order'])->latest()->paginate(15);
-        return view('admin.payouts.index', compact('payouts'));
+        return view('marketplacepipeline::admin.payouts.index', compact('payouts'));
     }
 
     public function process(Request $request, $id)

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Order;
 use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Http\Request;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Order;
 use Modules\MarketplacePipeline\Models\OrderItem;
 use Modules\MarketplacePipeline\Models\Cart;
@@ -22,7 +23,7 @@ class OrderController extends Controller
             ->latest()
             ->get();
 
-        return view('orders.index', compact('orders'));
+        return view('marketplacepipeline::orders.index', compact('orders'));
     }
 
     public function store(Request $request)

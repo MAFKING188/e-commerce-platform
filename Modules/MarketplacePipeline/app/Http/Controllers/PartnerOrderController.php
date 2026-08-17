@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class PartnerOrderController extends Controller
             $q->where('partners.id', $partner->id);
         })->latest()->paginate(10);
 
-        return view('partner.orders.index', compact('orders'));
+        return view('marketplacepipeline::partner.orders.index', compact('orders'));
     }
 
     public function show($id)
@@ -32,6 +33,6 @@ class PartnerOrderController extends Controller
         // Ensure the order actually contains items from this partner
         $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
         
-        return view('partner.orders.show', compact('order'));
+        return view('marketplacepipeline::partner.orders.show', compact('order'));
     }
 }

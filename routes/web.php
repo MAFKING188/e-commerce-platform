@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{
+use Modules\MarketplacePipeline\Http\Controllers\{
     AdminOrderController,
     CartController,
     OrderController,
@@ -49,8 +49,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
     /* Payout Management */
-    Route::get('/payouts', [\App\Http\Controllers\AdminPayoutController::class, 'index'])->name('payouts.index');
-    Route::post('/payouts/{id}/process', [\App\Http\Controllers\AdminPayoutController::class, 'process'])->name('payouts.process');
+    Route::get('/payouts', [\Modules\MarketplacePipeline\Http\Controllers\AdminPayoutController::class, 'index'])->name('payouts.index');
+    Route::post('/payouts/{id}/process', [\Modules\MarketplacePipeline\Http\Controllers\AdminPayoutController::class, 'process'])->name('payouts.process');
 });
 
 /*
@@ -59,6 +59,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
 |--------------------------------------------------------------------------
 */
     Route::middleware(['auth', 'partner'])->prefix('partner')->as('partner.')->group(function () {
-        Route::get('payouts', [\App\Http\Controllers\PartnerPayoutController::class, 'index'])->name('payouts.index');
-        Route::resource('orders', \App\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
+        Route::get('payouts', [\Modules\MarketplacePipeline\Http\Controllers\PartnerPayoutController::class, 'index'])->name('payouts.index');
+        Route::resource('orders', \Modules\MarketplacePipeline\Http\Controllers\PartnerOrderController::class)->only(['index', 'show']);
     });

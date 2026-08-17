@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\MarketplacePipeline\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
 
@@ -10,13 +11,13 @@ class AdminOrderController extends Controller
     public function index()
     {
         $orders = Order::with('user')->latest()->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        return view('marketplacepipeline::admin.orders.index', compact('orders'));
     }
 
     public function show($id)
     {
         $order = Order::with(['user', 'items.product'])->findOrFail($id);
-        return view('admin.orders.show', compact('order'));
+        return view('marketplacepipeline::admin.orders.show', compact('order'));
     }
 
     public function complete($id)
