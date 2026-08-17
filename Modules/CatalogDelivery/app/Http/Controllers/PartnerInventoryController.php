@@ -11,6 +11,7 @@ use Modules\CatalogDelivery\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\ProductImage;
+use Modules\TelemetryPipeline\Services\LowStockAlertService;
 
 class PartnerInventoryController extends Controller
 {
@@ -60,6 +61,8 @@ class PartnerInventoryController extends Controller
         $partner = $this->getPartner();
         $product = Product::create($request->validated());
 
+        (new LowStockAlertService)->check($product);
+
         // Associate with partner
         $partner->products()->attach($product->id);
 
@@ -99,6 +102,8 @@ class PartnerInventoryController extends Controller
         $product = $partner->products()->findOrFail($id);
 
         $product->update($request->validated());
+
+        (new LowStockAlertService)->check($product);
 
         if ($request->hasFile('images')) {
             $lastPosition = $product->images()->max('position') ?? -1;

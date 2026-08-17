@@ -4,6 +4,7 @@ namespace Modules\MarketplacePipeline\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Payout;
+use Modules\TelemetryPipeline\Services\TelemetryService;
 use Illuminate\Http\Request;
 
 class AdminPayoutController extends Controller
@@ -27,6 +28,8 @@ class AdminPayoutController extends Controller
             'transaction_reference' => $request->transaction_reference,
             'processed_at' => now()
         ]);
+
+        (new TelemetryService)->log('admin.payouts.process', ['payout_id' => $id]);
 
         return back()->with('success', 'Payout processed successfully.');
     }

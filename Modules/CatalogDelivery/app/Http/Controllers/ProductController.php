@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\Category;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\ProductImage;
+use Modules\TelemetryPipeline\Services\LowStockAlertService;
 
 class ProductController extends Controller
 {
@@ -26,6 +27,8 @@ class ProductController extends Controller
     public function store(\Modules\CatalogDelivery\Http\Requests\StoreProductRequest $request)
     {
         $product = Product::create($request->validated());
+
+        (new LowStockAlertService)->check($product);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
@@ -59,6 +62,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->update($request->validated());
+
+        (new LowStockAlertService)->check($product);
 
         if ($request->hasFile('images')) {
             $lastPosition = $product->images()->max('position') ?? -1;

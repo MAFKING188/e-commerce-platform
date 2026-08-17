@@ -3,25 +3,24 @@
 namespace Modules\TelemetryPipeline\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Support\Facades\Event;
+use Modules\TelemetryPipeline\Models\EmailLog;
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event handler mappings for the application.
-     *
-     * @var array<string, array<int, string>>
-     */
-    protected $listen = [];
+    public function boot(): void
+    {
+        Event::listen(MessageSending::class, function (MessageSending $event) {
+            $to = collect($event->message->getTo())
+                ->map(fn ($address) => $address->getAddress())
+                ->first();
 
-    /**
-     * Indicates if events should be discovered.
-     *
-     * @var bool
-     */
-    protected static $shouldDiscoverEvents = true;
-
-    /**
-     * Configure the proper event listeners for email verification.
-     */
-    protected function configureEmailVerification(): void {}
+            EmailLog::create([
+                'recipient' => $to,
+                'subject' => $event->message->getSubject(),
+                'status' => 'sent',
+            ]);
+        });
+    }
 }

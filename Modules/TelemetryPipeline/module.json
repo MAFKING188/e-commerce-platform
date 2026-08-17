@@ -5,7 +5,8 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\TelemetryPipeline\\Providers\\TelemetryPipelineServiceProvider"
+        "Modules\\TelemetryPipeline\\Providers\\TelemetryPipelineServiceProvider",
+        "Modules\\TelemetryPipeline\\Providers\\EventServiceProvider"
     ],
     "files": []
 }

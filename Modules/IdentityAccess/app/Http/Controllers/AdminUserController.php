@@ -5,11 +5,16 @@ namespace Modules\IdentityAccess\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Modules\IdentityAccess\Models\User;
 use Modules\IdentityAccess\Mail\UserStatusUpdated;
+use Modules\TelemetryPipeline\Services\TelemetryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class AdminUserController extends Controller
 {
+    public function __construct(private TelemetryService $telemetry)
+    {
+    }
+
     /**
      * Display a listing of all members with filtering for status.
      */
@@ -48,7 +53,9 @@ class AdminUserController extends Controller
         ]);
 
         $user->update($request->only(['role', 'status']));
-        
+
+        $this->telemetry->log('admin.users.update', ['user_id' => $id]);
+
         if ($oldStatus !== $user->status) {
             Mail::to($user->email)->send(new UserStatusUpdated($user));
         }
@@ -66,6 +73,8 @@ class AdminUserController extends Controller
         $user = User::findOrFail($id);
         $user->update(['status' => 'active']);
 
+        $this->telemetry->log('admin.users.approve', ['user_id' => $id]);
+
         Mail::to($user->email)->send(new UserStatusUpdated($user));
 
         return redirect()->back()->with('success', 'Member access granted.');
@@ -81,6 +90,7 @@ class AdminUserController extends Controller
         }
 
         User::destroy($id);
+        $this->telemetry->log('admin.users.destroy', ['user_id' => $id]);
         return redirect()->back()->with('success', 'Member purged from registry.');
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\MarketplacePipeline\Models\Order;
 use Modules\MarketplacePipeline\Services\PayoutService;
+use Modules\TelemetryPipeline\Services\TelemetryService;
 
 class AdminOrderController extends Controller
 {
@@ -29,6 +30,7 @@ class AdminOrderController extends Controller
             \DB::transaction(function () use ($order, $payouts) {
                 $order->update(['status' => 'completed']);
                 $payouts->settle($order);
+                (new TelemetryService)->log('admin.orders.complete', ['order_id' => $order->id]);
             });
 
             return back()->with('status', 'Order marked as completed and payouts generated.');
