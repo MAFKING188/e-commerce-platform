@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Modules\CatalogDelivery\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\CatalogDelivery\Models\Category;

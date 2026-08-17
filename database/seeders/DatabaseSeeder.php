@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Modules\IdentityAccess\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,11 +15,11 @@ class DatabaseSeeder extends Seeder
        public function run()
 {
     $this->call([
-        UserSeeder::class,
-        CategorySeeder::class,
-        ProductSeeder::class,
-        ReviewSeeder::class,
-        OrderSeeder::class,
+        \Modules\IdentityAccess\Database\Seeders\UserSeeder::class,
+        \Modules\CatalogDelivery\Database\Seeders\CategorySeeder::class,
+        \Modules\CatalogDelivery\Database\Seeders\ProductSeeder::class,
+        \Modules\CatalogDelivery\Database\Seeders\ReviewSeeder::class,
+        \Modules\MarketplacePipeline\Database\Seeders\OrderSeeder::class,
     ]);
 }
 }
