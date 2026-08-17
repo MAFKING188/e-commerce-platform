@@ -15,10 +15,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store')->middleware('throttle:checkout');
     Route::patch('/orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    Route::post('/paypal/store', [PaymentController::class, 'store'])->name('paypal.store');
+    Route::post('/paypal/store', [PaymentController::class, 'store'])->name('paypal.store')->middleware('throttle:checkout');
     Route::get('/paypal/capture', [PaymentController::class, 'capture'])->name('paypal.capture');
     Route::get('/paypal/cancel', function () {
         return redirect()->route('orders.index')->withErrors('Payment cancelled');

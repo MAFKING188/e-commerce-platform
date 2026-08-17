@@ -11,8 +11,8 @@ Route::middleware('guest')->group(function () {
     Route::get('/signup', fn() => view('identityaccess::auth.signup'))->name('signup');
 });
 
-Route::post('/createaccount', [AuthController::class, 'register']);
-Route::post('/accessaccount', [AuthController::class, 'login']);
+Route::post('/createaccount', [AuthController::class, 'register'])->middleware('throttle:auth');
+Route::post('/accessaccount', [AuthController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {

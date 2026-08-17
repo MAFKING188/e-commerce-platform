@@ -2,7 +2,10 @@
 
 namespace Modules\TelemetryPipeline\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
@@ -17,6 +20,9 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        RateLimiter::for('auth', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('checkout', fn (Request $request) => Limit::perMinute(3)->by($request->ip()));
     }
 
     /**
