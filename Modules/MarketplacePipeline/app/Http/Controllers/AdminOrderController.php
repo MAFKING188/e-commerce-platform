@@ -3,7 +3,6 @@
 namespace Modules\MarketplacePipeline\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Modules\MarketplacePipeline\Models\Order;
 use Modules\MarketplacePipeline\Services\PayoutService;
 use Modules\TelemetryPipeline\Services\TelemetryService;

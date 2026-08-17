@@ -2,7 +2,7 @@
 
 > **Purpose:** A single self-contained reference document. A new engineer should be able to read this and understand the entire project: what it is, how it is structured, what is built, what is broken, and what the roadmap is.
 >
-> **Generated:** 2026-08-16 · from a full sweep of the repository at commit `43df829` (working tree has uncommitted changes — see §12).
+> **Generated:** 2026-08-16 · refreshed 2026-08-17 at commit `fa24575` — architecture is now a modular monolith (see §15.9); module ownership map in `MODULE_OWNERSHIP.md`.
 >
 > **Companion docs:** `PROGRESS.md`, `PARTNER_ROADMAP.md`, `SESSION_HANDOVER.md`, `COLLABORATION_GUIDE.md`, `FinalSubmissionReport.tex`, `EXECUTION_LOG.tex`, `DEPLOYMENT_GUIDE.tex`.
 
@@ -79,7 +79,7 @@
 
 ## 3. High-Level Architecture
 
-The app is a **classic monolithic Laravel MVC application** organized by *role* (admin / partner / public) rather than by *domain*. Three "portals" share one codebase, one database, and one layout:
+The app is a **modular monolith** (migration executed 2026-08-16/17, commits `2b1cc33`..`da1e36f`): five nwidart-style modules (`IdentityAccess`, `CatalogDelivery`, `MarketplacePipeline`, `PartnerHub`, `TelemetryPipeline`) each own their models, controllers, services, routes, views, migrations, seeders, tests and assets. Core keeps shared infrastructure only (layout/AppLayout component, `CurrencyService`, `Address` model, `CurrencyMiddleware`). Three "portals" share one database and one layout:
 
 ```
                     ┌────────────────────────────────────────────┐
@@ -529,81 +529,66 @@ Every rendered page and the backend it exercises:
 
 ## 10. Backend NOT Wired to UI (Gaps & Orphans)
 
-### 🔴 Critical
-| # | Gap | Details |
-|---|---|---|
-| 1 | **Wishlist feature is broken end-to-end** | `WishlistController@index` calls non-existent `Auth::user()->wishlist()` relation with syntax error `-get()`; `toggle()` references typo class `Whishlist`, wrong column case (`Product_id`), missing `;`, and **never creates a record** (the else branch doesn't persist). UI (hearts + `/archive` page) calls these routes and will 500/JSON-error. The `wishlists` table and `Wishlist` model exist and are unused. |
-| 2 | **Customers cannot submit reviews** | `ReviewController@create/store/edit/update` have **no routes** and no views. There is no customer-facing review form on `product.blade.php` (reviews only appear via seeder/admin moderation). `reviews` table status workflow is built but the write path is missing. |
+> Status as of 2026-08-17: the two 🔴 Critical items (wishlist, reviews) are **fixed** — wishlist toggle/archive works end-to-end (`WishlistTest` green) and customer review submission is live (`ReviewSubmissionTest` green). Partner self-edit of the public artisan profile is live (`partner.profile.edit/update`).
 
 ### 🟠 Medium
 | # | Gap | Details |
 |---|---|---|
-| 3 | **API surface has no consumer/docs/tests** | `/api/login`, `/api/register`, `/api/catalog`, `/api/user` are registered but nothing in the UI uses them; no API tests; no docs. Fine as a design decision, but currently unverifiable. |
-| 4 | **Admin product `show` route 404s** | Route `admin.products.show` exists but `ProductController` has no `show()` method; legacy `products/show.blade.php` is orphaned. |
-| 5 | **Contact form is a dummy** | `contact.blade.php` uses `action="#"`; no backend endpoint handles messages. |
-| 6 | **Partner public profile is admin-managed only** | `partner_profile.blade.php` renders data set via `PartnerController` (admin). Partners cannot self-edit their artisan profile (bio, website, logo) — no route/view for it. |
+| 1 | **API surface has no consumer/docs/tests** | `/api/login`, `/api/register`, `/api/catalog`, `/api/user` are registered but nothing in the UI uses them; no API tests; no docs. Fine as a design decision, but currently unverifiable. |
+| 2 | **Contact form is a dummy** | `contact.blade.php` uses `action="#"`; no backend endpoint handles messages. |
 
 ### 🟡 Low
 | # | Gap | Details |
 |---|---|---|
-| 7 | `ReviewController@edit/update` dead methods (no routes/views) | |
-| 8 | `product_variants` table + `ProductVariant` model + migration fully unused | |
-| 9 | Partner pagination vendor templates (9 files) unused | |
-| 10 | No route/UI to *create* a review — see #2; also no way for a partner to see *their* reviews breakdown | |
+| 3 | `product_variants` table + `ProductVariant` model + migration fully unused (kept for future sizing/color variants) | |
+| 4 | No way for a partner to see *their* reviews breakdown | |
+| 5 | Admin product `show` route intentionally removed (`Route::resource(...)->except(['show'])`) — no admin product-detail page | |
 
 ---
 
 ## 11. Dead / Legacy / Broken Code
 
+> Status as of 2026-08-17: the full §11 inventory was purged in Task 7.1 (commit `cea2f55`, 20 files) — legacy `resources/views` duplicates, orphaned `admin.blade.php`, broken `partials/nav.blade.php`, empty `app.js` stub, `database_dump.sql`, malformed `.htaccess`, the no-op `add_provider_to_payments` migration, and the payment `provider` fillable entry. What remains is deliberate:
+
 | Item | Location | State |
 |---|---|---|
-| `WishlistController` | app/Http/Controllers | **Broken** (see §10) — contains a student-exercise-style TODO block |
 | `AuthServiceProvider` | app/Providers | Not registered; policies commented out |
-| `ProductPolicy`, `ReviewPolicy` | app/Policies | Dead (no `authorize()` calls anywhere) |
-| `resources/components/product-card.blade.php` | resources/components | Legacy duplicate of `views/components/product-card` |
-| `resources/dashboard/home.blade.php` | resources/dashboard | Legacy stub, unreachable |
-| `resources/partials/nav.blade.php` | resources/partials | Broken syntax (`route(shop)`, `@@auth`), unused |
-| `resources/users/` | resources/users | Empty directory |
-| `views/admin.blade.php` | resources/views | Legacy executive dashboard — **no route renders it** |
-| `views/products/show.blade.php` | resources/views | Orphaned (route 404s, see §10 #4) |
-| `views/users/index.blade.php` + `views/users/edit.blade.php` | resources/views | Legacy duplicates; `users/index` search posts to `route('users.index')` which resolves to the admin route by name collision; consistent-but-unused |
-| `resources/js/app.js` | resources/js | Empty |
-| `public/.htaccess` | public | Malformed/duplicated rewrite blocks |
-| `add_provider_to_payments` migration | database/migrations | No-op; `Payment::$fillable` mentions `provider` |
-| `emails/orders/confirmed.blade.php` | resources/views | Stray trailing `tml>` typo |
-| `database_dump.sql` | repo root | **Stale pre-rebrand snapshot** (`vendors`, `vendor_products`, singular `user`; no partners/wishlists) — do not use for restore |
-| `AuthController@apiRegister/apiLogin` | app/Http/Controllers | Live but undocumented API surface |
+| `ProductVariant` model + `product_variants` table | Modules/CatalogDelivery | Unused by design (future variant support) |
+| `emails/orders/confirmed.blade.php` stray `tml>` typo | Modules/MarketplacePipeline | Historical; harmless |
+| `AuthController@apiRegister/apiLogin` | Modules/IdentityAccess | Live but undocumented API surface |
+| `contact.blade.php` | Modules/CatalogDelivery | `action="#"` dummy (see §10) |
 
 ---
 
 ## 12. Progress Status
 
-### 12.1 Reported DONE (per PROGRESS.md / SESSION_HANDOVER / PARTNER_ROADMAP / git history)
+### 12.1 Reported DONE (verified 2026-08-17)
 
 - ✅ Phase I–IV: design → implementation → hardening → production deployment (DigitalOcean droplet, LEMP, SSL, Supervisor queue worker)
 - ✅ Production hardening: FormRequests, `lockForUpdate()` transactional checkout, route refactor, CSRF, `$fillable`, OpenGraph/SEO meta
 - ✅ Role-based registration with pending-approval workflow (user active; partner/admin pending → `admin.users.approve`)
 - ✅ Member registry with keyword search + status filtering; consolidated admin-nav
-- ✅ Partner ecosystem (PARTNER_ROADMAP modules A & B **all checked**): dashboard w/ revenue metrics, inventory CRUD + bulk delete, multi-image media manager + SortableJS, order fulfillment isolation, payout engine w/ 10% commission, Chart.js 30-day analytics, status mailers
-- ✅ Multi-currency (USD/EUR/GBP/MAD) via CurrencyMiddleware + `@money`
+- ✅ Partner ecosystem: dashboard w/ revenue metrics, inventory CRUD + bulk delete, multi-image media manager + SortableJS, order fulfillment isolation, payout engine w/ 10% commission, Chart.js 30-day analytics, status mailers
+- ✅ **Production-grade partner console** (2026-08-17): `.pc-*` component layer, segmented nav, filters, confirm dialogs, empty states, dark mode, responsive (commit `fa24575`)
+- ✅ Multi-currency (USD/EUR/GBP/MAD) via `CurrencyMiddleware` + `@money`
 - ✅ Sanctum API (login/register/catalog/user)
-- ✅ Database-backed wishlist schema + AJAX hearts (**UI built; controller never finished**)
-- ✅ Public artisan profile pages
+- ✅ Database-backed wishlist + AJAX hearts (**controller finished and tested** — `WishlistTest` green)
+- ✅ Customer review submission (`ReviewSubmissionTest` green)
+- ✅ Partner self-edit of public artisan profile (`partner.profile.edit/update`)
+- ✅ Wishlist / multi-partner payout split (equal split, tested — `PayoutSplitTest` green)
+- ✅ Business rules in `config/shop.php` (commission rate, default currency)
+- ✅ Rate limiting on auth (5/min) and checkout (3/min) via `RateLimiter::for` in TelemetryPipeline
+- ✅ **Modular monolith migration executed** (commits `2b1cc33`..`da1e36f`; see §15.9)
 
 ### 12.2 Reported PENDING / TODO
 
-- **PARTNER_ROADMAP Section D — "Profile & Trust Hardening"** (all unchecked): `profiles` table, GDPR/CCPA consent timestamps, Partner KYC documents, Admin Audit Log
-- **COLLABORATION_GUIDE high-priority items** (all unchecked):
-  1. **Fix payout logic** — pays every partner 90% on multi-partner products = financial leak
-  2. **Model hardening** — complete `$fillable` coverage
-  3. **Config decentralization** — hardcoded commission/currency rates → `config/shop.php`
-  4. **GDPR & identity layer**
-- **SESSION_HANDOVER future recommendations**: low-stock email alerts, partner onboarding guide, Stripe Connect automated disbursement, global shipping APIs
-- **WishlistController implementation** (see §10 #1)
-- **Customer review submission** (see §10 #2)
+- **PARTNER_ROADMAP Section D — "Profile & Trust Hardening"**: `profiles` table, GDPR/CCPA consent timestamps, Partner KYC documents, Admin Audit Log (audit/email log tables exist via TelemetryPipeline but no UI)
+- **SESSION_HANDOVER future recommendations**: low-stock email alerts (service exists), partner onboarding guide, Stripe Connect automated disbursement, global shipping APIs
+- **Contact form** backend (see §10 #2)
+- **API tests / docs** (see §10 #1)
 
 ### 12.3 Git state
-- Branch `main`, working tree clean. Modular monolith migration complete (phases 0–7, see §15): all models/controllers/services/views/routes/migrations/seeders/tests live in `Modules/`; module ownership map in `MODULE_OWNERSHIP.md`.
+- Branch `main`, working tree clean. Modular monolith migration complete (phases 0–7, see §15.9): all models/controllers/services/views/routes/migrations/seeders/tests live in `Modules/`; module ownership map in `MODULE_OWNERSHIP.md` (verified against filesystem).
 - **Uncommitted working tree:** none.
 
 ---
@@ -612,15 +597,12 @@ Every rendered page and the backend it exercises:
 
 | Severity | Issue |
 |---|---|
-| 🔴 Financial | Payout engine distributes 90% to **every** partner attached to an order's products (multi-partner revenue leak); no per-line-item allocation |
-| 🔴 Security | `.env` (Gmail app password, PayPal sandbox keys) and `database_dump.sql` are committed to git |
-| 🔴 Security | No rate limiting on login/register/checkout; no audit log |
+| 🔴 Security | `.env` (Gmail app password, PayPal sandbox keys) is committed to git — rotate credentials and gitignore it |
 | 🟠 Security | Policies dead → authorization is middleware-role-only; `ProductController` (admin-only by route placement) has no ownership checks for partner-created products |
-| 🟠 Stability | Wishlist broken; `ProductController@show` missing; contact form dummy; no-op payment migration; `carts` down() typo |
-| 🟠 Data | `database_dump.sql` stale (pre-rebrand) |
+| 🟠 Stability | Contact form dummy (`action="#"`); `carts` down() typo (historical, migrate:fresh clean) |
 | 🟠 Ops | Local file storage (needs S3/Cloudinary); no async failure logging; `APP_DEBUG=true` |
-| 🟡 Code | Business logic in controllers; no service layer; inline validation in several controllers; duplicated users migration; legacy views; brand string "Laravel" in `.env` vs "LUWI Collection" |
-| 🟡 Tests | 2 placeholder tests only; zero coverage of commerce/payouts/partner flows |
+| 🟡 Code | Business logic still heavy in controllers (service layer only for payout/checkout/low-stock/currency); partner console filters validated in-controller; duplicate `pending/paid/completed/cancelled` status strings across modules (no shared enum) |
+| 🟡 Tests | 19 tests / 53 assertions covering commerce, payouts, filters, wishlist, reviews — no API tests, no rate-limiter test, PartnerHub untested beyond profile edit smoke |
 
 ---
 
@@ -856,19 +838,33 @@ The modular monolith supports this growth path:
 
 **Conclusion of analysis:** the modular monolith is the correct target for this platform — it fixes the structural debt (role-grouped controllers, no service layer, no ownership boundaries) that actually blocks scaling, while avoiding the operational complexity of microservices. DB stays single (schema evolves additively), every step is deployable, and it directly unblocks the partner-completion roadmap.
 
+### 15.9 Execution record
+
+Executed 2026-08-16 → 2026-08-17 on `main` (46 commits, `8714b71`..`da1e36f`), SDD-gated (every phase reviewed; final whole-branch review: **"Migration complete and verified"** — 12 tests/32 assertions, 29 migrations FK-safe, 111 routes, all 39 baseline route names intact, `composer validate` clean, `npm run build` green with all module asset pairs).
+
+- **Post-migration additions:** partner console design (`fa24575`, 2026-08-17) — `.pc-*` component layer, filters, confirm modal, dark-mode-safe status tokens, responsive; suite at 19 tests / 53 assertions.
+- **Accepted trade-offs** (documented at final review): email blades keep own CSS (mail clients); module `scss` placeholders mostly empty (real styles consolidated in core `resources/css/app.css` + `partner.css`); `Address` stays in Core (imported by `IdentityAccess`'s `User`); `UserFactory` stays in Core bridged via `User::newFactory()`; PartnerHub has no dedicated tests; 3+-partner payout rounding residue persists by design (verbatim split logic mandated); rate-limiter feature test absent (until 2026-08-17 — see §13).
+
 ---
 
 ## 16. Recommendations & Next Steps
 
-**Priority order:**
+**Completed since this doc was first generated** (2026-08-16 → 17):
 
-1. **Fix the 3 blockers first** (small, high value, required before anything else):
-   - Rewrite `WishlistController` (implement toggle + index against the existing `wishlists` table)
-   - Add customer review submission (route + form on `product.blade.php`; enable `ReviewController@store`)
-   - Fix payout revenue split (per-line-item allocation) — financial leak
-2. **Complete the partner/vendor portal** (owner request #1) — see §14.3: self-service partner profile, partner fulfillment status updates, low-stock alerts, config-driven commission, then PARTNER_ROADMAP Section D (profiles, KYC, GDPR consent, audit log).
-3. **Modular monolith migration** (owner request #2) — see §15 (revised to Atlas-Learning conventions: `nwidart/laravel-modules`, 5 modules + Core, per-module Vite/services/migrations, no SQL/CSS in blades). Execute the Phase 0 → 7 plan. Keep route names stable; DB stays single.
-4. **Production hardening along the way**: remove committed `.env`/`database_dump.sql` from git history, rotate the Gmail/PayPal secrets, add rate limiting, move media to object storage, add per-module tests + CI.
+- ✅ Wishlist rewrite — toggle + archive work and are tested (`WishlistTest`)
+- ✅ Customer review submission — live and tested (`ReviewSubmissionTest`)
+- ✅ Multi-partner payout split — equal split with tests (`PayoutSplitTest`)
+- ✅ Partner portal completion: self-service profile edit, production-grade partner console (filters, confirm dialogs, empty states, dark mode, responsive)
+- ✅ Modular monolith migration — phases 0–7 executed and reviewed (see §15.9)
+- ✅ Rate limiting on auth + checkout; business rules centralized in `config/shop.php`
+
+**Still recommended (priority order):**
+
+1. **Security cleanup**: rotate committed Gmail/PayPal credentials; remove `.env` from git history; `APP_DEBUG=false` in production
+2. **Partner trust hardening** (PARTNER_ROADMAP Section D): KYC documents, GDPR/CCPA consent timestamps, admin audit-log UI (tables exist via TelemetryPipeline)
+3. **Partner reviews breakdown** — let partners see their review scorecard; **low-stock alert email** (service exists; wire the mailer)
+4. **API tests + docs** for the Sanctum surface; **contact form** backend (currently `action="#"`)
+5. **Production hardening**: media → S3/Cloudinary via the `image_url` seam, dedicated queue worker for `notifications`, CI workflow
 
 ---
 

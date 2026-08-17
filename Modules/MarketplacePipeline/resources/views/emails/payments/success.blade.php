@@ -6,7 +6,7 @@ We have successfully processed your payment for Order **#{{ $payment->order_id }
 **Payment Details:**
 - **Transaction ID:** {{ $payment->transaction_id }}
 - **Amount:** ${{ number_format($payment->amount, 2) }}
-- **Method:** {{ strtoupper($payment->provider) }}
+- **Method:** {{ strtoupper($payment->method ?? 'paypal') }}
 
 <x-mail::button :url="route('orders.index')">
 View Order Status
