@@ -1,29 +1,5 @@
 @section('title', 'Order Management | Admin')
 
-@section('styles')
-<style>
-    .admin-orders-header { margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; }
-    .table-container { background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto; box-shadow: var(--shadow-sm); }
-    .order-table { width: 100%; border-collapse: collapse; min-width: 900px; }
-    .order-table th, .order-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-    .order-table th { background: var(--surface-200); font-size: 0.75rem; text-transform: uppercase; color: var(--text-400); }
-    .status-pill { 
-        padding: 0.35rem 0.75rem; 
-        border-radius: 50px; 
-        font-size: 0.7rem; 
-        font-weight: 900; 
-        text-transform: uppercase; 
-        color: white !important;
-    }
-    .status-pending { background: #92400e !important; }
-    .status-cancelled { background: #991b1b !important; }
-    .status-paid { background: #166534 !important; }
-    .status-completed { background: #1e40af !important; }
-    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 4px; border: 1px solid var(--border); background: var(--surface-200); cursor: pointer; }
-    .btn-complete { background: #10b981; color: white; border: none; }
-</style>
-@endsection
-
 <x-app-layout>
 @include('partials.admin-nav')
 

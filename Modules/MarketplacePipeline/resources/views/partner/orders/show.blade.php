@@ -1,22 +1,5 @@
 @section('title', 'Order Details | Partner Dashboard')
 
-@section('styles')
-<style>
-    .order-header { margin-bottom: 4rem; }
-    .order-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
-    .meta-card { background: var(--surface-100); padding: 2rem; border-radius: 1.5rem; border: 1px solid var(--border); }
-    .meta-card label { display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-400); margin-bottom: 0.5rem; }
-    .meta-card .value { font-size: 1.25rem; font-weight: 800; color: var(--text-900); }
-    
-    .items-table-wrap { background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow: hidden; }
-    .items-table { width: 100%; border-collapse: collapse; }
-    .items-table th { padding: 1.5rem; background: var(--surface-200); text-align: left; font-size: 0.85rem; font-weight: 700; color: var(--text-600); border-bottom: 1px solid var(--border); }
-    .items-table td { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-    .product-info { display: flex; align-items: center; gap: 1rem; }
-    .product-img { width: 64px; height: 64px; border-radius: 0.75rem; object-fit: cover; }
-</style>
-@endsection
-
 <x-app-layout>
 @include('partials.partner-nav')
 

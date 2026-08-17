@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace Modules\MarketplacePipeline\Mail;
 
 use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Bus\Queueable;
@@ -40,7 +40,7 @@ class PaymentSuccess extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.payments.success',
+            markdown: 'marketplacepipeline::emails.payments.success',
         );
     }
 

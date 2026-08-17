@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderConfirmed;
-use App\Mail\OrderCancelled;
+use Modules\MarketplacePipeline\Mail\OrderConfirmed;
+use Modules\MarketplacePipeline\Mail\OrderCancelled;
 use Modules\MarketplacePipeline\Services\CheckoutService;
 
 class OrderController extends Controller

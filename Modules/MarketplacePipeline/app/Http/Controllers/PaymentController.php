@@ -8,7 +8,7 @@ use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\PaymentSuccess;
+use Modules\MarketplacePipeline\Mail\PaymentSuccess;
 use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller

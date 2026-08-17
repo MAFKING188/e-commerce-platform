@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Mail;
+namespace Modules\MarketplacePipeline\Mail;
 
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Bus\Queueable;
@@ -40,7 +40,7 @@ class OrderConfirmed extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.orders.confirmed',
+            markdown: 'marketplacepipeline::emails.orders.confirmed',
         );
     }
 
