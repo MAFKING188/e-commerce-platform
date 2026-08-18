@@ -7,14 +7,10 @@
 <x-app-layout>
 @include('partials.partner-nav')
 
-<x-profile-layout :user="$user" :stats="$stats" :subnav="[
-    ['id' => 'overview', 'label' => 'Overview'],
-    ['id' => 'activity', 'label' => 'My Orders'],
-    ['id' => 'security', 'label' => 'Address & Security'],
-    ['id' => 'settings', 'label' => 'Public Profile'],
-]">
+<x-profile-layout :user="$user" :stats="$stats" :active="'overview'" identity>
 
-    <section id="overview" class="profile-section">
+    <section class="profile-section">
+        <h2 class="pc-card__title">Atelier</h2>
         <div class="pc-stack">
             <div class="pc-card">
                 <div class="pc-card__head">
@@ -25,6 +21,22 @@
                     <a href="{{ route('partner.profile', $partner->id) }}" class="pc-btn-sm">View Public Profile</a>
                 </div>
             </div>
+            @if ($partner->website || $partner->contact_info)
+                <div class="profile-card">
+                    @if ($partner->website)
+                        <div class="profile-identity__row">
+                            <span class="profile-identity__label">Website</span>
+                            <span class="profile-identity__value"><a href="{{ $partner->website }}" target="_blank" rel="noopener">{{ $partner->website }}</a></span>
+                        </div>
+                    @endif
+                    @if ($partner->contact_info)
+                        <div class="profile-identity__row">
+                            <span class="profile-identity__label">Contact</span>
+                            <span class="profile-identity__value">{{ $partner->contact_info }}</span>
+                        </div>
+                    @endif
+                </div>
+            @endif
             <h2 class="pc-card__title">Recent Activity</h2>
             <div class="profile-card">
                 <ul class="profile-timeline">
@@ -42,42 +54,6 @@
                     @endforeach
                 </ul>
             </div>
-        </div>
-    </section>
-
-    <section id="activity" class="profile-section">
-        <h2 class="pc-card__title">My Orders</h2>
-        @forelse ($recentOrders as $order)
-            <div class="order-item-lite">
-                <div>
-                    <span class="order-lite-id">#{{ $order->id }}</span>
-                    <h3 class="order-lite-title">Placed on {{ $order->created_at->format('d M, Y') }}</h3>
-                </div>
-                <div class="order-lite-total">
-                    <div class="order-lite-price">${{ number_format($order->total_price, 0) }}</div>
-                    <span class="order-lite-status">{{ $order->status }}</span>
-                </div>
-            </div>
-        @empty
-            <div class="order-lite-empty">
-                <p class="order-lite-empty__text">No orders placed yet.</p>
-            </div>
-        @endforelse
-    </section>
-
-    <section id="security" class="profile-section">
-        <h2 class="pc-card__title">Address & Password</h2>
-        <div class="profile-card">
-            <p class="pc-subtitle">Address fields and password change are shared across roles — manage them from the member profile.</p>
-            <a href="{{ route('profile') }}" class="pc-btn-sm">Open Member Profile Settings</a>
-        </div>
-    </section>
-
-    <section id="settings" class="profile-section">
-        <h2 class="pc-card__title">Public Profile</h2>
-        <div class="profile-card">
-            <p class="pc-subtitle">Your public artisan page is built from these fields.</p>
-            <a href="{{ route('partner.profile.edit') }}" class="pc-btn-sm">Edit Business Name, Bio, Website & Contact</a>
         </div>
     </section>
 

@@ -20,6 +20,7 @@ class PartnerProfileShowTest extends TestCase
             'name' => 'Atelier Test',
             'description' => 'Handcrafted pieces',
             'contact_info' => 'contact@test.com',
+            'website' => 'https://atelier-test.example',
         ]);
         $product = Product::factory()->create(['stock' => 5]);
         $partner->products()->attach($product->id);
@@ -30,7 +31,11 @@ class PartnerProfileShowTest extends TestCase
             ->assertSee('Atelier Test')
             ->assertSee('profile-stats')
             ->assertSee('artisan-profile')
-            ->assertSee('profile-header');
+            ->assertSee('profile-header')
+            ->assertSee('contact@test.com')
+            ->assertSee('atelier-test.example')
+            ->assertSee('Identity')
+            ->assertDontSee('No orders placed yet.');
     }
 
     public function test_partner_profile_denied_for_buyers(): void

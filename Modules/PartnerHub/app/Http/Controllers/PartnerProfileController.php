@@ -34,7 +34,6 @@ class PartnerProfileController extends Controller
             'partner' => $partner,
             'stats' => $stats,
             'timeline' => $user->activityTimeline(8),
-            'recentOrders' => $user->orders()->latest()->take(4)->get(),
         ]);
     }
 
