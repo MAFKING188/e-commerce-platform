@@ -20,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/profile/security', [UserController::class, 'security'])->name('profile.security');
+    Route::get('/profile/settings', [UserController::class, 'settings'])->name('profile.settings');
 
     Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

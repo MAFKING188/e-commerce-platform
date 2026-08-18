@@ -1,5 +1,5 @@
 @php
-$profileTabs = match (auth()->user()->role) {
+$tabs = match ($user->role) {
     'admin' => [
         ['href' => route('admin.profile'), 'label' => 'Overview', 'active' => $active === 'overview'],
         ['href' => route('admin.dashboard'), 'label' => 'Command Center', 'active' => $active === 'dashboard'],
@@ -20,3 +20,9 @@ $profileTabs = match (auth()->user()->role) {
     ],
 };
 @endphp
+
+<nav class="profile-subnav" aria-label="Profile sections">
+    @foreach ($tabs as $tab)
+        <a href="{{ $tab['href'] }}" class="profile-subnav__link {{ $tab['active'] ? 'is-active' : '' }}">{{ $tab['label'] }}</a>
+    @endforeach
+</nav>

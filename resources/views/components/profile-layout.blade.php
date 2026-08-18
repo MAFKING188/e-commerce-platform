@@ -1,12 +1,7 @@
 @props([
     'user',
     'stats' => [],
-    'subnav' => [
-        ['id' => 'overview', 'label' => 'Overview'],
-        ['id' => 'activity', 'label' => 'Orders / Activity'],
-        ['id' => 'security', 'label' => 'Address & Security'],
-        ['id' => 'settings', 'label' => 'Settings'],
-    ],
+    'active' => 'overview',
     'identity' => false,
 ])
 
@@ -50,11 +45,7 @@
         </div>
     @endif
 
-    <nav class="profile-subnav" aria-label="Profile sections">
-        @foreach ($subnav as $item)
-            <a href="{{ $item['href'] }}" class="profile-subnav__link {{ $item['active'] ? 'is-active' : '' }}">{{ $item['label'] }}</a>
-        @endforeach
-    </nav>
+    @include('partials.profile-tabs', ['user' => $user, 'active' => $active])
 
     @if ($identity)
         <section class="profile-section">

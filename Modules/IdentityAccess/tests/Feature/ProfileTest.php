@@ -124,4 +124,41 @@ class ProfileTest extends TestCase
             ->assertSee('Orders / Activity')
             ->assertSee('Address & Security');
     }
+
+    public function test_security_page_renders_address_and_password_forms_for_all_roles(): void
+    {
+        foreach (['user', 'admin', 'partner'] as $role) {
+            $user = User::factory()->create(['role' => $role, 'status' => 'active']);
+            $response = $this->actingAs($user)->get('/profile/security');
+            $response->assertOk()
+                ->assertSee('Street Address')
+                ->assertSee('Current Password')
+                ->assertSee('Address & Security');
+        }
+    }
+
+    public function test_settings_page_renders_and_phone_is_saved_via_profile_update(): void
+    {
+        $user = User::factory()->create(['role' => 'partner', 'status' => 'active']);
+
+        $this->actingAs($user)->get('/profile/settings')
+            ->assertOk()
+            ->assertSee('Full Name')
+            ->assertSee('Email Address')
+            ->assertSee('Phone');
+
+        $this->actingAs($user)->put('/profile/update', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => '+33 6 11 22 33 44',
+        ])->assertRedirect();
+
+        $this->assertSame('+33 6 11 22 33 44', $user->fresh()->phone);
+    }
+
+    public function test_security_and_settings_require_authentication(): void
+    {
+        $this->get('/profile/security')->assertRedirect('/login');
+        $this->get('/profile/settings')->assertRedirect('/login');
+    }
 }
