@@ -1551,6 +1551,7 @@ footer {
     .profile-subnav__link { white-space: nowrap; }
     .profile-card { padding: 1.25rem; }
     .profile-identity__row { flex-direction: column; gap: 0.25rem; }
+    .form-row-2 { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
