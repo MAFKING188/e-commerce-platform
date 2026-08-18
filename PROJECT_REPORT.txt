@@ -1,0 +1,446 @@
+================================================================================
+ SMART SHOP (LUWI) — FULL PROJECT DOCUMENTATION
+ Single Source of Truth — Project Report & Engineer Handoff
+================================================================================
+ Generated : 2026-08-18 (session: modular monolith -> profile separation -> visual pass)
+ Scope     : Everything from the modular monolith architecture move up to the
+             upcoming responsive-design implementation phase.
+ Purpose   : Reflect the entire project state so it can (a) feed a project report,
+             (b) guide future sessions as the single source of truth, and
+             (c) let any engineer pick it up and understand what is happening.
+
+
+--------------------------------------------------------------------------------
+1. PROJECT IDENTITY & TECH STACK
+--------------------------------------------------------------------------------
+
+ Product      : SmartShop (branded "LUWI" on profile/auth pages) — a premium
+                e-commerce platform ("curating exceptional products with a focus
+                on quality, sustainability, and timeless design").
+ Repository   : <repo root>  (git, branch: main)
+ Framework    : Laravel 12 (PHP 8.x), modular monolith via nwidart/laravel-modules
+                + composer-merge-plugin for PSR-4 autoload of module code.
+ Frontend     : Blade components/partials + Tailwind CSS v4 + Vite.
+                Per-module asset aggregation via vite-module-loader.
+                Dark/light theme via CSS custom properties (.dark toggle).
+ Database     : MySQL (connection/name defined in .env). Schema migrated per module.
+ Auth/API     : Laravel Sanctum (personal access tokens), session-based web auth.
+ Payments     : PayPal flow (create/capture) + automated payout tracking.
+ Testing      : PHPUnit, per-module test suites (phpunit.xml), RefreshDatabase.
+
+
+--------------------------------------------------------------------------------
+2. HOW TO RUN / WORK WITH THE PROJECT
+--------------------------------------------------------------------------------
+
+  1) Install:        composer install && npm install
+  2) Env:            copy .env.example -> .env, set DB + mail, then:
+                     php artisan key:generate
+  3) Database:       php artisan migrate --force && php artisan db:seed
+                     (migrations + seeders live inside each module)
+  4) Assets:         npm run build          (Tailwind v4 + Vite; rebuild after
+                                             ANY resources/css or module css change)
+  5) Serve:          php artisan serve --port=8001
+  6) Tests:          php artisan test              (full suite)
+                     php artisan test --filter=<Name>   (single suite/test)
+                     NOTE: tests use RefreshDatabase — the local dev DB is
+                     NOT touched by tests.
+
+  Known dev quirks:
+   - `npm run build` prints a pre-existing `@source` warning — ignore it.
+   - After editing blade views while `php artisan serve` runs, run
+     `php artisan view:clear` defensively (Blade usually recompiles itself).
+   - When verifying pages with curl, login requires a CSRF token (see §11).
+   - Auth requests are rate limited: auth = 5/min per IP, checkout = 3/min.
+
+
+--------------------------------------------------------------------------------
+3. TEST ACCOUNTS & CREDENTIALS
+--------------------------------------------------------------------------------
+
+ Seeded (Modules/IdentityAccess/database/seeders/UserSeeder.php, password "password"):
+   admin@test.com   -> role: admin    (Admin User)
+   user1@test.com   -> role: partner  (John Doe)
+   user2@test.com   -> role: user     (Jane Doe)
+
+ Smoke-test account created during manual verification (still in dev DB):
+   artisan@test.com -> role: partner  (TestArtisan, id 33) — partner console access
+
+ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
+ Users table also has: status (active|pending|suspended), avatars, phone.
+
+ Manual-verification login procedure (CSRF):
+   GET / -> extract name="_token" value -> POST /accessaccount with
+   email, password, _token + session cookies (see §11 for the curl recipe).
+   NOTE: curl -L after login may report 405 — that is curl re-POSTing the 307
+   redirect target; the login itself succeeded.
+
+
+--------------------------------------------------------------------------------
+4. ARCHITECTURE: MODULAR MONOLITH
+--------------------------------------------------------------------------------
+
+ The original single-app Laravel codebase was refactored into a modular
+ monolith (five feature modules). One Laravel app, one database, one deployable,
+ but code is organized by business capability. Cross-module access happens
+ through explicit model imports (e.g. IdentityAccess User used by PartnerHub),
+ NOT through HTTP calls.
+
+ Module inventory (Modules/):
+  1) IdentityAccess
+       Ownership : users, auth (login/register/logout), profile pages, wishlist
+                   (archive), admin command center (dashboard, member registry),
+                   GovernanceService, User model signals.
+       Routes    : web.php (auth, profile, admin.*, wishlist) + api.php (Sanctum).
+       Views     : auth/, users/, admin/, emails/, wishlist.blade.php.
+
+  2) CatalogDelivery
+       Ownership : storefront (home, shop, product, about, contact), categories,
+                   products + multi-image media, reviews (submission + admin
+                   moderation), partner inventory CRUD, legal pages.
+       Routes    : storefront + admin/categories|products|reviews + partner/inventory.
+       Views     : home/shop/product/about/contact/legal/, admin/, partner/.
+
+  3) MarketplacePipeline
+       Ownership : cart, orders, PayPal integration, payouts (commission split),
+                   admin orders/payouts, partner orders/payouts, commerce emails.
+       Services  : CheckoutService, PayoutService (thin controllers).
+       Views     : cart/, checkout/, orders/, paypal/, emails/.
+
+  4) PartnerHub
+       Ownership : partner (artisan) entities & metadata, partner registry
+                   (admin side), artisan public profiles, partner self-service
+                   profile, partner dashboard.
+       Views     : partner/ (dashboard, profile, registry), artisan profiles.
+
+  5) TelemetryPipeline
+       Ownership : audit_logs + email_logs tables/models, email + low-stock
+                   alert logging, AnalyticsService (partner dashboard metrics),
+                   rate limiting (auth 5/min, checkout 3/min), health route (/up).
+
+ Refactor history (git, oldest->newest):
+   - 8714b71 "wip: baseline working tree before modular monolith refactor"
+   - a7000ec install nwidart/laravel-modules + composer-merge-plugin
+   - 0491990 scaffold five modules
+   - c14cf36 / e4a3830 PSR-4 autoload for module factories+seeders, module autoload
+   - 2788718 vite-module-loader (per-module asset aggregation)
+   - 478ffd3 / 992bf56 hermetic page tests (withoutVite), category counts out of blade
+   - af5ce2c per-module phpunit suites
+   - Then per-module moves: IdentityAccess (08d1a68..cb82c16), CatalogDelivery
+     (77dc103..6a4d67f), MarketplacePipeline (45f04e4..c6d9b70), PartnerHub
+     (06ed17f..bd9bb75), TelemetryPipeline (35c99ae..0041569)
+   - 05f2670 migrations + seeders moved into owning modules
+   - da1e36f MODULE_OWNERSHIP.md + tests moved into module suites
+   - 439d822 "production uniformity" (shared console design system, per-order
+     delivery, full profiles) — milestone commit
+   - Vendor -> Partner rebrand series (b8a263a..3d41bd1): tables, models,
+     controllers, routes, views, docs renamed vendor* -> partner*.
+
+ Key module route groups:
+   Route::middleware(['auth','admin'])->prefix('admin')->as('admin.')...
+   Route::middleware(['auth','partner'])->prefix('partner')->name('partner.')...
+   profile.* routes are auth-only, shared by all roles.
+
+
+--------------------------------------------------------------------------------
+5. FEATURE INVENTORY (WHAT EXISTS TODAY)
+--------------------------------------------------------------------------------
+
+ Storefront (guest + buyer):
+   - Home (hero, editor's choice, latest drop), Shop grid with filters,
+     Product pages with multi-image narratives + SortableJS reordering (admin),
+     About, Contact, Privacy, Terms, Shipping & Returns (legal pages, footer).
+   - Multi-currency engine (USD/EUR/GBP/MAD selector persists via session).
+   - Dark/light theme toggle (.dark).
+   - Wishlist ("archive") fully DB-backed, toggle + page.
+
+ Buyer (authenticated):
+   - Profile overview, Address & Security page, Settings page (see §7),
+     Order history, cart + checkout, PayPal flow, review submission.
+
+ Partner (artisan):
+   - Partner dashboard with real analytics (AnalyticsService),
+     Inventory CRUD (products + images + reorder), orders & payouts views,
+     self-service profile (business name, bio, website, contact) +
+     public artisan profile page, partner profile overview (§7).
+
+ Admin (command center):
+   - Dashboard with GovernanceService metrics (revenue, active orders, catalog
+     size, total members, low-stock count, pending reviews, pending users).
+   - Member registry (users CRUD + approve/pending workflow),
+     categories, products + media, reviews moderation, orders (complete flow),
+     partners registry + payouts processing (commission split),
+     admin profile overview (§7).
+
+ Backend services:
+   - CheckoutService, PayoutService, CatalogQueryService, AnalyticsService,
+     GovernanceService — thin controllers, business logic in services.
+   - Automated email outreach (account status updates), PayPal create/capture,
+     low-stock alerts, audit/email logs.
+   - Sanctum token API (auth/api routes).
+
+--------------------------------------------------------------------------------
+6. DESIGN SYSTEM & CODE CONVENTIONS
+--------------------------------------------------------------------------------
+
+ Global CSS lives in resources/css/app.css (shared tokens + all component
+ classes). Console-specific classes (partner dashboard) live in
+ Modules/PartnerHub/resources/css/partner.css; admin dashboard uses
+ dashboard.css. Both are loaded via @section('styles')/@vite on console pages.
+
+ Hard rules (enforced by verification):
+   - ZERO inline style="..." attributes in blades (email templates exempt).
+   - No emojis in UI text. SVG icons (stroke="currentColor") and "★" star
+     ratings are allowed.
+   - No SQL in blades; no URL hardcoding; route() everywhere.
+   - Route NAMES are immutable — never rename existing ones; only ADD new
+     names (e.g. profile.security, profile.settings were added).
+   - No new composer/npm dependencies without explicit approval.
+
+ Key shared classes:
+   - Layout:        <x-app-layout> (header/nav/footer, theme, currency, toasts).
+   - Buttons:       .btn, .btn-primary, .btn-ghost, .pc-btn-sm (console).
+   - Forms:         .form-group, .form-label, .form-input, .form-row-2
+                    (2-col grid, collapses to 1 col under 768px).
+   - Cards:         .profile-card (rounded-2xl surface card), .pc-card (console).
+   - Section title: .pc-card__title (1.15rem / 800 / text-900).
+   - Console stack: .pc-stack (> * + * { margin-top: 1.5rem }) in partner.css.
+   - Badges:        .profile-badge (+ --verified, --tier, --status-ok|warn|danger).
+
+ PROFILE SHELL (shared storefront + console, in app.css):
+   .profile-shell, .profile-header (avatar + identity), .profile-id__name/__meta,
+   .profile-avatar (upload via POST /profile/avatar, image/jpeg|png|webp 2MB),
+   .profile-stats (label/value tiles), .profile-subnav + .profile-subnav__link
+   with .is-active (accent underline), .profile-section, .profile-card,
+   .profile-timeline (items/dot/title/detail/time), .profile-empty,
+   .profile-identity (rows label/value), .profile-quicklinks (4-up grid ->
+   1 col on mobile), .profile-badge--status-* tones.
+   Responsive rules at max-width:768px: header stacks & centers, subnav becomes
+   horizontally scrollable (nowrap + overflow-x auto), cards shrink padding,
+   identity rows and form-row-2 collapse to single column.
+
+ LEGAL PAGES (app.css): .legal-page, .legal-hero, .legal-prose; footer links:
+   /privacy /terms /shipping /returns -> LegalController views + _hero partial.
+
+
+--------------------------------------------------------------------------------
+7. IDENTITY & PROFILES — CURRENT FOCUS AREA (deep dive)
+--------------------------------------------------------------------------------
+
+ 7.1 User model signals (Modules/IdentityAccess/app/Models/User.php)
+   - avatarUrl(): null | asset('storage/avatars/<file>').
+   - memberTier(): Benefactor (>=10k spent) | Patron (>=2.5k) | Collector (>=500)
+     | Member — based on completed orders' total_price.
+   - isVerifiedMember(): status==='active' && has avatars && primary address &&
+     >=1 completed order.
+   - statusChip(): ['label'=>Active|Pending|Suspended,'tone'=>ok|warn|danger].
+   - memberNumber(): 'Member #' + id zero-padded to 6 digits.
+   - activityTimeline(limit): merged Order/Review/Wishlist events, newest first.
+   - $fillable: name, email, password, role, status, avatars, phone.
+     password cast 'hashed' (Hash::check works on stored hashes).
+
+ 7.2 users table (IdentityAccess)
+   id, name, email, phone (nullable, added 2026_08_18_000003), password, role,
+   status (default active), avatars (nullable), created_at, updated_at.
+   addresses: user_id, is_primary, line1..line2, city, state, zip, country.
+
+ 7.3 Pages (route -> controller -> view)
+   - GET /profile                 UserController::show  users/show.blade.php
+   - GET /profile/security        UserController::security  users/security.blade.php
+   - GET /profile/settings        UserController::settings  users/settings.blade.php
+   - PUT /profile/update          UserController::updateProfile (name/email/phone +
+                                   optional address fields; address saved only when
+                                   line1/city/country present)
+   - POST /profile/avatar         UserController::updateAvatar
+   - PUT /profile/password        UserController::updatePassword (current+new, min 8)
+   - GET /admin/profile           AdminProfileController::index  admin/profile.blade.php
+   - GET /partner/profile         PartnerProfileController::profile  partner/profile/show.blade.php
+
+ 7.4 Shell + tabs architecture (IMPORTANT — learn this)
+   <x-profile-layout :user :stats :active :identity> renders: identity header
+   (avatar+upload, name, role badge, verified badge, tier badge, member since),
+   stats tiles, then INCLUDES partials/profile-tabs (passing user + active), then
+   the identity details card when :identity=true, then the page slot.
+   partials/profile-tabs.blade.php ECHOES the <nav class="profile-subnav"> and
+   computes per-role tab arrays (href/label/active) via match(user->role):
+     buyer  : Overview(/profile) Orders(/orders) Address&Security Settings
+     admin  : Overview(/admin/profile) Command Center(/admin/dashboard)
+              Address&Security Settings
+     partner: Overview(/partner/profile) My Orders(/partner/orders)
+              Address&Security Public Profile(/partner/profile/edit)
+   The shell component itself does NOT define the tabs — the partial owns them.
+
+   BLAZE SCOPE GOTCHA: Blade @include renders in a child scope — variables
+   assigned inside an included partial DO NOT leak into the parent template.
+   That is why the partial must echo markup instead of setting $profileTabs.
+
+ 7.5 Page contents
+   - Overview (buyer): Identity card (email, phone, status chip, member number,
+     member since) + Activity timeline + Quick Links grid (My Orders /archive/
+     Address&Security/Settings). NO order list on the page.
+   - Overview (admin): Identity card + Platform Pulse (timeline) + Command Center
+     CTA card. NO acquisitions table (moved to admin dashboard).
+   - Overview (partner): Identity card + Atelier card (name, description,
+     View Public Profile link) + website/contact rows (shown only when set)
+     + Recent Activity. NO order list (link out via tabs).
+   - Address & Security (/profile/security): address form (6 fields, POST to
+     profile.update) + password form (PUT profile.password). Shared by all roles.
+   - Settings (/profile/settings): Full Name, Email, Phone (POST profile.update).
+     Shared by all roles.
+
+ 7.6 Profile data-collection gap closed on 2026-08-18
+   Before: status/phone/member-number never surfaced, order lists duplicated on
+   overviews, subnav was #anchor-only.
+   After:  users.phone column + fillable; status chip + member number in identity
+   card; real tab links with is-active; orders moved out of overviews; partner
+   website/contact surfaced on overview; phone saved via Settings.
+
+
+--------------------------------------------------------------------------------
+8. RECENT WORK LOG (2026-08-18 session — profile separation & full-detail
+   collection). All committed to main, tests green after each commit.
+--------------------------------------------------------------------------------
+
+   030ce48 docs: profile separation & full-detail collection — design spec
+   920bde9 docs: implementation plan (7 tasks, TDD + commit per task)
+   be990f5 feat: user phone column, status chip and member number helpers
+            (migration 2026_08_18_000003_add_phone_to_users_table.php;
+             User::statusChip(), User::memberNumber(); UserDetailsTest 3 tests)
+   ca305a2 feat: profile shell — role-aware tab links, identity card,
+            responsive rules (partials/profile-tabs; identity card; CSS tones;
+            768px rules; quick links)
+   25fd466 feat: shared address & security and settings pages with phone
+            collection (routes profile.security/profile.settings;
+             updateProfile accepts optional address + phone; 3 new ProfileTest
+             tests; security/settings blades)
+   3d56d4e feat: buyer overview — identity card, timeline and quick links,
+            orders moved out (show() drops $address/$recentOrders)
+   ed10901 feat: admin overview — pulse stats and timeline, acquisitions
+            table removed (index() drops $recentOrders)
+   4273d7a feat: partner overview — full atelier business card and stats,
+            orders moved out (profile() drops $recentOrders; website/contact
+            rows)
+   e72b004 fix: stack address and password form pairs on mobile
+            (.form-row-2 collapses under 768px)
+
+ Earlier milestone commits (previous sessions): 9b84bb2/56b3771 (profile pages
+ + legal pages plan/spec), f53b526 (legal pages), 4268fea (review avatars),
+ f2258e7/ae97a62/713bffa (buyer/admin/partner profile pages),
+ bc2e231 (identity signals), 439d822 (production uniformity), vendor->partner
+ rebrand series, module moves (see §4), d735240 (role-based registration with
+ pending status), 3d41bd1.. (rebrand), 0deb1dd (inventory CRUD),
+ d86a2c1 (partner analytics), 8441ed6 (email outreach), 101607c (media),
+ b4b9bc3 (payouts), 8e6bb79 (multi-currency), 8d8c764 (global responsiveness),
+ 43df829 (admin-nav + mobile), 70ed276 (reviews moderation), 656d201 (wishlist),
+ 512d430 (business rules config), 2dbd546 (image validation),
+ 1765119 (mass assignment hardening), 69aa883 (Sanctum).
+
+
+--------------------------------------------------------------------------------
+9. VISUAL PASS (2026-08-18, done right after profile separation)
+--------------------------------------------------------------------------------
+
+ Method: agent-browser (CDP) against php artisan serve :8001; audited DOM
+ geometry + computed styles (desktop 1280 + mobile 390) because the current
+ model cannot render images. Screenshots saved for human review at
+ /tmp/opencode/visual-pass/ (1-buyer-overview-desktop, 2-security-desktop,
+ 3-admin-overview-desktop, 4-security-mobile, 5-partner-mobile,
+ 6-security-mobile-fixed).
+
+ Results — all 5 profile pages, desktop + mobile:
+   - No horizontal overflow anywhere.
+   - Tabs correct with proper is-active per role; cards uniform width/offsets;
+     inputs uniform (509px pairs / 1034 full / 50px tall).
+   - Status chip contrast ok (#dcfce7/#166534, #fef3c7/#92400e, #fee2e2/#991b1b).
+   - Mobile: header stacks, subnav scrolls horizontally, identity rows and
+     quick-links collapse to 1 col, form pairs collapse to full width (after fix).
+   - Admin page: acquisitions table confirmed gone; pulse stats real
+     ($17,520 / 7 active orders / 13 members / 0 pending reviews).
+   - Partner page: atelier card + contact row; website row hidden when unset.
+   - UI Slop Score ~25/100 (product-specific, low interchangeable risk).
+   - ONE issue found & fixed (e72b004): .form-row-2 stayed 2-col at 390px
+     (cramped 139px inputs) -> grid-template-columns:1fr under 768px.
+
+ Remaining to eyeball by a human: the PNGs above, and light-theme rendering
+ (audits were run in dark theme via prefers-color-scheme).
+
+
+--------------------------------------------------------------------------------
+10. VERIFICATION STANDARDS (what "done" means here)
+--------------------------------------------------------------------------------
+
+  1) TDD: failing test written first, run to confirm failure, implement, run to
+     confirm green, then commit (one logical unit per commit on main).
+  2) Full suite: php artisan test -> currently 48 passed / 182 assertions.
+     Suites: CatalogDelivery (CategoryIndexSmoke, LegalPages, PartnerInventory
+     Filter, ReviewSubmission), IdentityAccess (AdminProfile, IdentitySignals,
+     Profile 11 tests, UserDetails 3, Wishlist), MarketplacePipeline
+     (CheckoutFlow, PartnerOrderFilter, PayoutSplit), PartnerHub (Onboarding,
+     ProfileShow), TelemetryPipeline (RateLimiter, Telemetry), Tests\Unit.
+  3) npm run build must succeed after CSS changes.
+  4) Zero-inline-style sweep:
+     grep -rn 'style="' Modules/*/resources/views/ resources/views/ --include="*.blade.php" | grep -v emails
+     -> only email templates may remain.
+  5) HTTP smoke (manual, against :8001): GET each profile/legal page, assert 200
+     + presence markers (e.g. 'Identity', 'Member #', 'is-active' tab,
+     'Platform Pulse') and absence markers ('Recent Acquisitions',
+     'No acquisitions recorded yet.', 'No orders placed yet.').
+  6) Cleanup after manual E2E: remove test uploads/avatars, reset data.
+
+
+--------------------------------------------------------------------------------
+11. ENGINEER HANDOFF NOTES (gotchas & procedures)
+--------------------------------------------------------------------------------
+
+   - Blade include scoping: variables set in an @include do NOT propagate to the
+     parent (see §7.4). To share per-role data, echo markup from the partial or
+     compute in the component/controller.
+   - Route naming constraints: existing names are frozen; add-only policy.
+   - Rate limits: auth 5/min/IP, checkout 3/min/IP (TelemetryPipeline
+     RateLimiter::for). Excess login attempts -> silent 302 back to /login
+     (the login view renders no error banner — don't chase "no error shown").
+   - curl CSRF recipe: GET page with cookie jar -> extract
+     name="_token" value="..." -> POST /accessaccount with jar + _token.
+     A 405 after login = curl following the 307 with POST (harmless).
+   - Tests are hermetic: RefreshDatabase + withoutVite where needed; page tests
+     assert against rendered DOM text, not manifests.
+   - Console pages need @section('styles')/@vite partner.css|dashboard.css;
+     storefront pages must NOT depend on console classes.
+   - User statuses: role-based registration creates pending accounts; admins
+     approve via member registry; only active accounts may log in.
+   - Payouts split line value equally among product partners (fix ddcaec8).
+   - Docs live in docs/superpowers/ (specs/ + plans/); a project convention
+     doc exists (MODULE_OWNERSHIP.md).
+   - Seeded + smoke accounts and their roles: see §3.
+
+  Documentation index:
+   - docs/superpowers/specs/2026-08-18-profile-separation-full-details-design.md
+   - docs/superpowers/plans/2026-08-18-profile-separation-full-details.md
+   - docs/superpowers/ (earlier specs/plans for profiles, partner console, etc.)
+   - MODULE_OWNERSHIP.md (module boundaries)
+
+
+--------------------------------------------------------------------------------
+12. KNOWN LIMITATIONS & NEXT PHASE
+--------------------------------------------------------------------------------
+
+ Current state: all profile pages are separated, light, and verified; visual
+ pass done at desktop + 390px; one responsive bug fixed.
+
+ NEXT PHASE (agreed): responsive-design implementation pass across the app —
+ the profile separation was deliberately done first so each page is light
+ enough to adapt cleanly. Planned scope for that phase:
+   - Sweep all pages at 768/640/390 breakpoints (storefront, shop grid,
+     product, cart/checkout, partner + admin consoles).
+   - Verify the 768px profile rules against every actor page.
+   - Fix remaining cramped grids (e.g. any form-row-2 leftovers outside
+     profile, stat tiles, pc-table wrapping) and tap-target sizes.
+   - Human visual review of the PNGs in §9 and light-theme pass.
+
+ Open items tracked outside this file: review avatars are rendered from
+ storage/avatars via symlink (public/storage must exist); remember to clean
+ uploads in dev after avatar E2E.
+
+================================================================================
+ END OF DOCUMENT
+================================================================================
