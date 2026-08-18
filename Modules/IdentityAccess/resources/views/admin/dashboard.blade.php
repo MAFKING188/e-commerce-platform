@@ -3,43 +3,43 @@
 <x-app-layout>
 @include('partials.admin-nav')
 
-<div class="admin-header">
+<div class="pc-header">
     <div>
-        <span style="font-weight: 800; color: var(--brand-accent); text-transform: uppercase; letter-spacing: 0.2em;">Platform Overview</span>
-        <h1>Command Center</h1>
+        <span class="pc-eyebrow">Platform Overview</span>
+        <h1 class="pc-title">Command Center</h1>
     </div>
-    <div style="font-weight: 700; color: var(--text-400);">{{ now()->format('l, F d') }}</div>
+    <div class="pc-header__date">{{ now()->format('l, F d') }}</div>
 </div>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <label>Total Revenue</label>
-        <div class="value">${{ number_format($stats['revenue'], 0) }}</div>
+<div class="pc-stats">
+    <div class="pc-stat">
+        <span class="pc-stat__label">Total Revenue</span>
+        <span class="pc-stat__value is-accent">${{ number_format($stats['revenue'], 0) }}</span>
     </div>
-    <div class="stat-card">
-        <label>Active Orders</label>
-        <div class="value">{{ $stats['active_orders'] }}</div>
+    <div class="pc-stat">
+        <span class="pc-stat__label">Active Orders</span>
+        <span class="pc-stat__value">{{ $stats['active_orders'] }}</span>
     </div>
-    <div class="stat-card">
-        <label>Catalog Size</label>
-        <div class="value">{{ $stats['catalog_size'] }}</div>
+    <div class="pc-stat">
+        <span class="pc-stat__label">Catalog Size</span>
+        <span class="pc-stat__value">{{ $stats['catalog_size'] }}</span>
     </div>
-    <div class="stat-card" style="{{ $stats['low_stock_count'] > 0 ? 'border-color: #ef4444; background: #fef2f2;' : '' }}">
-        <label style="{{ $stats['low_stock_count'] > 0 ? 'color: #ef4444;' : '' }}">Low Stock Items</label>
-        <div class="value" style="{{ $stats['low_stock_count'] > 0 ? 'color: #ef4444;' : '' }}">{{ $stats['low_stock_count'] }}</div>
+    <div class="pc-stat {{ $stats['low_stock_count'] > 0 ? 'is-alert' : '' }}">
+        <span class="pc-stat__label">Low Stock Items</span>
+        <span class="pc-stat__value">{{ $stats['low_stock_count'] }}</span>
     </div>
 </div>
 
-<div class="quick-actions" style="margin-bottom: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+<div class="quick-actions">
     <a href="{{ route('admin.orders.index') }}" class="action-panel">
         <div>
-            <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+            <div class="icon-box">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
             </div>
             <h2>Fulfillment</h2>
             <p>Monitor real-time acquisitions, process payments, and manage shipping status.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #3b82f6;">Order Queue</span>
+        <span class="btn btn-primary">Order Queue</span>
     </a>
 
     <a href="{{ route('admin.products.index') }}" class="action-panel">
@@ -50,82 +50,81 @@
             <h2>Inventory</h2>
             <p>Manage products, adjust stock levels, and curate the luxury catalog.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content;">Manage Archive</span>
+        <span class="btn btn-primary">Manage Archive</span>
     </a>
 
     <a href="{{ route('admin.users.index') }}" class="action-panel">
         <div>
-            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+            <div class="icon-box">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
             <h2>Member Base</h2>
             <p>Administer user permissions, verify identities, and manage the community.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #10b981;">
+        <span class="btn btn-primary">
             Access Registry ({{ $stats['pending_users'] }})
         </span>
     </a>
 
     <a href="{{ route('admin.partners.index') }}" class="action-panel">
         <div>
-            <div class="icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+            <div class="icon-box">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             </div>
             <h2>Supply Chain</h2>
             <p>Manage partner partners, track sources, and map inventory origins.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #8b5cf6;">Partner Ecosystem</span>
+        <span class="btn btn-primary">Partner Ecosystem</span>
     </a>
 
     <a href="{{ route('admin.reviews.index') }}" class="action-panel">
         <div>
-            <div class="icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+            <div class="icon-box">
                 <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
             </div>
             <h2>Community Feedback</h2>
             <p>Moderate user reviews, curate testimonials, and manage platform sentiment.</p>
         </div>
-        <span class="btn btn-primary" style="width: fit-content; background: #f59e0b;">
+        <span class="btn btn-primary">
             Moderate ({{ $stats['pending_reviews'] }})
         </span>
     </a>
 </div>
 
-<div class="recent-activity" style="background: var(--surface-100); border-radius: 2rem; border: 1px solid var(--border); padding: 3rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--text-900);">Pulse: Recent Acquisitions</h2>
-        <a href="{{ route('admin.orders.index') }}" style="color: var(--brand-accent); font-weight: 700; text-decoration: none;">View All</a>
+<div class="pc-card">
+    <div class="pc-card__head">
+        <div>
+            <h2 class="pc-card__title">Pulse: Recent Acquisitions</h2>
+        </div>
+        <a href="{{ route('admin.orders.index') }}" class="pc-section-link">View All</a>
     </div>
 
     @if($recentOrders->isEmpty())
-        <div style="text-align: center; padding: 4rem; color: var(--text-400); font-weight: 600;">
-            No recent activity recorded.
-        </div>
+        @include('partials.partner.empty-state', [
+            'icon' => 'receipt',
+            'title' => 'No recent activity',
+            'text' => 'New acquisitions will appear here as members complete their purchases.',
+        ])
     @else
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="pc-table-wrap">
+            <table class="pc-table">
                 <thead>
-                    <tr style="text-align: left; border-bottom: 1px solid var(--border);">
-                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Order ID</th>
-                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Member</th>
-                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Value</th>
-                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Status</th>
-                        <th style="padding: 1rem 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-400);">Date</th>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Member</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($recentOrders as $order)
-                        <tr style="border-bottom: 1px solid var(--border); transition: background 0.3s ease;">
-                            <td style="padding: 1.5rem 0; font-weight: 800; color: var(--brand-accent);">#{{ $order->id }}</td>
-                            <td style="padding: 1.5rem 0; font-weight: 600;">{{ $order->user->name }}</td>
-                            <td style="padding: 1.5rem 0; font-weight: 800;">${{ number_format($order->total_price, 2) }}</td>
-                            <td style="padding: 1.5rem 0;">
-                                <span style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: 20px; 
-                                    {{ $order->status == 'completed' ? 'background: rgba(16, 185, 129, 0.1); color: #10b981;' : 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;' }}">
-                                    {{ $order->status }}
-                                </span>
-                            </td>
-                            <td style="padding: 1.5rem 0; color: var(--text-400); font-size: 0.9rem;">{{ $order->created_at->diffForHumans() }}</td>
+                        <tr>
+                            <td class="is-numeric">#{{ $order->id }}</td>
+                            <td class="is-muted">{{ $order->user->name }}</td>
+                            <td class="is-strong">${{ number_format($order->total_price, 2) }}</td>
+                            <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
+                            <td class="is-muted">{{ $order->created_at->diffForHumans() }}</td>
                         </tr>
                     @endforeach
                 </tbody>

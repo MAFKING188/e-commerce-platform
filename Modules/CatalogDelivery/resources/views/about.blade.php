@@ -42,7 +42,8 @@
         </p>
         <div class="about-support-actions">
             <a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" class="btn btn-primary about-support-btn">
-                💳 SUPPORT VIA PAYPAL
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                Support Via PayPal
             </a>
         </div>
     </div>

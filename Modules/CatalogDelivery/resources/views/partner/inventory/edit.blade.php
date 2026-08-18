@@ -114,7 +114,7 @@
                 @foreach ($product->images->sortBy('position') as $image)
                     <div class="pc-media-item" data-id="{{ $image->id }}">
                         <img src="{{ asset($image->url) }}" alt="Product Image">
-                        <button type="button" class="pc-media-item__remove" onclick="deleteVisual({{ $product->id }}, {{ $image->id }}, this)" title="Remove Visual" aria-label="Remove visual">✕</button>
+                        <button type="button" class="pc-media-item__remove" onclick="deleteVisual({{ $product->id }}, {{ $image->id }}, this)" title="Remove Visual" aria-label="Remove visual"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                     </div>
                 @endforeach
             </div>

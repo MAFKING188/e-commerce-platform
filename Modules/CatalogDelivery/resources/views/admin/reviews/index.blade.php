@@ -24,7 +24,7 @@
                 <div class="align-right">
                     <div class="review-stars-row">
                         @for($i = 1; $i <= 5; $i++)
-                            <span style="color: {{ $i <= $review->rating ? '#f59e0b' : 'var(--border)' }};">★</span>
+                            <span class="review-star {{ $i <= $review->rating ? 'is-filled' : '' }}">★</span>
                         @endfor
                     </div>
                     <span class="status-badge status-{{ $review->status ?? 'pending' }}">
@@ -54,7 +54,7 @@
                             <button type="submit" class="btn btn-ghost review-hide">Hide</button>
                         </form>
                     @endif
-                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" onsubmit="return confirm('Permanently purge this review?')">
+                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" data-confirm="Permanently purge this review?">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-primary review-purge">Purge</button>
@@ -64,7 +64,7 @@
         </div>
     @empty
         <div class="review-empty">
-            <div class="review-empty-icon">🍃</div>
+            <svg class="review-empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <p>No community feedback recorded yet.</p>
         </div>
     @endforelse

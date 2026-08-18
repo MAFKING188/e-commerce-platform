@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutService
 {
-    public function checkout(User $user): Order
+    public function checkout(User $user, array $delivery = []): Order
     {
         $cart = Cart::with('items')->where('user_id', $user->id)->first();
 
@@ -20,7 +20,7 @@ class CheckoutService
             throw new \RuntimeException('Cart is empty');
         }
 
-        return DB::transaction(function () use ($cart, $user) {
+        return DB::transaction(function () use ($cart, $user, $delivery) {
             $total = 0;
             $products = [];
 
@@ -44,7 +44,17 @@ class CheckoutService
                 'user_id' => $user->id,
                 'total_price' => $total,
                 'status' => 'pending',
-            ]);
+            ] + array_intersect_key($delivery, array_flip([
+                'recipient_name',
+                'recipient_phone',
+                'shipping_line1',
+                'shipping_line2',
+                'shipping_city',
+                'shipping_state',
+                'shipping_zip',
+                'shipping_country',
+                'delivery_notes',
+            ])));
 
             foreach ($cart->items as $item) {
                 $product = $products[$item->product_id];

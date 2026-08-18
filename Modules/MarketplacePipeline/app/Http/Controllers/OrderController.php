@@ -24,8 +24,20 @@ class OrderController extends Controller
 
     public function store(Request $request, CheckoutService $checkout)
     {
+        $delivery = $request->validate([
+            'recipient_name' => 'required|string|max:120',
+            'recipient_phone' => 'required|string|max:40',
+            'shipping_line1' => 'required|string|max:255',
+            'shipping_line2' => 'nullable|string|max:255',
+            'shipping_city' => 'required|string|max:120',
+            'shipping_state' => 'nullable|string|max:120',
+            'shipping_zip' => 'nullable|string|max:20',
+            'shipping_country' => 'required|string|max:120',
+            'delivery_notes' => 'nullable|string|max:1000',
+        ]);
+
         try {
-            $order = $checkout->checkout(auth()->user());
+            $order = $checkout->checkout(auth()->user(), $delivery);
 
             $order->load('items.product');
             Mail::to(auth()->user())->send(new OrderConfirmed($order));

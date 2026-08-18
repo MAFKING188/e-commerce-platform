@@ -11,6 +11,7 @@
     --pc-warn-fg: #92400e;
     --pc-danger-bg: #fee2e2;
     --pc-danger-fg: #991b1b;
+    --pc-danger-border: #fecaca;
     --pc-neutral-bg: var(--surface-300);
     --pc-neutral-fg: var(--text-600);
     --pc-overlay: rgba(15, 23, 42, 0.45);
@@ -23,6 +24,7 @@
     --pc-warn-fg: #fbbf24;
     --pc-danger-bg: rgba(239, 68, 68, 0.16);
     --pc-danger-fg: #f87171;
+    --pc-danger-border: rgba(239, 68, 68, 0.4);
     --pc-neutral-bg: var(--surface-300);
     --pc-neutral-fg: var(--text-400);
     --pc-overlay: rgba(2, 6, 23, 0.6);
@@ -115,6 +117,12 @@
     font-weight: 500;
 }
 
+.pc-header__date {
+    font-weight: 700;
+    color: var(--text-400);
+    white-space: nowrap;
+}
+
 /* ---------- Cards ---------- */
 
 .pc-card {
@@ -160,6 +168,16 @@
     color: var(--brand-accent);
 }
 
+.pc-stat.is-alert {
+    border-color: var(--pc-danger-border);
+    background: var(--pc-danger-bg);
+}
+
+.pc-stat.is-alert .pc-stat__label,
+.pc-stat.is-alert .pc-stat__value {
+    color: var(--pc-danger-fg);
+}
+
 .pc-stat__foot {
     color: var(--text-400);
     font-size: 0.8rem;
@@ -199,6 +217,12 @@
     justify-content: space-between;
     gap: 1rem;
     padding: 1.75rem 1.75rem 0;
+}
+
+.pc-card__title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-900);
 }
 
 .pc-table {
@@ -254,7 +278,11 @@
 }
 
 .pc-table .is-muted {
-    color: var(--text-600);
+    color: var(--text-400);
+}
+
+.pc-table .is-strong {
+    font-weight: 800;
 }
 
 .pc-table .is-ref {
@@ -397,6 +425,11 @@
     min-width: 220px;
 }
 
+.pc-filter__input--sm {
+    min-width: 0;
+    width: 120px;
+}
+
 .pc-filter__input:focus,
 .pc-filter__select:focus {
     outline: none;
@@ -500,7 +533,21 @@
 .pc-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0 2rem;
+    gap: 1.5rem;
+    padding: 1.75rem;
+}
+
+.pc-field--full {
+    grid-column: 1 / -1;
+}
+
+.pc-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 1.75rem 1.75rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
 }
 
 .pc-field {
@@ -697,6 +744,11 @@ textarea.pc-field__input {
     color: var(--brand-accent);
 }
 
+.pc-wrap-narrow {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
 .pc-totals {
     display: flex;
     align-items: baseline;
@@ -786,8 +838,81 @@ textarea.pc-field__input {
 /* ---------- Buttons (console variants) ---------- */
 
 .pc-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
     padding: 0.5rem 1.1rem;
     font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    border: 1px solid var(--border);
+    background: var(--surface-200);
+    color: var(--text-900);
+    text-decoration: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.pc-btn-sm:hover {
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+.pc-btn-sm--ok {
+    background: var(--pc-ok-bg);
+    border-color: transparent;
+    color: var(--pc-ok-fg);
+}
+
+.pc-btn-sm--ok:hover {
+    color: var(--pc-ok-fg);
+    filter: brightness(0.97);
+}
+
+.pc-btn-sm--danger {
+    background: var(--pc-danger-bg);
+    border-color: transparent;
+    color: var(--pc-danger-fg);
+}
+
+.pc-btn-sm--danger:hover {
+    color: var(--pc-danger-fg);
+    filter: brightness(0.97);
+}
+
+.pc-row-actions {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pc-row-actions--end {
+    justify-content: flex-end;
+}
+
+.pc-pagination {
+    margin-top: 3rem;
+}
+
+.pc-role-select {
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--brand-accent);
+    outline: none;
+    cursor: pointer;
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.pc-role-select:hover {
+    background: var(--surface-300);
 }
 
 /* ---------- Responsive ---------- */

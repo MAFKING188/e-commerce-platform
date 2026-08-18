@@ -54,11 +54,12 @@
 </script>
 @endsection
 <x-app-layout>
+@include('partials.admin-nav')
 
 <div class="editor-stage">
     <div class="editor-header">
         <span class="stat-label">Inventory Management</span>
-        <h1>Edit Product.</h1>
+        <h1>Edit Product</h1>
     </div>
 
     <div class="editor-card">
@@ -105,7 +106,7 @@
                             <div class="media-item" data-id="{{ $image->id }}">
                                 <img src="{{ asset($image->url) }}" alt="">
                                 <div class="media-actions">
-                                    <button type="button" class="media-btn" onclick="deleteVisual({{ $product->id }}, {{ $image->id }}, this)" title="Remove Visual">✕</button>
+                                    <button type="button" class="media-btn" onclick="deleteVisual({{ $product->id }}, {{ $image->id }}, this)" title="Remove Visual"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                                 </div>
                             </div>
                         @endforeach

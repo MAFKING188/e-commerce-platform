@@ -25,7 +25,9 @@ class CartController extends Controller
 
     $total = $cart->items->sum(fn ($item) => $item->product->price * $item->quantity);
 
-    return view('marketplacepipeline::cart.index', compact('cart', 'total'));
+    $address = auth()->user()->addresses()->where('is_primary', true)->first();
+
+    return view('marketplacepipeline::cart.index', compact('cart', 'total', 'address'));
 }
 
     public function add(Request $request)

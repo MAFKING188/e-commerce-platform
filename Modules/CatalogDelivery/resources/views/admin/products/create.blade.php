@@ -1,11 +1,12 @@
 @section('title', 'Curate New Piece | LUWI')
 
 <x-app-layout>
+@include('partials.admin-nav')
 
 <div class="editor-stage">
     <div class="editor-header">
         <span class="cat-badge">Inventory Management</span>
-        <h1>Curate New Piece.</h1>
+        <h1>Curate New Piece</h1>
         <p class="editor-subtitle">Expand the archive with a new item of exceptional design.</p>
     </div>
 
@@ -49,7 +50,7 @@
                 <div class="form-group field-full">
                     <label class="form-label">Visual Narrative (Narrative Images)</label>
                     <div class="image-upload-zone">
-                        <span class="upload-icon">✦</span>
+                        <svg class="upload-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
                         <div class="file-input-wrapper">
                             <span class="btn btn-ghost upload-btn">Select Assets</span>
                             <input type="file" name="images[]" multiple required>

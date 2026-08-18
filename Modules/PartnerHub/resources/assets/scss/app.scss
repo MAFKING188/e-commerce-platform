@@ -123,6 +123,33 @@
 }
 .mapping-card:hover { border-color: var(--brand-accent); transform: translateY(-5px); }
 
+.mapping-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: var(--text-900);
+}
+
+.mapping-card__cat {
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.mapping-card__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mapping-card__foot .is-strong {
+    font-weight: 800;
+    color: var(--brand-accent);
+}
+
 // ---------- partner/dashboard ----------
 .partner-header { margin-bottom: 4rem; }
 .partner-header h1 { font-size: 3rem; font-weight: 800; color: var(--text-900); }

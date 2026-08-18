@@ -3,23 +3,26 @@
 <x-app-layout>
 @include('partials.admin-nav')
 
-<div class="admin-header">
+<div class="pc-header">
     <div>
-        <span class="cat-badge">Stock Control</span>
-        <h1>Product Inventory.</h1>
+        <span class="pc-eyebrow">Stock Control</span>
+        <h1 class="pc-title">Product Inventory</h1>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Add New Product</a>
+    <a href="{{ route('admin.products.create') }}" class="btn btn-primary pc-btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add New Product
+    </a>
 </div>
 
-<div class="inventory-table-wrap">
-    <table class="inventory-table">
+<div class="pc-table-wrap">
+    <table class="pc-table">
         <thead>
             <tr>
                 <th>Product</th>
                 <th>Category</th>
                 <th>Price</th>
                 <th>Status</th>
-                <th class="align-right">Actions</th>
+                <th class="is-right">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -34,10 +37,10 @@
                             </div>
                         </div>
                     </td>
-                    <td class="td-category">
+                    <td class="is-muted">
                         {{ $product->category->name ?? 'Uncategorized' }}
                     </td>
-                    <td class="td-price">
+                    <td class="is-strong">
                         ${{ number_format($product->price, 2) }}
                     </td>
                     <td>
@@ -49,13 +52,13 @@
                             <span class="stock-pill stock-none">Out of Stock</span>
                         @endif
                     </td>
-                    <td class="align-right">
-                        <div class="action-links">
-                            <a href="{{ route('admin.products.edit', $product->id) }}" class="link-edit">Edit</a>
-                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="inline-form" onsubmit="return confirm('Archive this product permanently?')">
+                    <td class="is-right">
+                        <div class="pc-row-actions pc-row-actions--end">
+                            <a href="{{ route('admin.products.edit', $product->id) }}" class="pc-btn-sm">Edit</a>
+                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" data-confirm="Archive this product permanently?">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="link-delete">Delete</button>
+                                <button type="submit" class="pc-btn-sm pc-btn-sm--danger">Delete</button>
                             </form>
                         </div>
                     </td>
@@ -65,7 +68,7 @@
     </table>
 </div>
 
-<div class="pagination-wrap">
+<div class="pc-pagination">
     {{ $products->links('partials.pagination') }}
 </div>
 

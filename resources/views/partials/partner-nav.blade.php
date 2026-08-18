@@ -7,13 +7,13 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
         Dashboard
     </a>
-    <a href="{{ route('partner.orders.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.orders.*') ? 'is-active' : '' }}">
-        <svg viewBox="0 0 24 24"><path d="M6 2h12v20l-2-1.5L14 22l-2-1.5L10 22l-2-1.5L6 22V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
-        Orders
-    </a>
     <a href="{{ route('partner.inventory.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.inventory.*') ? 'is-active' : '' }}">
         <svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>
         Inventory
+    </a>
+    <a href="{{ route('partner.orders.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.orders.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M6 2h12v20l-2-1.5L14 22l-2-1.5L10 22l-2-1.5L6 22V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
+        Orders
     </a>
     <a href="{{ route('partner.payouts.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.payouts.*') ? 'is-active' : '' }}">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M15.5 9.5a3.5 3.5 0 0 0-3.5-2.5c-2 0-3.5 1.2-3.5 2.5s1.5 2.5 3.5 2.5 3.5 1.2 3.5 2.5-1.5 2.5-3.5 2.5a3.5 3.5 0 0 1-3.5-2.5"/></svg>

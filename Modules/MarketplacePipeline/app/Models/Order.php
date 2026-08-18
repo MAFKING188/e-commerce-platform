@@ -11,7 +11,28 @@ class Order extends Model
         'user_id',
         'total_price',
         'status',
+        'recipient_name',
+        'recipient_phone',
+        'shipping_line1',
+        'shipping_line2',
+        'shipping_city',
+        'shipping_state',
+        'shipping_zip',
+        'shipping_country',
+        'delivery_notes',
     ];
+
+    public function getShippingAddressAttribute(): string
+    {
+        $parts = array_filter([
+            $this->shipping_line1,
+            $this->shipping_line2,
+            trim(($this->shipping_city ?? '') . ($this->shipping_state ? ', ' . $this->shipping_state : '')),
+            implode(' - ', array_filter([$this->shipping_zip, $this->shipping_country])),
+        ]);
+
+        return implode(', ', $parts);
+    }
 
     public function user()
     {

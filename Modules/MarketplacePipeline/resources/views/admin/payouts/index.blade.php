@@ -3,50 +3,50 @@
 <x-app-layout>
 @include('partials.admin-nav')
 
-<div style="margin-bottom: 4rem;">
-    <span class="cat-badge">Financial Command</span>
-    <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Partner Payouts.</h1>
+<div class="pc-header">
+    <div>
+        <span class="pc-eyebrow">Financial Command</span>
+        <h1 class="pc-title">Partner Payouts</h1>
+    </div>
 </div>
 
-<div class="inventory-table-wrap" style="background: var(--surface-100); border-radius: 1.5rem; border: 1px solid var(--border); overflow-x: auto;">
-    <table class="inventory-table" style="width: 100%; border-collapse: collapse; text-align: left; min-width: 1000px;">
+<div class="pc-table-wrap">
+    <table class="pc-table">
         <thead>
             <tr>
-                <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600);">Partner</th>
-                <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600);">Order</th>
-                <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600);">Amount</th>
-                <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600);">Status</th>
-                <th style="padding: 1.5rem; background: var(--surface-200); font-size: 0.85rem; font-weight: 700; color: var(--text-600); text-align: right;">Action</th>
+                <th>Partner</th>
+                <th>Order</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th class="is-right">Action</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($payouts as $payout)
                 <tr>
-                    <td style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
-                        <div style="font-weight: 700;">{{ $payout->partner->name }}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-400);">{{ $payout->partner->user->email }}</div>
+                    <td>
+                        <div class="is-strong">{{ $payout->partner->name }}</div>
+                        <div class="is-muted">{{ $payout->partner->user->email }}</div>
                     </td>
-                    <td style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
-                        <a href="{{ route('admin.orders.show', $payout->order_id) }}" style="color: var(--brand-accent); font-weight: 600;">#{{ $payout->order_id }}</a>
+                    <td>
+                        <a href="{{ route('admin.orders.show', $payout->order_id) }}" class="pc-section-link">#{{ $payout->order_id }}</a>
                     </td>
-                    <td style="padding: 1.5rem; border-bottom: 1px solid var(--border); font-weight: 700;">
+                    <td class="is-strong">
                         @money($payout->amount)
                     </td>
-                    <td style="padding: 1.5rem; border-bottom: 1px solid var(--border);">
-                        <span class="cat-badge" style="background: {{ $payout->status === 'processed' ? 'var(--brand-accent-soft)' : '#fef2f2' }}; color: {{ $payout->status === 'processed' ? 'var(--brand-accent)' : '#991b1b' }};">
-                            {{ ucfirst($payout->status) }}
-                        </span>
+                    <td>
+                        @include('partials.partner.status-badge', ['status' => $payout->status])
                     </td>
-                    <td style="padding: 1.5rem; border-bottom: 1px solid var(--border); text-align: right;">
+                    <td class="is-right">
                         @if ($payout->status === 'pending')
-                            <form action="{{ route('admin.payouts.process', $payout->id) }}" method="POST" style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                            <form action="{{ route('admin.payouts.process', $payout->id) }}" method="POST" class="pc-row-actions pc-row-actions--end">
                                 @csrf
-                                <input type="text" name="transaction_reference" placeholder="Ref#" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; width: 120px;" required>
-                                <button type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem;">Mark Paid</button>
+                                <input type="text" name="transaction_reference" placeholder="Ref#" class="pc-filter__input pc-filter__input--sm" required>
+                                <button type="submit" class="pc-btn-sm pc-btn-sm--ok">Mark Paid</button>
                             </form>
                         @else
-                            <div style="font-size: 0.85rem; color: var(--text-400);">Ref: {{ $payout->transaction_reference }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-400);">{{ $payout->processed_at?->format('M d, H:i') ?? '—' }}</div>
+                            <div class="is-muted">Ref: {{ $payout->transaction_reference }}</div>
+                            <div class="is-muted">{{ $payout->processed_at?->format('M d, H:i') ?? '—' }}</div>
                         @endif
                     </td>
                 </tr>
@@ -55,7 +55,7 @@
     </table>
 </div>
 
-<div style="margin-top: 3rem;">
+<div class="pc-pagination">
     {{ $payouts->links() }}
 </div>
 </x-app-layout>

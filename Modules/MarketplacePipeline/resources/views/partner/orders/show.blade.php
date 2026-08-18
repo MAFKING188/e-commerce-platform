@@ -33,6 +33,12 @@
         <span class="pc-meta__label">Client Reference</span>
         <div class="pc-meta__value">{{ $order->user->name }}</div>
     </div>
+    @if($order->shipping_address)
+        <div class="pc-card pc-meta">
+            <span class="pc-meta__label">Delivery Destination</span>
+            <div class="pc-meta__value">{{ $order->shipping_city }}, {{ $order->shipping_country }}</div>
+        </div>
+    @endif
 </div>
 
 <div class="pc-card">

@@ -1,52 +1,64 @@
 @section('title', 'Establish Partner | Admin')
 
 <x-app-layout>
-<div class="form-container">
-    <div style="margin-bottom: 4rem;">
-        <span class="cat-badge">Supply Chain</span>
-        <h1 style="font-size: 2.5rem; font-weight: 800; margin-top: 1rem;">Establish Partner.</h1>
+@include('partials.admin-nav')
+<div class="pc-wrap-narrow">
+    <a href="{{ route('admin.partners.index') }}" class="pc-back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        Back to Ecosystem
+    </a>
+
+    <div class="pc-header">
+        <div>
+            <span class="pc-eyebrow">Supply Chain</span>
+            <h1 class="pc-title">Establish Partner</h1>
+        </div>
     </div>
 
-    <form action="{{ route('admin.partners.store') }}" method="POST">
-        @csrf
-        
-        <div class="form-group">
-            <label>Associate Partner Account (User)</label>
-            <select name="user_id" class="form-control" required>
-                <option value="">Select a user...</option>
-                @foreach($users as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                @endforeach
-            </select>
-            @error('user_id')
-                <div style="color: #ef4444; margin-top: 0.5rem; font-size: 0.8rem;">{{ $message }}</div>
-            @enderror
-        </div>
+    <div class="pc-card">
+        <form action="{{ route('admin.partners.store') }}" method="POST">
+            @csrf
 
-        <div class="form-group">
-            <label>Artisan / Partner Name</label>
-            <input type="text" name="name" class="form-control" placeholder="e.g. Atelier Mafuleti" required>
-        </div>
+            <div class="pc-form-grid">
+                <div class="pc-field pc-field--full">
+                    <label class="pc-field__label" for="user_id">Associate Partner Account (User)</label>
+                    <select name="user_id" id="user_id" class="pc-field__input" required>
+                        <option value="">Select a user...</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                        @endforeach
+                    </select>
+                    @error('user_id')
+                        <div class="pc-field__error">{{ $message }}</div>
+                    @enderror
+                </div>
 
-        <div class="form-group">
-            <label>Philosophy / Description</label>
-            <textarea name="description" class="form-control" rows="4" placeholder="Describe the artisan's philosophy and craft..."></textarea>
-        </div>
+                <div class="pc-field pc-field--full">
+                    <label class="pc-field__label" for="name">Artisan / Partner Name</label>
+                    <input id="name" type="text" name="name" class="pc-field__input" placeholder="e.g. Atelier Mafuleti" required>
+                </div>
 
-        <div class="form-group">
-            <label>Contact Registry (Email/Phone)</label>
-            <input type="text" name="contact_info" class="form-control" placeholder="Direct contact details">
-        </div>
+                <div class="pc-field pc-field--full">
+                    <label class="pc-field__label" for="description">Philosophy / Description</label>
+                    <textarea id="description" name="description" class="pc-field__input" rows="4" placeholder="Describe the artisan's philosophy and craft..."></textarea>
+                </div>
 
-        <div class="form-group">
-            <label>Official Website (URL)</label>
-            <input type="url" name="website" class="form-control" placeholder="https://artisan.com">
-        </div>
+                <div class="pc-field pc-field--full">
+                    <label class="pc-field__label" for="contact_info">Contact Registry (Email/Phone)</label>
+                    <input id="contact_info" type="text" name="contact_info" class="pc-field__input" placeholder="Direct contact details">
+                </div>
 
-        <div style="display: flex; gap: 2rem; margin-top: 4rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 1.25rem;">Initialize Relationship</button>
-            <a href="{{ route('admin.partners.index') }}" class="btn btn-ghost" style="flex: 1; padding: 1.25rem;">Cancel</a>
-        </div>
-    </form>
+                <div class="pc-field pc-field--full">
+                    <label class="pc-field__label" for="website">Official Website (URL)</label>
+                    <input id="website" type="url" name="website" class="pc-field__input" placeholder="https://artisan.com">
+                </div>
+            </div>
+
+            <div class="pc-form-actions">
+                <button type="submit" class="btn btn-primary pc-btn-sm">Initialize Relationship</button>
+                <a href="{{ route('admin.partners.index') }}" class="pc-btn-sm">Cancel</a>
+            </div>
+        </form>
+    </div>
 </div>
 </x-app-layout>

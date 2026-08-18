@@ -1196,7 +1196,6 @@
 }
 
 .upload-icon {
-    font-size: 2.5rem;
     margin-bottom: 1rem;
     display: block;
     color: var(--brand-accent);
@@ -1457,6 +1456,14 @@
 
 .review-stars-row { margin-bottom: 0.5rem; }
 
+.review-star {
+    color: var(--border);
+}
+
+.review-star.is-filled {
+    color: #f59e0b;
+}
+
 .review-footer {
     display: flex;
     justify-content: space-between;
@@ -1489,8 +1496,8 @@
 }
 
 .review-empty-icon {
-    font-size: 3rem;
     margin-bottom: 1rem;
+    color: var(--text-400);
 }
 
 .review-pagination { margin-top: 4rem; }

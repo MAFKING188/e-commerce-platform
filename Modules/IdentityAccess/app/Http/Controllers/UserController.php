@@ -9,34 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = User::query();
-
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $users = $query->latest()->paginate(10);
-        return view('identityaccess::users.index', compact('users'));
-    }
-
-   public function show()
+public function show()
 {
     $user = Auth::user()->load(['orders', 'addresses']);
-    $address = $user->addresses->first();
+    $address = $user->addresses->firstWhere('is_primary', true) ?? $user->addresses->first();
     return view('identityaccess::users.show', compact('user', 'address'));
 }
-
-    public function edit($id)
-    {
-        $user = User::findOrFail($id);
-        return view('identityaccess::users.edit', compact('user'));
-    }
 
     /**
      * SELF-SERVICE: Update own profile
@@ -51,7 +29,10 @@ class UserController extends Controller
 
             // Address validation
             'line1' => 'required|string|max:255',
+            'line2' => 'nullable|string|max:255',
             'city' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'zip' => 'nullable|string|max:20',
             'country' => 'required|string|max:100',
         ]);
 
@@ -63,7 +44,10 @@ class UserController extends Controller
             ['is_primary' => true],
             [
                 'line1' => $request->line1,
+                'line2' => $request->line2,
                 'city' => $request->city,
+                'state' => $request->state,
+                'zip' => $request->zip,
                 'country' => $request->country,
             ]
         );
