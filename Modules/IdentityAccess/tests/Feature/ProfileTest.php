@@ -58,4 +58,50 @@ class ProfileTest extends TestCase
             'city' => 'Rome',
         ]);
     }
+
+    public function test_avatar_upload_stores_file_and_sets_url(): void
+    {
+        $user = User::factory()->create(['status' => 'active']);
+
+        $response = $this->actingAs($user)->post('/profile/avatar', [
+            'avatar' => \Illuminate\Http\UploadedFile::fake()->image('me.jpg', 200, 200),
+        ]);
+
+        $response->assertRedirect();
+        $this->assertNotNull($user->fresh()->avatars);
+        $this->assertStringContainsString('/storage/avatars/', $user->fresh()->avatarUrl());
+    }
+
+    public function test_avatar_upload_rejects_invalid_type(): void
+    {
+        $user = User::factory()->create(['status' => 'active']);
+
+        $response = $this->actingAs($user)->post('/profile/avatar', [
+            'avatar' => \Illuminate\Http\UploadedFile::fake()->create('evil.txt', 10),
+        ]);
+
+        $response->assertSessionHasErrors('avatar');
+        $this->assertNull($user->fresh()->avatars);
+    }
+
+    public function test_password_change_requires_current_password_and_persists_new_hash(): void
+    {
+        $user = User::factory()->create(['password' => 'current-pass-123']);
+
+        $response = $this->actingAs($user)->put('/profile/password', [
+            'current_password' => 'wrong',
+            'password' => 'new-pass-456',
+            'password_confirmation' => 'new-pass-456',
+        ]);
+        $response->assertSessionHasErrors('current_password');
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('current-pass-123', $user->fresh()->password));
+
+        $this->actingAs($user)->put('/profile/password', [
+            'current_password' => 'current-pass-123',
+            'password' => 'new-pass-456',
+            'password_confirmation' => 'new-pass-456',
+        ])->assertRedirect();
+
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('new-pass-456', $user->fresh()->password));
+    }
 }

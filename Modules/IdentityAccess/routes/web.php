@@ -18,6 +18,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'show'])->name('profile');
     Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/avatar', [UserController::class, 'updateAvatar'])->name('profile.avatar');
+    Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 
     Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

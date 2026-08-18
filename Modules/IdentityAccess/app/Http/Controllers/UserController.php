@@ -56,6 +56,42 @@ public function show()
             ->with('success', 'Identity and Residence updated successfully');
     }
 
+    public function updateAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,webp|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+
+        if ($user->avatars && \Illuminate\Support\Facades\Storage::disk('public')->exists('avatars/' . $user->avatars)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete('avatars/' . $user->avatars);
+        }
+
+        $user->update(['avatars' => basename($path)]);
+
+        return redirect()->back()->with('success', 'Profile photo updated');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', function ($attribute, $value, $fail) {
+                if (! \Illuminate\Support\Facades\Hash::check($value, Auth::user()->password)) {
+                    $fail('The current password is incorrect.');
+                }
+            }],
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        Auth::user()->update(['password' => $request->password]);
+        $request->session()->regenerate();
+
+        return redirect()->back()->with('success', 'Password updated successfully');
+    }
+
     /**
      * ADMINISTRATIVE: Update any user (Role, Name, Email)
      */
