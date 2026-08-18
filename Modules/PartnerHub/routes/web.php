@@ -15,6 +15,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 
 Route::prefix('partner')->middleware(['auth', 'partner'])->name('partner.')->group(function () {
     Route::get('/dashboard', [PartnerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [PartnerProfileController::class, 'profile'])->name('profile.show');
     Route::get('/profile/edit', [PartnerProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [PartnerProfileController::class, 'update'])->name('profile.update');
 });

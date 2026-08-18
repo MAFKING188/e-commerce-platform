@@ -132,6 +132,8 @@
     box-shadow: var(--shadow-sm);
 }
 
+.pc-stack > * + * { margin-top: 1.5rem; }
+
 /* ---------- Stats ---------- */
 
 .pc-stats {

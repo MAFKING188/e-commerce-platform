@@ -15,6 +15,29 @@ class PartnerProfileController extends Controller
         return view('partnerhub::partner_profile', compact('partner'));
     }
 
+    public function profile()
+    {
+        $partner = Partner::where('user_id', auth()->id())->firstOrFail();
+        $user = auth()->user()->load(['orders', 'addresses', 'reviews', 'wishlists']);
+
+        $inventoryCount = $partner->products()->count();
+        $pendingPayout = $partner->payouts()->where('status', 'pending')->sum('amount');
+
+        $stats = [
+            'Pieces in catalog' => $inventoryCount,
+            'Pending earnings' => '$' . number_format($pendingPayout, 2),
+            'Archived pieces' => $user->wishlists->count(),
+        ];
+
+        return view('partnerhub::partner.profile.show', [
+            'user' => $user,
+            'partner' => $partner,
+            'stats' => $stats,
+            'timeline' => $user->activityTimeline(8),
+            'recentOrders' => $user->orders()->latest()->take(4)->get(),
+        ]);
+    }
+
     public function edit()
     {
         $partner = Partner::where('user_id', auth()->id())->firstOrFail();
