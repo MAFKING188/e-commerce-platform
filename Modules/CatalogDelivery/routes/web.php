@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\CatalogDelivery\Http\Controllers\CategoryController;
+use Modules\CatalogDelivery\Http\Controllers\LegalController;
 use Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController;
 use Modules\CatalogDelivery\Http\Controllers\ProductController;
 use Modules\CatalogDelivery\Http\Controllers\ReviewController;
@@ -17,6 +18,10 @@ Route::get('/shop', [ViewController::class, 'shop'])->name('shop');
 Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.show');
 Route::get('/about', [ViewController::class, 'about'])->name('about');
 Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
+Route::get('/privacy', fn () => app(LegalController::class)->show('privacy'))->name('privacy');
+Route::get('/terms', fn () => app(LegalController::class)->show('terms'))->name('terms');
+Route::get('/shipping', fn () => app(LegalController::class)->show('shipping'))->name('shipping');
+Route::get('/returns', fn () => app(LegalController::class)->show('returns'))->name('returns');
 
 /*
 |--------------------------------------------------------------------------

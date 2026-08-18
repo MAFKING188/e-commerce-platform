@@ -1478,6 +1478,22 @@ footer {
 }
 
 /* ============================================================
+   LEGAL PAGES
+   ============================================================ */
+
+.legal-page { max-width: 780px; margin: 0 auto; padding-top: 2rem; }
+
+.legal-hero { margin-bottom: 3rem; }
+
+.legal-hero h1 { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.03em; margin-top: 1rem; }
+
+.legal-hero p { color: var(--text-400); font-weight: 700; margin-top: 0.5rem; }
+
+.legal-prose h2 { font-size: 1.35rem; font-weight: 800; margin: 2.5rem 0 1rem; color: var(--text-900); }
+
+.legal-prose p { color: var(--text-600); line-height: 1.8; font-size: 0.95rem; margin-bottom: 1rem; }
+
+/* ============================================================
    RESPONSIVE (moved from module blades)
    ============================================================ */
 
