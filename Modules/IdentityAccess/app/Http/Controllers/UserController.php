@@ -12,7 +12,6 @@ class UserController extends Controller
 public function show()
 {
     $user = Auth::user()->load(['orders', 'addresses', 'reviews', 'wishlists']);
-    $address = $user->addresses->firstWhere('is_primary', true) ?? $user->addresses->first();
 
     $stats = [
         'Orders placed' => $user->orders->count(),
@@ -22,10 +21,8 @@ public function show()
 
     return view('identityaccess::users.show', [
         'user' => $user,
-        'address' => $address,
         'stats' => $stats,
         'timeline' => $user->activityTimeline(8),
-        'recentOrders' => $user->orders()->latest()->take(4)->get(),
     ]);
 }
 

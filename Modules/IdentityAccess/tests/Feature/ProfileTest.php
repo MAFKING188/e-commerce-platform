@@ -107,7 +107,7 @@ class ProfileTest extends TestCase
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('new-pass-456', $user->fresh()->password));
     }
 
-    public function test_profile_page_renders_identity_signals_and_stats(): void
+    public function test_profile_page_renders_identity_signals_stats_and_quick_links(): void
     {
         $user = User::factory()->create(['status' => 'active']);
         $product = Product::factory()->create(['stock' => 5]);
@@ -121,8 +121,12 @@ class ProfileTest extends TestCase
             ->assertSee('Collector', false)
             ->assertSee('profile-stats')
             ->assertSee('profile-timeline')
-            ->assertSee('Orders / Activity')
-            ->assertSee('Address & Security');
+            ->assertSee('Identity')
+            ->assertSee('Member #')
+            ->assertSee('/orders')
+            ->assertSee('/profile/security')
+            ->assertSee('/profile/settings')
+            ->assertDontSee('No acquisitions recorded yet.');
     }
 
     public function test_security_page_renders_address_and_password_forms_for_all_roles(): void
