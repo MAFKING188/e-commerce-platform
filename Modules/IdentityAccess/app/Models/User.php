@@ -30,6 +30,7 @@ class User extends Authenticatable
         'role',
         'status',
         'avatars',
+        'phone',
     ];
 
     protected $hidden = [
@@ -92,6 +93,20 @@ class User extends Authenticatable
             $spent >= 500 => 'Collector',
             default => 'Member',
         };
+    }
+
+    public function statusChip(): array
+    {
+        return match ($this->status) {
+            'pending' => ['label' => 'Pending', 'tone' => 'warn'],
+            'suspended' => ['label' => 'Suspended', 'tone' => 'danger'],
+            default => ['label' => 'Active', 'tone' => 'ok'],
+        };
+    }
+
+    public function memberNumber(): string
+    {
+        return 'Member #' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
     }
 
     public function isVerifiedMember(): bool
