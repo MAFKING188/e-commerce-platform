@@ -4,6 +4,8 @@ namespace Modules\IdentityAccess\Tests\Feature;
 
 use Modules\IdentityAccess\Models\User;
 use App\Models\Address;
+use Modules\CatalogDelivery\Models\Product;
+use Modules\IdentityAccess\Models\Wishlist;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\IdentityAccess\Tests\TestCase;
 
@@ -103,5 +105,23 @@ class ProfileTest extends TestCase
         ])->assertRedirect();
 
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('new-pass-456', $user->fresh()->password));
+    }
+
+    public function test_profile_page_renders_identity_signals_and_stats(): void
+    {
+        $user = User::factory()->create(['status' => 'active']);
+        $product = Product::factory()->create(['stock' => 5]);
+        \Modules\MarketplacePipeline\Models\Order::create(['user_id' => $user->id, 'total_price' => 620, 'status' => 'completed']);
+        Address::create(['user_id' => $user->id, 'is_primary' => true, 'line1' => 'A', 'city' => 'B', 'country' => 'C']);
+        Wishlist::create(['user_id' => $user->id, 'product_id' => $product->id]);
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk()
+            ->assertSee('Collector', false)
+            ->assertSee('profile-stats')
+            ->assertSee('profile-timeline')
+            ->assertSee('Orders / Activity')
+            ->assertSee('Address & Security');
     }
 }

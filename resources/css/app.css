@@ -660,70 +660,6 @@ footer {
     accent-color: var(--brand-accent);
 }
 
-/* ============================================================
-   MEMBER PROFILE (moved from identityaccess users/show)
-   ============================================================ */
-
-.profile-grid {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 5rem;
-    align-items: start;
-}
-
-.settings-card {
-    background: var(--surface-100);
-    padding: 3rem;
-    border-radius: 2rem;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-    position: sticky;
-    top: 8rem;
-}
-
-.avatar-circle {
-    width: 100px;
-    height: 100px;
-    background: var(--brand-primary);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 2rem;
-}
-
-.profile-grid .form-group {
-    margin-bottom: 2rem;
-}
-
-.profile-grid .form-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
-    letter-spacing: 0.1em;
-}
-
-.profile-grid .form-input {
-    padding: 1rem 1.25rem;
-    border-radius: 12px;
-}
-
-.profile-grid .form-input:focus {
-    border-color: var(--brand-accent);
-    outline: none;
-    background: var(--surface-100);
-}
-
-.history-section h2 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--text-900);
-    margin-bottom: 3rem;
-}
-
 .order-item-lite {
     background: var(--surface-100);
     padding: 2rem;
@@ -1521,6 +1457,8 @@ footer {
 
 .profile-timeline__time { margin-left: auto; color: var(--text-400); font-size: 0.8rem; white-space: nowrap; }
 
+.profile-empty { color: var(--text-400); font-weight: 700; }
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -1542,13 +1480,6 @@ footer {
 /* ============================================================
    RESPONSIVE (moved from module blades)
    ============================================================ */
-
-@media (max-width: 1024px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-        gap: 4rem;
-    }
-}
 
 @media (max-width: 768px) {
     .quick-actions {

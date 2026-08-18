@@ -11,9 +11,22 @@ class UserController extends Controller
 {
 public function show()
 {
-    $user = Auth::user()->load(['orders', 'addresses']);
+    $user = Auth::user()->load(['orders', 'addresses', 'reviews', 'wishlists']);
     $address = $user->addresses->firstWhere('is_primary', true) ?? $user->addresses->first();
-    return view('identityaccess::users.show', compact('user', 'address'));
+
+    $stats = [
+        'Orders placed' => $user->orders->count(),
+        'Total spent' => '$' . number_format($user->orders->where('status', 'completed')->sum('total_price'), 0),
+        'Archived pieces' => $user->wishlists->count(),
+    ];
+
+    return view('identityaccess::users.show', [
+        'user' => $user,
+        'address' => $address,
+        'stats' => $stats,
+        'timeline' => $user->activityTimeline(8),
+        'recentOrders' => $user->orders()->latest()->take(4)->get(),
+    ]);
 }
 
     /**
