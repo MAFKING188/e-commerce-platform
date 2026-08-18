@@ -25,7 +25,6 @@ class AdminProfileController extends Controller
             'user' => $user,
             'stats' => $stats,
             'timeline' => $user->activityTimeline(8),
-            'recentOrders' => \Modules\MarketplacePipeline\Models\Order::latest()->take(5)->get(),
         ]);
     }
 }

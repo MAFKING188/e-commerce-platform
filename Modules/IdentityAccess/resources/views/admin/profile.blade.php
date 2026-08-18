@@ -3,14 +3,9 @@
 <x-app-layout>
 @include('partials.admin-nav')
 
-<x-profile-layout :user="$user" :stats="$stats" :subnav="[
-    ['id' => 'overview', 'label' => 'Overview'],
-    ['id' => 'activity', 'label' => 'Recent Activity'],
-    ['id' => 'security', 'label' => 'Address & Security'],
-    ['id' => 'settings', 'label' => 'Settings'],
-]">
+<x-profile-layout :user="$user" :stats="$stats" :active="'overview'" identity>
 
-    <section id="overview" class="profile-section">
+    <section class="profile-section">
         <h2 class="pc-card__title">Platform Pulse</h2>
         <div class="profile-card">
             <ul class="profile-timeline">
@@ -30,60 +25,11 @@
         </div>
     </section>
 
-    <section id="activity" class="profile-section">
-        <h2 class="pc-card__title">Recent Acquisitions</h2>
-        <div class="pc-table-wrap">
-            <table class="pc-table">
-                <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Member</th>
-                        <th>Value</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($recentOrders as $order)
-                        <tr>
-                            <td class="is-numeric">#{{ $order->id }}</td>
-                            <td class="is-muted">{{ $order->user->name }}</td>
-                            <td class="is-strong">${{ number_format($order->total_price, 2) }}</td>
-                            <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
-                            <td class="is-muted">{{ $order->created_at->diffForHumans() }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="is-muted">No acquisitions yet.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <section id="security" class="profile-section">
-        <h2 class="pc-card__title">Address & Password</h2>
+    <section class="profile-section">
+        <h2 class="pc-card__title">Command Center</h2>
         <div class="profile-card">
-            <p class="pc-subtitle">Use the same forms as the member profile — address fields and password change are shared across roles.</p>
-            <a href="{{ route('profile') }}" class="btn btn-ghost">Open Member Profile Settings</a>
-        </div>
-    </section>
-
-    <section id="settings" class="profile-section">
-        <h2 class="pc-card__title">Settings</h2>
-        <div class="profile-card">
-            <form action="{{ route('profile.update') }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-input" value="{{ $user->name }}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-input" value="{{ $user->email }}">
-                </div>
-                <button type="submit" class="btn btn-primary">Save Details</button>
-            </form>
+            <p class="pc-subtitle">Orders, payouts, reviews and members live in the Command Center.</p>
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-ghost">Open Command Center</a>
         </div>
     </section>
 

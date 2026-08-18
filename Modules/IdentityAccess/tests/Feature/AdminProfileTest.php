@@ -24,7 +24,10 @@ class AdminProfileTest extends TestCase
         $response->assertOk()
             ->assertSee('profile-header')
             ->assertSee('Verified Member')
-            ->assertSee('profile-stats');
+            ->assertSee('profile-stats')
+            ->assertSee('Identity')
+            ->assertSee('Member #')
+            ->assertDontSee('Recent Acquisitions');
     }
 
     public function test_admin_profile_denied_for_buyers(): void
