@@ -46,7 +46,7 @@
                             </form>
                         @else
                             <div style="font-size: 0.85rem; color: var(--text-400);">Ref: {{ $payout->transaction_reference }}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-400);">{{ $payout->processed_at->format('M d, H:i') }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-400);">{{ $payout->processed_at?->format('M d, H:i') ?? '—' }}</div>
                         @endif
                     </td>
                 </tr>

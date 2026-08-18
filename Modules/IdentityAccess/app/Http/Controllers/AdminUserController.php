@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\IdentityAccess\Models\User;
 use Modules\IdentityAccess\Mail\UserStatusUpdated;
 use Modules\TelemetryPipeline\Services\TelemetryService;
+use Modules\PartnerHub\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -54,6 +55,14 @@ class AdminUserController extends Controller
 
         $user->update($request->only(['role', 'status']));
 
+        // Keep partner registry in sync with role changes so the artisan portal never 404s
+        if ($user->role === 'partner') {
+            Partner::firstOrCreate(
+                ['user_id' => $user->id],
+                ['name' => $user->name, 'description' => null, 'contact_info' => $user->email, 'website' => null]
+            );
+        }
+
         $this->telemetry->log('admin.users.update', ['user_id' => $id]);
 
         if ($oldStatus !== $user->status) {
@@ -72,6 +81,14 @@ class AdminUserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->update(['status' => 'active']);
+
+        // Approved partners get their registry entry so the portal is reachable immediately
+        if ($user->role === 'partner') {
+            Partner::firstOrCreate(
+                ['user_id' => $user->id],
+                ['name' => $user->name, 'description' => null, 'contact_info' => $user->email, 'website' => null]
+            );
+        }
 
         $this->telemetry->log('admin.users.approve', ['user_id' => $id]);
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Modules\IdentityAccess\Mail\WelcomeMember;
+use Modules\PartnerHub\Models\Partner;
 
 class AuthController extends Controller
 {
@@ -33,6 +34,14 @@ class AuthController extends Controller
             'status' => $status
         ]);
         \Log::info('User Created:', $user->toArray());
+
+        // Partner artisan: scaffold their partner registry entry so the portal is immediately usable after approval
+        if ($data['role'] === 'partner') {
+            Partner::firstOrCreate(
+                ['user_id' => $user->id],
+                ['name' => $data['name'], 'description' => null, 'contact_info' => $data['email'], 'website' => null]
+            );
+        }
 
         // 📧 Trigger Welcome Email
         Mail::to($user)->queue(new WelcomeMember($user));
