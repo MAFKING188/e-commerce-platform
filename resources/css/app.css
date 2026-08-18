@@ -1352,6 +1352,194 @@ footer {
 }
 
 /* ============================================================
+   PROFILE SHELL (shared — storefront + console)
+   ============================================================ */
+
+.profile-shell { max-width: 1100px; margin: 0 auto; }
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 2rem;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.profile-avatar {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+}
+
+.profile-avatar__img,
+.profile-avatar__letter {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand-accent-soft);
+    color: var(--brand-accent);
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.profile-avatar__upload { position: absolute; right: -4px; bottom: -4px; }
+
+.profile-avatar__btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--text-900);
+    color: var(--surface-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease;
+}
+
+.profile-avatar__btn:hover { transform: scale(1.08); }
+
+.profile-id__name { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; }
+
+.profile-id__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+}
+
+.profile-id__since { color: var(--text-400); font-size: 0.85rem; font-weight: 600; }
+
+.profile-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2rem;
+    background: var(--surface-300);
+    color: var(--text-600);
+}
+
+.profile-badge--verified { background: var(--pc-ok-bg, #dcfce7); color: var(--pc-ok-fg, #166534); }
+
+.profile-badge--tier { background: var(--brand-accent-soft); color: var(--brand-accent); }
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.profile-stat {
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.profile-stat__value { display: block; font-size: 1.75rem; font-weight: 800; color: var(--text-900); }
+
+.profile-stat__label {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-400);
+}
+
+.profile-subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+    margin-bottom: 3rem;
+}
+
+.profile-subnav__link {
+    padding: 0.8rem 1.4rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-600);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-subnav__link:hover { color: var(--text-900); border-color: var(--border); }
+
+.profile-section { scroll-margin-top: 2rem; margin-bottom: 4rem; }
+
+.profile-card {
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    padding: 2rem;
+}
+
+.profile-card + .profile-card { margin-top: 1rem; }
+
+.profile-timeline { list-style: none; margin: 0; padding: 0; }
+
+.profile-timeline__item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-timeline__item:last-child { border-bottom: none; }
+
+.profile-timeline__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--brand-accent);
+    margin-top: 0.45rem;
+    flex-shrink: 0;
+}
+
+.profile-timeline__title { font-weight: 800; color: var(--text-900); font-size: 0.95rem; }
+
+.profile-timeline__detail { color: var(--text-600); font-size: 0.85rem; margin-top: 0.15rem; }
+
+.profile-timeline__time { margin-left: auto; color: var(--text-400); font-size: 0.8rem; white-space: nowrap; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.pc-card__title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-900);
+}
+
+/* ============================================================
    RESPONSIVE (moved from module blades)
    ============================================================ */
 
