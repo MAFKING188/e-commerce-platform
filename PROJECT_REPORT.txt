@@ -444,3 +444,69 @@
 ================================================================================
  END OF DOCUMENT
 ================================================================================
+
+
+--------------------------------------------------------------------------------
+13. RESPONSIVE DESIGN ASSESSMENT (2026-08-18 — audit only, no fixes applied)
+--------------------------------------------------------------------------------
+
+ Method: agent-browser (CDP) against :8001; 67 page/viewport checks across
+ 29 distinct pages at 1280 / 768 / 390 widths; measured page-level horizontal
+ overflow (documentElement.scrollWidth > clientWidth) plus offending element
+ geometry. Auth sessions: user2@test.com (buyer), artisan@test.com (partner),
+ admin@test.com (admin); guest pages tested logged out.
+
+ VERDICT: GOOD. The responsive work done pre-migration (8b33db9/8f32d99 era)
+ survived the modular monolith move; the only breakage is two small, easily
+ fixable items. Profile pages built in the separation phase are clean at all
+ widths (subnav + identity rows + form pairs collapse correctly; pc-nav and
+ profile-subnav tabs scroll horizontally by design on small screens).
+
+ ISSUES FOUND (2 root causes, affecting 3 page types):
+
+ 1) PRODUCT PAGE — horizontal overflow below ~790px (found at 768 AND 390).
+    Symptom: .gallery / .main-image-container / .product-info stay ~758px wide
+    on a 375-768px viewport; page scrolls sideways.
+    Root cause: .product-details is `display:grid; 1fr 1fr` collapsing to 1fr
+    under 768px, but the grid CHILDREN have no `min-width: 0`, so the single
+    track takes the .gallery's min-content width = the main image's intrinsic
+    width (~756px). The img has `max-width:100%` but that does not reduce
+    min-content contribution in grid.
+    Files: Modules/CatalogDelivery/resources/assets/scss/app.scss
+           (.product-details ~line 309, .gallery ~line 317,
+            .main-image-container ~line 322, 768px block ~line 411).
+    Fix (later): min-width:0 on .gallery/.product-info and/or
+    .main-image-container img { width:100%; height:100%; object-fit:cover }.
+
+ 2) PAGINATION COMPONENT — horizontal overflow at 390 (34px) on any page with
+    more than one page of records: /shop and /admin/products confirmed (also
+    affects /admin/users, /admin/orders, /admin/partners, /admin/reviews,
+    partner inventory/orders once they exceed one page).
+    Symptom: .pagination-inner is 442px wide, centered (l:-33), never wraps.
+    Root cause: shared partial resources/views/partials/pagination.blade.php
+    embeds its CSS in a <style> block inside the blade; .pagination-inner uses
+    flex + gap:1.5rem with no wrap and no overflow handling.
+    Secondary issue: CSS embedded in the blade violates the project convention
+    (styles belong in resources/css/app.css) — the earlier zero-inline sweep
+    only checks style="" attributes, so this passed unnoticed.
+    Fix (later): move pagination styles to app.css and add a mobile rule
+    (e.g. overflow-x:auto on .luxury-pagination or allow wrap/smaller gaps).
+
+ VERIFIED NON-ISSUES:
+   - filter-drawer on /shop: off-canvas via translateX(100%), does NOT extend
+     scrollWidth at rest (Chrome excludes fixed-position overflow); the 390px
+     /shop overflow is fully explained by the pagination component.
+   - pc-nav tabs + profile-subnav tabs: overflow-x:auto + nowrap = intended
+     horizontal-scroll pattern on mobile; not page overflow.
+   - inventory/orders/payouts tables: wrapped in .pc-table-wrap /
+     .inventory-table-wrap (overflow-x:auto) — correct pattern.
+   - All legal pages, auth pages, buyer pages, partner console, admin
+     dashboard/users/orders/payouts/reviews/partners/profile: no overflow at
+     any tested width.
+
+ Fix priority when work resumes: (1) pagination component (shared, touches
+ most pages), (2) product page grid min-width. Both are CSS-only, small, and
+ testable with the same audit script.
+--------------------------------------------------------------------------------
+ END OF DOCUMENT
+--------------------------------------------------------------------------------
