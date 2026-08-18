@@ -110,7 +110,11 @@
                     <p class="product-review-text">"{{ $review->comment }}"</p>
                     <div class="product-reviewer">
                         <div class="product-avatar">
-                            {{ substr($review->user->name, 0, 1) }}
+                            @if ($review->user->avatarUrl())
+                                <img src="{{ $review->user->avatarUrl() }}" alt="{{ $review->user->name }}" class="product-avatar__img">
+                            @else
+                                {{ substr($review->user->name, 0, 1) }}
+                            @endif
                         </div>
                         <span class="product-reviewer-name">{{ $review->user->name }}</span>
                     </div>

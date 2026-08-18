@@ -15,7 +15,13 @@
         <div class="review-card">
             <div class="review-meta">
                 <div class="user-info">
-                    <div class="user-avatar">{{ substr($review->user->name, 0, 1) }}</div>
+                    <div class="user-avatar">
+                        @if ($review->user->avatarUrl())
+                            <img src="{{ $review->user->avatarUrl() }}" alt="{{ $review->user->name }}" class="user-avatar__img">
+                        @else
+                            {{ substr($review->user->name, 0, 1) }}
+                        @endif
+                    </div>
                     <div>
                         <div class="review-user-name">{{ $review->user->name }}</div>
                         <div class="review-date">{{ $review->created_at->format('M d, Y') }}</div>
