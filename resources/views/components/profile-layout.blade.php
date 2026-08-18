@@ -7,6 +7,7 @@
         ['id' => 'security', 'label' => 'Address & Security'],
         ['id' => 'settings', 'label' => 'Settings'],
     ],
+    'identity' => false,
 ])
 
 <div class="profile-shell">
@@ -51,9 +52,40 @@
 
     <nav class="profile-subnav" aria-label="Profile sections">
         @foreach ($subnav as $item)
-            <a href="#{{ $item['id'] }}" class="profile-subnav__link">{{ $item['label'] }}</a>
+            <a href="{{ $item['href'] }}" class="profile-subnav__link {{ $item['active'] ? 'is-active' : '' }}">{{ $item['label'] }}</a>
         @endforeach
     </nav>
+
+    @if ($identity)
+        <section class="profile-section">
+            <h2 class="pc-card__title">Identity</h2>
+            <div class="profile-card profile-identity">
+                <div class="profile-identity__row">
+                    <span class="profile-identity__label">Email</span>
+                    <span class="profile-identity__value">{{ $user->email }}</span>
+                </div>
+                <div class="profile-identity__row">
+                    <span class="profile-identity__label">Phone</span>
+                    <span class="profile-identity__value">{{ $user->phone ?: 'Not set — add it in Settings' }}</span>
+                </div>
+                <div class="profile-identity__row">
+                    <span class="profile-identity__label">Account Status</span>
+                    <span class="profile-identity__value">
+                        @php($chip = $user->statusChip())
+                        <span class="profile-badge profile-badge--status-{{ $chip['tone'] }}">{{ $chip['label'] }}</span>
+                    </span>
+                </div>
+                <div class="profile-identity__row">
+                    <span class="profile-identity__label">Member Number</span>
+                    <span class="profile-identity__value">{{ $user->memberNumber() }}</span>
+                </div>
+                <div class="profile-identity__row">
+                    <span class="profile-identity__label">Member Since</span>
+                    <span class="profile-identity__value">{{ $user->created_at->format('F Y') }}</span>
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{ $slot }}
 </div>
