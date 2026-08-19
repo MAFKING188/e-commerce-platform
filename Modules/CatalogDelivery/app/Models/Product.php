@@ -13,6 +13,15 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'price',
+        'description',
+        'stock',
+        'image',
+        'category_id',
+    ];
+
     protected static function newFactory(): ProductFactory
     {
         return ProductFactory::new();

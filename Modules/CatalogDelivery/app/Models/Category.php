@@ -10,6 +10,8 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name'];
+
     protected static function newFactory(): CategoryFactory
     {
         return CategoryFactory::new();
