@@ -34,9 +34,15 @@ SmartShop is a high-fidelity, production-grade e-commerce platform designed for 
 *   **Member Registry:** Multi-tier confirmation workflow for Partner and Admin registrations.
 *   **Automated Outreach:** Event-driven email notifications for account status updates.
 
+### 7. Security & Verification (Email-OTP)
+*   **Mandatory Email Verification at Signup:** New accounts must enter a 6-digit code emailed to them before they can sign in.
+*   **Challenge-Before-Login for Privileged Roles:** Admins and Partners receive a fresh email code at **every** login — no enrollment setup, no authenticator app.
+*   **Buyer Step-Up Verification:** Optional "Email Codes" login toggle; mandatory step-up codes before checkout, password change, email change, and disabling 2FA.
+*   **Throttled Codes:** Single-use, 10-minute expiry, bcrypt-hashed in cache, rate-limited resend/verify endpoints.
+
 ## 🛠️ Tech Stack
 *   **Framework:** Laravel (PHP 8.3+)
-*   **Security:** Laravel Sanctum & Role-Based Access Control (RBAC)
+*   **Security:** Laravel Sanctum & Role-Based Access Control (RBAC), email-OTP two-factor verification (Google2FA removed)
 *   **Analytics:** Chart.js
 *   **Interactivity:** SortableJS, Vanilla JS, AJAX
 *   **Database:** MySQL

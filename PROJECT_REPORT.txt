@@ -66,13 +66,13 @@
  Smoke-test account created during manual verification (still in dev DB):
    artisan@test.com -> role: partner  (TestArtisan, id 33) — partner console access
 
- Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
- Users table also has: status (active|pending|suspended), avatars, phone,
- google_id (unique), avatar (Google picture), two_factor_secret (encrypted),
- two_factor_type (totp|email), two_factor_confirmed_at.
- 2FA: optional for users/partners; MANDATORY for admins (admin routes gated
- until enrollment via /profile/settings). Password is nullable for
- Google-only accounts.
+Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
+  Users table also has: status (active|pending|suspended), avatars, phone,
+  google_id (unique), avatar (Google picture), email_verified_at (nullable),
+  two_factor_type (null|email — TOTP removed, see §14; two_factor_secret dropped).
+  2FA: email codes optional for users; MANDATORY email-code challenge before
+  login for admins and partners (no enrollment). Password is nullable for
+  Google-only accounts.
 
  Manual-verification login procedure (CSRF):
    GET / -> extract name="_token" value -> POST /accessaccount with
@@ -186,6 +186,9 @@
 
 --------------------------------------------------------------------------------
 5b. 2FA + GOOGLE SIGN-IN (2026-08-19)
+    ⚠ SUPERSEDED SAME DAY by section 14 (email-OTP 2FA). Kept as historical
+      record. TOTP authenticator, enrollment UI (QR), Ensure2faEnrolled, and
+      two_factor_secret are REMOVED. Google OAuth paragraphs below remain valid.
 --------------------------------------------------------------------------------
  Two-factor authentication (user's choice of TOTP authenticator app or email
  code) and Google OAuth sign-up/login, built on the custom auth stack:

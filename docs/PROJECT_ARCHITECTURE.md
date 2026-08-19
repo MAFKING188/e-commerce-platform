@@ -4,6 +4,8 @@
 >
 > **Generated:** 2026-08-16 · refreshed 2026-08-17 at commit `fa24575` — architecture is now a modular monolith (see §15.9); module ownership map in `MODULE_OWNERSHIP.md`.
 >
+> **Refreshed:** 2026-08-19 — email-OTP verification layer shipped (see §7 routes, §12.1; detailed changelog in `PROJECT_REPORT.txt` §14–15).
+>
 > **Companion docs:** `PROGRESS.md`, `PARTNER_ROADMAP.md`, `SESSION_HANDOVER.md`, `COLLABORATION_GUIDE.md`, `FinalSubmissionReport.tex`, `EXECUTION_LOG.tex`, `DEPLOYMENT_GUIDE.tex`.
 
 ---
@@ -190,7 +192,7 @@ e-commerce-platform/
 
 | Table | Key columns | Notes / relationships |
 |---|---|---|
-| `users` | id, name(100), email(150, unique), password, role (enum-ish string: user/partner/admin, default 'user'), status (active/pending/suspended, added later), timestamps | The **de-facto** users table (app migration). FK target of carts/orders/addresses/reviews/wishlists/partners |
+| `users` | id, name(100), email(150, unique), password, role (enum-ish string: user/partner/admin, default 'user'), status (active/pending/suspended, added later), two_factor_type (null/'email', default null), email_verified_at (nullable, added 2026-08-19; TOTP-era `two_factor_secret` column **dropped**), timestamps | The **de-facto** users table (app migration). FK target of carts/orders/addresses/reviews/wishlists/partners |
 | `categories` | id, name(100) | 1→N products |
 | `products` | id, name(150), price(10,2), description, stock, image, FK category_id | 1→N product_images/variants/order_items/reviews; N→N partners via partner_products |
 | `carts` | FK user_id (unique) | 1 user : 1 cart; 1→N cart_items. ⚠ down() drops `cart` (typo) |
@@ -221,7 +223,7 @@ e-commerce-platform/
 
 | Model | Table | Purpose / key relations |
 |---|---|---|
-| `User` | users | Authenticatable + Sanctum; role, status; orders, cart, addresses, reviews, wishlists |
+| `User` | users | Authenticatable + Sanctum; role, status, `two_factor_type`, `email_verified_at`, `isPartner()` helper; orders, cart, addresses, reviews, wishlists |
 | `Product` | products | getImageUrlAttribute() w/ Unsplash fallback; isWishlistedByUser(); category, cartItem, orderItems, images, variants, reviews, partners (pivot) |
 | `Order` | orders | user, items, payment, payouts |
 | `Partner` | partners | user, products (pivot), payouts, orders (custom belongsToMany through order_items + partner_products) |
@@ -251,8 +253,11 @@ e-commerce-platform/
 **Auth / identity:**
 | Controller | Methods | Notes |
 |---|---|---|
-| `AuthController` | register, login, logout, apiRegister, apiLogin | Role-based status (user→active; partner/admin→pending); queues WelcomeMember; login blocks non-active; API returns Sanctum tokens |
-| `UserController` | index, show, edit, updateProfile, update, destroy | show = self profile w/ orders+addresses; updateProfile updates name/email + primary address; update/destroy = admin role mgmt (update role in:user,admin only) |
+| `AuthController` | register, login, logout, apiRegister, apiLogin, verifyEmailPage, verifyEmail, resendVerifyEmail | Role-based status (user→active; partner/admin→pending); queues WelcomeMember; login blocks non-active; **challenge-before-login**: admins/partners (+ any user with email codes enabled) get a `2fa.pending` session and are redirected to `/2fa/challenge` before `Auth::login` runs; unverified new signups are bounced to `/verify-email`; API returns Sanctum tokens |
+| `TwoFactorController` | challenge, verify, resend, enableEmail, confirm, disable | Email-OTP only (TOTP removed 2026-08-19). challenge/verify/resend guarded by `2fa.pending`; enable/confirm/disable on settings, throttled (`2fa`, `2fa-resend`, `2fa-enroll` limiters) |
+| `PasswordResetController` | showForgotForm, sendResetLink, showResetForm, storeNewPassword | sendResetLink queues `PasswordResetMail` w/ broker plaintext token (DB stores bcrypt hash); reset logs in + queues `PasswordChangedMail`; forgot/reset throttled (5/min) |
+| `GoogleAuthController` | redirectToGoogle, handleCallback | OAuth sign-in; new users created `email_verified_at = now()`; 2FA enabled users fall through the same challenge |
+| `UserController` | index, show, edit, updateProfile, update, destroy, updatePassword, updateAvatar, security, settings | show = self profile w/ orders+addresses; updateProfile updates name/email + primary address — **email change requires a step-up email code**; updatePassword requires step-up code; update/destroy = admin role mgmt (update role in:user,admin only) |
 | `AdminUserController` | index, update, approve, destroy | Member registry: search+status filter; emails UserStatusUpdated on role/status change; blocks self-delete |
 | `WishlistController` | index, toggle | ⚠ **BROKEN — see §11** |
 
@@ -282,31 +287,40 @@ e-commerce-platform/
 | `PartnerOrderController` | index, show | Orders containing partner's products, via Partner::orders() |
 | `PartnerPayoutController` | index | Payout list + processed/pending totals |
 
-### 6.3 Middleware (3)
+### 6.3 Middleware (4) + rate limiters
 - `AdminMiddleware` (alias `admin`) — redirect non-admin → home w/ error
 - `PartnerMiddleware` (alias `partner`) — redirect non-partner → home w/ error
 - `CurrencyMiddleware` — appended to `web` group; sets `currency` session from `?currency=` param validated against `config/currency.php`
+- `Ensure2faChallenge` (alias `2fa.pending`) — redirects to `/login` unless `2fa.pending` session flag is set (guards challenge routes). TOTP-era `Ensure2faEnrolled` **deleted** (2026-08-19)
+- Rate limiters (`RateLimiter::for` in TelemetryPipeline `RouteServiceProvider`): `auth` (5/min login+register), `checkout` (3/min), `2fa` (5/min verify), `2fa-resend` (5/min), `2fa-enroll` (5/min), `2fa-verify` (5/min signup email verify), `forgot-password` via `throttle:5,1`
 
 ### 6.4 FormRequests (4)
 - `StorePartnerRequest` / `UpdatePartnerRequest` — admin-only; name unique (ignore-self on update), description, contact_info, website, user_id
 - `StoreProductRequest` / `UpdateProductRequest` — admin **or partner**; name, price, category_id, stock, description, single `image` or `images[]` (jpeg/png/jpg/gif ≤ 2MB)
 
-### 6.5 Services (1)
+### 6.5 Services (3)
 - `CurrencyService` — static `convert($amount)` (session currency × rate), `format($amount)` (symbol + 2 decimals), `getCurrent()`. Rates hardcoded in `config/currency.php`.
+- `OtpService` — 6-digit email OTP: `issue($user)` (returns plaintext, bcrypt-hashed in cache `2fa:otp:{id}`, TTL 600s, single-use), `check($user, $code)`, `send($user)`. Queues `OtpMail`.
+- `StepUpService` — step-up marker for sensitive buyer actions (checkout, password/email change, 2FA disable): `begin($user)` (15-min `stepup.verified` session flag), `isVerified`, `complete`, `invalidate`.
 
-### 6.6 Mailables (5) — 4 queued (ShouldQueue) on database queue
+### 6.6 Mailables (8) — 7 queued (ShouldQueue)
 - `WelcomeMember` (queued) — markdown `emails.members.welcome`
 - `OrderConfirmed` (queued) — markdown `emails.orders.confirmed` (⚠ template has stray trailing `tml>`)
 - `OrderCancelled` (queued) — markdown `emails.orders.cancelled`
 - `PaymentSuccess` (queued) — markdown `emails.payments.success`
 - `UserStatusUpdated` (NOT queued) — plain view `emails.user_status_updated`
+- `OtpMail` (queued) — markdown `emails.otp`; generic "Your LUWI verification code" (login challenge, signup verify, step-up)
+- `PasswordResetMail` (queued) — markdown `emails.password.reset`; link = `url('/reset-password/{token}')` (plaintext token)
+- `PasswordChangedMail` (queued) — markdown `emails.password.changed`
+
+⚠ **Local dev:** `QUEUE_CONNECTION=sync` — no worker runs locally; `database` queue silently stalls all mail (see `PROJECT_REPORT.txt` §15).
 
 ### 6.7 Providers / Policies
 - `AppServiceProvider` — registered; registers `@money` directive
 - `AuthServiceProvider` — **NOT registered**; policy map commented out → both policies are dead code
 
 ### 6.8 What does NOT exist (important)
-No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exceptions/`, `Support/`, `Helpers/` directories. No scheduled tasks. No rate limiting. No custom console commands.
+No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exceptions/`, `Support/`, `Helpers/` directories. No scheduled tasks. No custom console commands.
 
 ---
 
@@ -324,9 +338,25 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | GET | `/contact` | ViewController@contact | `contact` |
 | GET | `/login` | closure → auth.login | `login` (guest) |
 | GET | `/signup` | closure → auth.signup | `signup` (guest) |
-| POST | `/createaccount` | AuthController@register | — |
-| POST | `/accessaccount` | AuthController@login | — |
+| GET | `/forgot-password` | PasswordResetController@showForgotForm | `forgot-password` (guest) |
+| POST | `/forgot-password` | PasswordResetController@sendResetLink | `password.email` (guest, throttle:5,1) |
+| GET | `/reset-password/{token}` | PasswordResetController@showResetForm | `password.reset` (guest) |
+| POST | `/reset-password` | PasswordResetController@storeNewPassword | `password.store` (guest) |
+| GET | `/auth/google/redirect` | GoogleAuthController@redirectToGoogle | `auth.google.redirect` |
+| GET | `/auth/google/callback` | GoogleAuthController@handleCallback | `auth.google.callback` |
+| POST | `/createaccount` | AuthController@register | — (throttle:auth) |
+| POST | `/accessaccount` | AuthController@login | — (throttle:auth) |
 | POST | `/logout` | AuthController@logout | `logout` |
+| GET | `/verify-email` | AuthController@verifyEmailPage | `verify-email` (no middleware; redirects if no pending) |
+| POST | `/verify-email` | AuthController@verifyEmail | `verify-email.post` (throttle:2fa-verify) |
+| POST | `/verify-email/resend` | AuthController@resendVerifyEmail | `verify-email.resend` (throttle:2fa-resend) |
+
+**2FA challenge (`2fa.pending` middleware — before full login):**
+| Method | URI | Handler | Name |
+|---|---|---|---|
+| GET | `/2fa/challenge` | TwoFactorController@challenge | `2fa.challenge` |
+| POST | `/2fa/challenge/verify` | TwoFactorController@verify | `2fa.verify` (throttle:2fa) |
+| POST | `/2fa/challenge/resend` | TwoFactorController@resend | `2fa.resend` (throttle:2fa-resend) |
 
 ### 7.2 Web routes — Authenticated member (`auth`)
 
@@ -342,7 +372,14 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | GET | `/paypal/capture` | PaymentController@capture | `paypal.capture` |
 | GET | `/paypal/cancel` | closure (redirect w/ error) | `paypal.cancel` |
 | GET | `/profile` | UserController@show | `profile` |
-| PUT | `/profile/update` | UserController@updateProfile | `profile.update` |
+| PUT | `/profile/update` | UserController@updateProfile | `profile.update` (step-up code required when email changes) |
+| POST | `/profile/avatar` | UserController@updateAvatar | `profile.avatar` |
+| PUT | `/profile/password` | UserController@updatePassword | `profile.password` (step-up code required) |
+| GET | `/profile/security` | UserController@security | `profile.security` |
+| GET | `/profile/settings` | UserController@settings | `profile.settings` |
+| POST | `/profile/settings/twofa/enable-email` | TwoFactorController@enableEmail | `profile.settings.twofa.enable-email` (throttle:2fa-enroll) |
+| POST | `/profile/settings/twofa/confirm` | TwoFactorController@confirm | `profile.settings.twofa.confirm` (throttle:2fa-enroll) |
+| POST | `/profile/settings/twofa/disable` | TwoFactorController@disable | `profile.settings.twofa.disable` (throttle:2fa-enroll; password + step-up code required) |
 | GET | `/archive` | WishlistController@index | `profile.wishlist` |
 | POST | `/wishlist/toggle` | WishlistController@toggle | `wishlist.toggle` |
 
@@ -486,8 +523,8 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | `partner/payouts/index.blade.php` | Earnings stats + payout table |
 | `partner/pagination/*` (9 files) | Vendor Laravel paginator templates (unused overrides) |
 
-### 8.7 Email templates (5)
-`emails/members/welcome`, `emails/orders/confirmed` (raw HTML, stray `tml>` typo), `emails/orders/cancelled`, `emails/payments/success`, `emails/user_status_updated`.
+### 8.7 Email templates (8)
+`emails/members/welcome`, `emails/orders/confirmed` (raw HTML, stray `tml>` typo), `emails/orders/cancelled`, `emails/payments/success`, `emails/user_status_updated`, `emails/otp` (markdown), `emails/password/reset` (markdown), `emails/password/changed` (markdown).
 
 ### 8.8 AJAX / fetch endpoints used by UI
 1. `layouts/app.blade.php` → **POST `/wishlist/toggle`** (JSON `{product_id}`) — wishlist hearts (⚠ backend broken)
@@ -579,6 +616,7 @@ Every rendered page and the backend it exercises:
 - ✅ Business rules in `config/shop.php` (commission rate, default currency)
 - ✅ Rate limiting on auth (5/min) and checkout (3/min) via `RateLimiter::for` in TelemetryPipeline
 - ✅ **Modular monolith migration executed** (commits `2b1cc33`..`da1e36f`; see §15.9)
+- ✅ **Email-OTP verification layer** (2026-08-19, commits `3ba967e`..`3b431e4`): mandatory email code challenge before login for admins + partners; buyer opt-in email codes; step-up codes at checkout, password/email change, 2FA disable; mandatory signup email verification; TOTP removed; `Ensure2faEnrolled` deleted; all five admin route groups gated (bug-fix `da3688e`). Full suite **100 tests / 336 assertions** green; deployed + live-verified on smartshop-luwi.tech (spec/plan in `docs/superpowers/`)
 
 ### 12.2 Reported PENDING / TODO
 
@@ -602,7 +640,7 @@ Every rendered page and the backend it exercises:
 | 🟠 Stability | Contact form dummy (`action="#"`); `carts` down() typo (historical, migrate:fresh clean) |
 | 🟠 Ops | Local file storage (needs S3/Cloudinary); no async failure logging; `APP_DEBUG=true` |
 | 🟡 Code | Business logic still heavy in controllers (service layer only for payout/checkout/low-stock/currency); partner console filters validated in-controller; duplicate `pending/paid/completed/cancelled` status strings across modules (no shared enum) |
-| 🟡 Tests | 19 tests / 53 assertions covering commerce, payouts, filters, wishlist, reviews — no API tests, no rate-limiter test, PartnerHub untested beyond profile edit smoke |
+| 🟡 Tests | 100 tests / 336 assertions (IdentityAccess: 2FA/OTP, signup verification, profiles, resets; MarketplacePipeline: checkout w/ step-up, payouts, wishlist, reviews) — no API tests, no rate-limiter test |
 
 ---
 

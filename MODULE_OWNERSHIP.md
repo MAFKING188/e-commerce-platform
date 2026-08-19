@@ -9,7 +9,7 @@ This document is the single source of truth for module boundaries, table ownersh
 
 | Module | Owns (tables) | Reads | View alias | Key services |
 | :--- | :--- | :--- | :--- | :--- |
-| **`IdentityAccess`** | users, addresses, personal_access_tokens, wishlists | products (wishlist join) | `identityaccess::` | `GovernanceService` |
+| **`IdentityAccess`** | users, addresses, personal_access_tokens, wishlists | products (wishlist join) | `identityaccess::` | `GovernanceService`, `OtpService`, `StepUpService` |
 | **`CatalogDelivery`** | products, categories, product_images, product_variants, reviews | users, partners (attribution) | `catalogdelivery::` | `CatalogQueryService` |
 | **`MarketplacePipeline`** | carts, cart_items, orders, order_items, payments, payouts | users, products, partners | `marketplacepipeline::` | `CheckoutService`, `PayoutService` |
 | **`PartnerHub`** | partners, partner_products | users, products | `partnerhub::` | — |
@@ -29,6 +29,8 @@ This document is the single source of truth for module boundaries, table ownersh
 | Service | Module | Responsibility |
 | :--- | :--- | :--- |
 | `GovernanceService` | IdentityAccess | Admin member registry queries (users index/filter/status) |
+| `OtpService` | IdentityAccess | 6-digit email OTP — issue (bcrypt-hashed cache, 10-min TTL, single-use), check, send (queues `OtpMail`); used by login challenge, signup verify, step-up |
+| `StepUpService` | IdentityAccess | Step-up marker for sensitive buyer actions (checkout, password/email change, 2FA disable) — 15-min verified session flag |
 | `CatalogQueryService` | CatalogDelivery | Product/category/review queries — blades contain zero SQL |
 | `CheckoutService` | MarketplacePipeline | Transactional checkout (lockForUpdate), order creation, mails |
 | `PayoutService` | MarketplacePipeline | Payout computation + processing (10% commission) |
@@ -42,13 +44,14 @@ This document is the single source of truth for module boundaries, table ownersh
 ## 3. Per-Module Inventory
 
 ### 3.1 IdentityAccess
-- **Models:** `User`, `Wishlist`
-- **Controllers:** `AuthController` (web + Sanctum API), `AdminDashboardController`, `AdminUserController`, `UserController`, `WishlistController`, `IdentityAccessController` (scaffold)
-- **Mailables:** `WelcomeMember`, `UserStatusUpdated`
-- **Migrations:** users, addresses, personal_access_tokens, wishlists (+ status/confirmation columns)
+- **Models:** `User` (role, status, `two_factor_type`, `email_verified_at`, `isPartner()`), `Wishlist`
+- **Controllers:** `AuthController` (web + Sanctum API + verify-email), `TwoFactorController` (email-OTP challenge/enable/disable), `PasswordResetController` (forgot/reset), `GoogleAuthController` (OAuth), `AdminDashboardController`, `AdminUserController`, `AdminProfileController`, `UserController` (profile, security, settings, step-up password/email), `WishlistController`, `IdentityAccessController` (scaffold)
+- **Services:** `OtpService`, `StepUpService`
+- **Mailables:** `WelcomeMember`, `UserStatusUpdated`, `OtpMail`, `PasswordResetMail`, `PasswordChangedMail`
+- **Migrations:** users, addresses, personal_access_tokens, wishlists (+ status/confirmation columns), `2026_08_19_140001_email_otp_2fa` (email_verified_at, drop two_factor_secret), `2026_08_19_150001_backfill_email_verified_at`
 - **Seeders:** `IdentityAccessDatabaseSeeder`, `UserSeeder`
-- **Routes:** `routes/web.php` (auth, profile, wishlist, `admin.*`) + `routes/api.php` (login/register/user)
-- **Tests:** `tests/Feature/WishlistTest`
+- **Routes:** `routes/web.php` (auth, 2fa challenge, verify-email, forgot/reset-password, profile/security/settings, wishlist, `admin.*`) + `routes/api.php` (login/register/user)
+- **Tests:** `tests/Feature/TwoFactorTest`, `TwoFactorSchemaTest`, `RegistrationTest`, `ProfileTest`, `PasswordResetTest`, `UserDetailsTest`, `GoogleAuthTest`, `WishlistTest`
 
 ### 3.2 CatalogDelivery
 - **Models:** `Product`, `Category`, `ProductImage`, `ProductVariant`, `Review`
@@ -68,7 +71,7 @@ This document is the single source of truth for module boundaries, table ownersh
 - **Migrations:** carts, cart_items, orders, order_items, payments, payouts
 - **Seeders:** `MarketplacePipelineDatabaseSeeder`, `OrderSeeder`
 - **Routes:** `routes/web.php` (cart, orders, paypal, `admin.orders|payouts`, `partner.orders|payouts`) + `routes/api.php` (scaffold)
-- **Tests:** `tests/Feature/CheckoutFlowTest`, `tests/Feature/PayoutSplitTest`
+- **Tests:** `tests/Feature/CheckoutFlowTest` (incl. step-up code), `tests/Feature/CheckoutStepUpTest`, `tests/Feature/PayoutSplitTest`
 
 ### 3.4 PartnerHub
 - **Models:** `Partner`, `PartnerProduct`
@@ -86,6 +89,7 @@ This document is the single source of truth for module boundaries, table ownersh
 - **Migrations:** audit_logs, email_logs
 - **Seeders:** `TelemetryPipelineDatabaseSeeder`
 - **Routes:** `routes/web.php` (`/health`) + `routes/api.php` (scaffold)
+- **Rate limiters (`RateLimiter::for` in `RouteServiceProvider`):** `auth` (5/min), `checkout` (3/min), `2fa`, `2fa-resend`, `2fa-enroll`, `2fa-verify` (5/min each)
 - **Tests:** `tests/Feature/TelemetryTest`
 
 ---
