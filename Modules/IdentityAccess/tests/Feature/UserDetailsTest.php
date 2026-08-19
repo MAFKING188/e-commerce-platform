@@ -34,4 +34,29 @@ class UserDetailsTest extends TestCase
         $user->update(['phone' => '+33 6 12 34 56 78']);
         $this->assertSame('+33 6 12 34 56 78', $user->fresh()->phone);
     }
+
+    public function test_two_factor_type_enum_round_trips(): void
+    {
+        $user = User::factory()->create(['two_factor_type' => 'totp', 'two_factor_confirmed_at' => now()]);
+
+        $this->assertTrue($user->twoFactorEnabled());
+        $this->assertSame('totp', $user->twoFactorMethod());
+    }
+
+    public function test_two_factor_helpers_for_disabled_user(): void
+    {
+        $user = User::factory()->create();
+
+        $this->assertFalse($user->twoFactorEnabled());
+        $this->assertNull($user->twoFactorMethod());
+    }
+
+    public function test_is_admin_helper(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'user']);
+
+        $this->assertTrue($admin->isAdmin());
+        $this->assertFalse($user->isAdmin());
+    }
 }

@@ -31,6 +31,11 @@ class User extends Authenticatable
         'status',
         'avatars',
         'phone',
+        'google_id',
+        'avatar',
+        'two_factor_secret',
+        'two_factor_type',
+        'two_factor_confirmed_at',
     ];
 
     protected $hidden = [
@@ -48,6 +53,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_type' => \Modules\IdentityAccess\Enums\TwoFactorType::class,
         ];
     }
 
@@ -148,5 +155,20 @@ class User extends Authenticatable
             ->sortByDesc('at')
             ->take($limit)
             ->values();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function twoFactorEnabled(): bool
+    {
+        return $this->two_factor_type !== null && $this->two_factor_confirmed_at !== null;
+    }
+
+    public function twoFactorMethod(): ?string
+    {
+        return $this->two_factor_type?->value;
     }
 }
