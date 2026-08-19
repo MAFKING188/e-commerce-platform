@@ -3,6 +3,8 @@
 namespace Modules\IdentityAccess\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use Modules\IdentityAccess\Mail\PasswordChangedMail;
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -113,6 +115,7 @@ public function show()
         ]);
 
         Auth::user()->update(['password' => $request->password]);
+        Mail::to(Auth::user())->queue(new PasswordChangedMail(Auth::user()));
         $request->session()->regenerate();
 
         return redirect()->back()->with('success', 'Password updated successfully');

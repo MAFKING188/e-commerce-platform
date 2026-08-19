@@ -3,12 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Modules\IdentityAccess\Http\Controllers\AdminUserController;
 use Modules\IdentityAccess\Http\Controllers\AuthController;
+use Modules\IdentityAccess\Http\Controllers\PasswordResetController;
 use Modules\IdentityAccess\Http\Controllers\UserController;
 use Modules\IdentityAccess\Http\Controllers\WishlistController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn() => view('identityaccess::auth.login'))->name('login');
     Route::get('/signup', fn() => view('identityaccess::auth.signup'))->name('signup');
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('forgot-password');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:5,1');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'storeNewPassword'])->name('password.store');
 });
 
 Route::post('/createaccount', [AuthController::class, 'register'])->middleware('throttle:auth');
