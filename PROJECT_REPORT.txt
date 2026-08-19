@@ -447,8 +447,22 @@
 
 
 --------------------------------------------------------------------------------
-13. RESPONSIVE DESIGN ASSESSMENT (2026-08-18 — audit only, no fixes applied)
+13. RESPONSIVE DESIGN ASSESSMENT (2026-08-18 — audit) AND RESOLUTION (0cec31e)
 --------------------------------------------------------------------------------
+ RESOLVED 2026-08-18 in 0cec31e. Both issues fixed and re-verified with the
+ same CDP audit script at 1280/768/390: /shop, /product/73, /admin/products
+ all scrollWidth <= clientWidth. Root cause of the product page turned out
+ to be a cross-module class collision: MarketplacePipeline's scss still
+ shipped a DEAD .product-info{display:flex} rule (no view uses it) that
+ leaked onto the CatalogDelivery product page info column and re-arranged
+ it as a non-wrapping flex row once min-width:0 collapsed the grid track.
+ Removal of the dead rule + min-width:0 on .product-details children fixed
+ the page at every width. Pagination styles moved from the blade <style>
+ into app.css (PAGINATION block) with a <=768px flex-wrap rule. 48 tests /
+ 182 assertions green; zero inline styles; only <style> left is the email.
+ LESSON: module asset bundles load globally via @vite (app-layout) — class
+ names must be module-prefixed or verified dead-code-free across modules;
+ add a cross-module class-collision grep to future verification passes.
 
  Method: agent-browser (CDP) against :8001; 67 page/viewport checks across
  29 distinct pages at 1280 / 768 / 390 widths; measured page-level horizontal
@@ -510,3 +524,4 @@
 --------------------------------------------------------------------------------
  END OF DOCUMENT
 --------------------------------------------------------------------------------
+
