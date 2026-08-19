@@ -71,14 +71,37 @@ class AuthController extends Controller
             ]);
         }
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+        if (! $user || $user->password === null) {
+            return back()->withErrors([
+                'email' => $user ? 'This account uses Google sign-in.' : 'Invalid credentials',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials'
-        ]);
+        if (! Auth::validate($credentials)) {
+            return back()->withErrors([
+                'email' => 'Invalid credentials'
+            ]);
+        }
+
+        if ($user->twoFactorEnabled()) {
+            session([
+                '2fa.pending' => $user->id,
+                '2fa.attempts' => 0,
+                '2fa.pending_method' => $user->twoFactorMethod(),
+            ]);
+            if ($user->twoFactorMethod() === 'email') {
+                \Modules\IdentityAccess\Services\OtpService::send($user);
+            }
+            return redirect()->route('2fa.challenge');
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        if ($user->isAdmin()) {
+            session(['2fa.required' => true]);
+        }
+
+        return redirect()->intended('/');
     }
 
     /* API REGISTER */

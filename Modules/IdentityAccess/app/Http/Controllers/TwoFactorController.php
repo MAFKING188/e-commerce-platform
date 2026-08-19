@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Modules\IdentityAccess\Mail\OtpMail;
+use Illuminate\Support\Facades\Auth;
 use Modules\IdentityAccess\Models\User;
+use Modules\IdentityAccess\Services\OtpService;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -17,6 +17,97 @@ class TwoFactorController extends Controller
 {
     private const OTP_TTL = 600;
     private const MAX_CONFIRM_ATTEMPTS = 5;
+    private const MAX_CHALLENGE_ATTEMPTS = 5;
+
+    /* ---------- challenge ---------- */
+
+    public function challenge()
+    {
+        $userId = session('2fa.pending');
+        $user = User::find($userId);
+
+        if (! $user || ! $user->twoFactorEnabled()) {
+            session()->forget('2fa.pending');
+            return redirect()->route('login');
+        }
+
+        return view('identityaccess::auth.challenge', [
+            'user' => $user,
+            'method' => session('2fa.pending_method', $user->twoFactorMethod()),
+        ]);
+    }
+
+    public function verify(Request $request)
+    {
+        $data = $request->validate(['code' => 'required|string|max:10']);
+        $userId = session('2fa.pending');
+        $user = User::find($userId);
+
+        if (! $user || ! $user->twoFactorEnabled()) {
+            session()->forget('2fa.pending');
+            return redirect()->route('login');
+        }
+
+        $method = session('2fa.pending_method', $user->twoFactorMethod());
+        $valid = $method === 'email'
+            ? OtpService::check($user, trim($data['code']))
+            : $this->verifyTotp($user, trim($data['code']));
+
+        if (! $valid) {
+            $attempts = (int) session('2fa.attempts', 0) + 1;
+            session(['2fa.attempts' => $attempts]);
+            if ($attempts >= self::MAX_CHALLENGE_ATTEMPTS) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('login')->withErrors(['code' => 'Too many invalid attempts. Please sign in again.']);
+            }
+            return back()->withErrors(['code' => 'The code is invalid or has expired.']);
+        }
+
+        $request->session()->forget(['2fa.pending', '2fa.attempts', '2fa.pending_method', '2fa:otp:' . $user->id]);
+        Auth::login($user);
+        $request->session()->regenerate();
+        Log::info('auth.2fa_challenge', ['user' => $user->id, 'method' => $method]);
+
+        if ($user->isAdmin() && ! $user->twoFactorEnabled()) {
+            session(['2fa.required' => true]);
+            return redirect()->route('profile.settings')->with('status', 'Two-factor authentication is required for admin accounts. Please enable it.');
+        }
+
+        return redirect()->intended('/');
+    }
+
+    public function resend(Request $request)
+    {
+        $userId = session('2fa.pending');
+        $user = User::find($userId);
+
+        if (! $user || ! $user->twoFactorEnabled()) {
+            return redirect()->route('login');
+        }
+
+        if (Cache::has('2fa:resend:' . $user->id)) {
+            return back()->withErrors(['code' => 'Please wait a moment before requesting another code.']);
+        }
+
+        OtpService::send($user);
+        Cache::put('2fa:resend:' . $user->id, true, 60);
+
+        return back()->with('status', 'A new verification code was sent to your email.');
+    }
+
+    private function verifyTotp(User $user, string $code): bool
+    {
+        if (! $user->two_factor_secret) {
+            return false;
+        }
+        $timestamp = Google2FA::verifyKeyNewer($user->two_factor_secret, $code, (int) Cache::get('2fa:totp-ts:' . $user->id, 0));
+        if ($timestamp === false) {
+            return false;
+        }
+        Cache::put('2fa:totp-ts:' . $user->id, $timestamp, self::OTP_TTL);
+        return true;
+    }
 
     /* ---------- enrollment: TOTP ---------- */
 
@@ -72,8 +163,7 @@ class TwoFactorController extends Controller
             return back()->withErrors(['twofa' => 'Two-factor authentication is already enabled.']);
         }
 
-        $code = $this->issueOtp($user);
-        Mail::to($user)->queue(new OtpMail($user, $code));
+        OtpService::send($user);
         session(['twofa.pending_type' => 'email']);
 
         return back()->with('status', 'A verification code was sent to your email. It expires in 10 minutes.');
@@ -93,7 +183,7 @@ class TwoFactorController extends Controller
 
         $valid = $pending === 'totp'
             ? Google2FA::verifyKey($user->two_factor_secret, trim($data['code']), 1)
-            : $this->checkOtp($user, trim($data['code']));
+            : OtpService::check($user, trim($data['code']));
 
         if (! $valid) {
             $attempts = (int) session('twofa.confirm_attempts', 0) + 1;
@@ -138,24 +228,5 @@ class TwoFactorController extends Controller
         Log::info('auth.2fa_disabled', ['user' => $user->id]);
 
         return back()->with('status', 'Two-factor authentication disabled.');
-    }
-
-    /* ---------- OTP helpers ---------- */
-
-    private function issueOtp(User $user): string
-    {
-        $code = (string) random_int(100000, 999999);
-        Cache::put('2fa:otp:' . $user->id, Hash::make($code), self::OTP_TTL);
-        return $code;
-    }
-
-    private function checkOtp(User $user, string $code): bool
-    {
-        $hashed = Cache::get('2fa:otp:' . $user->id);
-        if (! $hashed || ! Hash::check($code, $hashed)) {
-            return false;
-        }
-        Cache::forget('2fa:otp:' . $user->id);
-        return true;
     }
 }

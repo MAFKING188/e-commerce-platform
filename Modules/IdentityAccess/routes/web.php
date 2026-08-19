@@ -15,6 +15,12 @@ Route::post('/createaccount', [AuthController::class, 'register'])->middleware('
 Route::post('/accessaccount', [AuthController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::middleware(['2fa.pending'])->group(function () {
+    Route::get('/2fa/challenge', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'challenge'])->name('2fa.challenge');
+    Route::post('/2fa/challenge/verify', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'verify'])->middleware('throttle:2fa')->name('2fa.verify');
+    Route::post('/2fa/challenge/resend', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'resend'])->middleware('throttle:2fa-resend')->name('2fa.resend');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'show'])->name('profile');
     Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');

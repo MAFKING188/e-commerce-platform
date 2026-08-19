@@ -5,6 +5,8 @@ namespace Modules\IdentityAccess\Tests\Feature;
 use Modules\IdentityAccess\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\IdentityAccess\Tests\TestCase;
+use Illuminate\Support\Facades\Mail;
+use Modules\IdentityAccess\Mail\OtpMail;
 
 class TwoFactorTest extends TestCase
 {
@@ -92,5 +94,112 @@ class TwoFactorTest extends TestCase
         $this->assertNull($fresh->two_factor_secret);
         $this->assertNull($fresh->two_factor_type);
         $this->assertNull($fresh->two_factor_confirmed_at);
+    }
+
+    /* ---------- challenge flow ---------- */
+
+    public function test_password_login_with_2fa_redirects_to_challenge(): void
+    {
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'two_factor_secret' => 'ABCDEFGHIJKLMNOP',
+            'two_factor_type' => 'totp',
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $response = $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password']);
+        $response->assertRedirect(route('2fa.challenge'));
+        $this->assertGuest();
+        $this->assertSame($user->id, session('2fa.pending'));
+    }
+
+    public function test_challenge_verify_with_totp_logs_in(): void
+    {
+        $secret = \PragmaRX\Google2FALaravel\Facade::generateSecretKey();
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'two_factor_secret' => $secret,
+            'two_factor_type' => 'totp',
+            'two_factor_confirmed_at' => now(),
+        ]);
+        $code = \PragmaRX\Google2FALaravel\Facade::getCurrentOtp($secret);
+
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password']);
+        $this->post('/2fa/challenge/verify', ['code' => $code])
+            ->assertRedirect('/');
+        $this->assertAuthenticatedAs($user);
+        $this->assertNull(session('2fa.pending'));
+    }
+
+    public function test_challenge_wrong_code_after_five_attempts_invalidates_session(): void
+    {
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'two_factor_secret' => 'ABCDEFGHIJKLMNOP',
+            'two_factor_type' => 'totp',
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password']);
+
+        for ($i = 0; $i < 4; $i++) {
+            $this->post('/2fa/challenge/verify', ['code' => '000000'])->assertSessionHasErrors('code');
+        }
+        $this->post('/2fa/challenge/verify', ['code' => '000000'])->assertRedirect(route('login'));
+        $this->assertGuest();
+        $this->assertNull(session('2fa.pending'));
+    }
+
+    public function test_email_method_challenge_with_queued_code(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'two_factor_type' => 'email',
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password']);
+
+        $code = '';
+        Mail::assertQueued(OtpMail::class, function (OtpMail $mail) use (&$code) {
+            $code = $mail->code;
+            return true;
+        });
+        $this->assertNotSame('', $code);
+
+        $this->post('/2fa/challenge/verify', ['code' => $code])
+            ->assertRedirect('/');
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_resend_respects_cooldown(): void
+    {
+        Mail::fake();
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'two_factor_type' => 'email',
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password']);
+        $this->post('/2fa/challenge/resend')->assertRedirect();
+        Mail::assertQueued(OtpMail::class, 2);
+
+        $this->post('/2fa/challenge/resend');
+        Mail::assertQueued(OtpMail::class, 2);
+    }
+
+    public function test_google_only_account_cannot_login_with_password(): void
+    {
+        $user = User::factory()->create([
+            'status' => 'active', 'role' => 'user',
+            'password' => null,
+            'google_id' => 'g-123',
+        ]);
+
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password'])
+            ->assertSessionHasErrors('email');
+        $this->assertGuest();
     }
 }
