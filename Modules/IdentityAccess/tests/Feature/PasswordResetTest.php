@@ -123,6 +123,7 @@ class PasswordResetTest extends TestCase
             'current_password' => 'password',
             'password' => 'freshpass123',
             'password_confirmation' => 'freshpass123',
+            'code' => \Modules\IdentityAccess\Services\OtpService::issue($this->user),
         ])->assertSessionHas('success');
 
         Mail::assertQueued(PasswordChangedMail::class, fn ($mail) => $mail->hasTo('resetme@test.com'));

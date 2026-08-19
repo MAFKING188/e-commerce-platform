@@ -64,6 +64,12 @@
                         <input type="password" name="password_confirmation" class="form-input" required>
                     </div>
                 </div>
+                                <div class="form-group">
+                        <label class="form-label">Verification Code</label>
+                        <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10" required>
+                        <p class="form-hint">A code is sent to your email to confirm this change.</p>
+                        @error('code') <p class="form-error">{{ $message }}</p> @enderror
+                    </div>
                 <button type="submit" class="btn btn-primary">Update Password</button>
             </form>
         </div>

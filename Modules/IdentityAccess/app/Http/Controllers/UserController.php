@@ -49,6 +49,15 @@ public function show()
             'country' => 'nullable|string|max:100',
         ]);
 
+        // Email changes require a fresh verification code (step-up)
+        if ($request->filled('email') && strtolower($request->email) !== strtolower($user->email)) {
+            $request->validate(['code' => 'required|string|max:10']);
+            if (! \Modules\IdentityAccess\Services\OtpService::check($user, trim($request->code))) {
+                \Modules\IdentityAccess\Services\OtpService::send($user);
+                return back()->withErrors(['code' => 'The code is invalid or has expired. A new code was sent to your email.']);
+            }
+        }
+
         // Update user model
         $user->update($request->only(['name', 'email', 'phone']));
 
@@ -112,7 +121,13 @@ public function show()
                 }
             }],
             'password' => 'required|string|min:8|confirmed',
+            'code' => 'required|string|max:10',
         ]);
+
+        if (! \Modules\IdentityAccess\Services\OtpService::check(Auth::user(), trim($request->code))) {
+            \Modules\IdentityAccess\Services\OtpService::send(Auth::user());
+            return back()->withErrors(['code' => 'The code is invalid or has expired. A new code was sent to your email.']);
+        }
 
         Auth::user()->update(['password' => $request->password]);
         Mail::to(Auth::user())->queue(new PasswordChangedMail(Auth::user()));

@@ -143,11 +143,19 @@ class TwoFactorController extends Controller
 
     public function disable(Request $request)
     {
-        $data = $request->validate(['password' => 'required|string']);
+        $data = $request->validate([
+            'password' => 'required|string',
+            'code' => 'required|string|max:10',
+        ]);
         $user = $request->user();
 
         if (! Hash::check($data['password'], $user->password)) {
             return back()->withErrors(['password' => 'Current password is incorrect.']);
+        }
+
+        if (! OtpService::check($user, trim($data['code']))) {
+            OtpService::send($user);
+            return back()->withErrors(['code' => 'The code is invalid or has expired. A new code was sent to your email.']);
         }
 
         $user->forceFill([

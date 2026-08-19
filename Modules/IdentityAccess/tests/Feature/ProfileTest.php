@@ -123,9 +123,78 @@ class ProfileTest extends TestCase
             'current_password' => 'current-pass-123',
             'password' => 'new-pass-456',
             'password_confirmation' => 'new-pass-456',
+            'code' => \Modules\IdentityAccess\Services\OtpService::issue($user),
         ])->assertRedirect();
 
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('new-pass-456', $user->fresh()->password));
+    }
+
+    public function test_password_change_requires_verification_code(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
+        $this->actingAs($user);
+        $this->put('/profile/password', [
+            'current_password' => 'password',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ])->assertSessionHasErrors('code');
+        $user->refresh();
+        $this->assertFalse(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->password));
+    }
+
+    public function test_password_change_with_valid_code_applies(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
+        $this->actingAs($user);
+        $code = \Modules\IdentityAccess\Services\OtpService::issue($user);
+        $this->put('/profile/password', [
+            'current_password' => 'password',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+            'code' => $code,
+        ])->assertSessionHasNoErrors();
+        $user->refresh();
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->password));
+    }
+
+    public function test_email_change_requires_verification_code(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
+        $this->actingAs($user);
+        $this->put('/profile/update', [
+            'name' => 'QA Buyer',
+            'email' => 'newmail@test.com',
+            'phone' => '+212 600 000 000',
+        ])->assertSessionHasErrors('code');
+        $user->refresh();
+        $this->assertNotEquals('newmail@test.com', $user->email);
+    }
+
+    public function test_email_change_with_valid_code_applies(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
+        $this->actingAs($user);
+        $code = \Modules\IdentityAccess\Services\OtpService::issue($user);
+        $this->put('/profile/update', [
+            'name' => 'QA Buyer',
+            'email' => 'newmail@test.com',
+            'phone' => '+212 600 000 000',
+            'code' => $code,
+        ])->assertSessionHasNoErrors();
+        $user->refresh();
+        $this->assertEquals('newmail@test.com', $user->email);
+    }
+
+    public function test_address_only_save_still_works_without_code(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
+        $this->actingAs($user);
+        $this->put('/profile/update', [
+            'line1' => '88 Boulevard Mohammed V',
+            'city' => 'Casablanca',
+            'country' => 'Morocco',
+        ])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('addresses', ['city' => 'Casablanca']);
     }
 
     public function test_profile_page_renders_identity_signals_stats_and_quick_links(): void

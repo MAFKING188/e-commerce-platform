@@ -111,7 +111,8 @@ class TwoFactorTest extends TestCase
         $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
         $user->forceFill(['two_factor_type' => 'email', 'two_factor_confirmed_at' => now()])->save();
         $this->actingAs($user);
-        $this->post('/profile/settings/twofa/disable', ['password' => 'password'])
+        $code = OtpService::issue($user);
+        $this->post('/profile/settings/twofa/disable', ['password' => 'password', 'code' => $code])
             ->assertSessionHasNoErrors();
         $user->refresh();
         $this->assertFalse($user->twoFactorEnabled());

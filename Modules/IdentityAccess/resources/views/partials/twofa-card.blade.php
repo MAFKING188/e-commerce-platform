@@ -11,6 +11,12 @@
                 <input type="password" name="password" class="form-input" required>
                 @error('password') <p class="form-error">{{ $message }}</p> @enderror
             </div>
+            <div class="form-group">
+                <label class="form-label">Verification Code</label>
+                <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10" required>
+                <p class="form-hint">A code is sent to your email to confirm disabling.</p>
+                @error('code') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
             <button type="submit" class="btn btn-ghost btn-danger">Disable Two-Factor Authentication</button>
         </form>
     @else

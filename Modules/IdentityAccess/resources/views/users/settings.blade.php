@@ -21,6 +21,12 @@
                     <label class="form-label">Phone</label>
                     <input type="text" name="phone" class="form-input" value="{{ $user->phone }}" placeholder="+33 6 12 34 56 78">
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Verification Code</label>
+                    <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10">
+                    <p class="form-hint">Required only when changing your email address.</p>
+                    @error('code') <p class="form-error">{{ $message }}</p> @enderror
+                </div>
                 <button type="submit" class="btn btn-primary">Save Account Details</button>
             </form>
         </div>
