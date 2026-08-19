@@ -55,6 +55,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_secret' => 'encrypted',
             'two_factor_type' => \Modules\IdentityAccess\Enums\TwoFactorType::class,
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 
