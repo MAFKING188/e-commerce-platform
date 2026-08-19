@@ -26,6 +26,7 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('2fa', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('2fa-resend', fn (Request $request) => Limit::perMinute(1)->by($request->ip()));
         RateLimiter::for('2fa-enroll', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('2fa-verify', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
     }
 
     /**

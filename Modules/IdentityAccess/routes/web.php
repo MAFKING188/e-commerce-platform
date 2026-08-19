@@ -7,6 +7,10 @@ use Modules\IdentityAccess\Http\Controllers\PasswordResetController;
 use Modules\IdentityAccess\Http\Controllers\UserController;
 use Modules\IdentityAccess\Http\Controllers\WishlistController;
 
+Route::get('/verify-email', [AuthController::class, 'verifyEmailPage'])->name('verify-email');
+Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:2fa-verify')->name('verify-email.post');
+Route::post('/verify-email/resend', [AuthController::class, 'resendVerifyEmail'])->middleware('throttle:2fa-resend')->name('verify-email.resend');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn() => view('identityaccess::auth.login'))->name('login');
     Route::get('/signup', fn() => view('identityaccess::auth.signup'))->name('signup');

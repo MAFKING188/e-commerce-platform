@@ -61,7 +61,10 @@ class AuthController extends Controller
 
         if ($status === 'active') {
             Auth::login($user);
-            return redirect('/')->with('status', 'Welcome to the Collection! Account created.');
+            $request->session()->regenerate();
+            \Modules\IdentityAccess\Services\OtpService::send($user);
+            session(['email.verify.pending' => $user->id]);
+            return redirect()->route('verify-email')->with('status', 'Welcome to the Collection! Verify your email to finish signing up.');
         }
 
         return redirect('/login')->with('status', 'Account request received. Please wait for administrative confirmation.');
@@ -94,6 +97,12 @@ class AuthController extends Controller
             return back()->withErrors([
                 'email' => 'Invalid credentials'
             ]);
+        }
+
+        if ($user->email_verified_at === null) {
+            \Modules\IdentityAccess\Services\OtpService::send($user);
+            session(['email.verify.pending' => $user->id]);
+            return redirect()->route('verify-email')->with('status', 'A verification code was sent to your email.');
         }
 
         if ($user->isAdmin() || $user->isPartner() || $user->twoFactorEnabled()) {
@@ -164,5 +173,55 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    /* EMAIL VERIFICATION */
+    public function verifyEmailPage()
+    {
+        $userId = session('email.verify.pending');
+        $user = $userId ? User::find($userId) : null;
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        return view('identityaccess::auth.verify-email', ['user' => $user]);
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        $data = $request->validate(['code' => 'required|string|max:10']);
+        $userId = session('email.verify.pending');
+        $user = $userId ? User::find($userId) : null;
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if (! \Modules\IdentityAccess\Services\OtpService::check($user, trim($data['code']))) {
+            \Modules\IdentityAccess\Services\OtpService::send($user);
+            return back()->withErrors(['code' => 'The code is invalid or has expired. A new code was sent to your email.']);
+        }
+
+        $user->forceFill(['email_verified_at' => now()])->save();
+        session()->forget('email.verify.pending');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect('/')->with('status', 'Email verified. Welcome to the Collection!');
+    }
+
+    public function resendVerifyEmail()
+    {
+        $userId = session('email.verify.pending');
+        $user = $userId ? User::find($userId) : null;
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        \Modules\IdentityAccess\Services\OtpService::send($user);
+
+        return back()->with('status', 'A new verification code was sent to your email.');
     }
 }

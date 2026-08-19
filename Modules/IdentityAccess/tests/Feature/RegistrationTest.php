@@ -80,4 +80,36 @@ class RegistrationTest extends TestCase
 
         $this->assertSame(config('currency.default'), session('currency'));
     }
+
+    public function test_signup_redirects_to_verify_email_with_unverified_account(): void
+    {
+        $this->post('/createaccount', $this->payload)->assertRedirect(route('verify-email'));
+
+        $user = User::where('email', 'newmember@test.com')->first();
+        $this->assertNotNull($user);
+        $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_verify_email_with_valid_code_marks_verified(): void
+    {
+        $this->post('/createaccount', $this->payload);
+
+        $user = User::where('email', 'newmember@test.com')->first();
+        $code = \Modules\IdentityAccess\Services\OtpService::issue($user);
+        $this->post('/verify-email', ['code' => $code])->assertRedirect('/');
+        $user->refresh();
+        $this->assertNotNull($user->email_verified_at);
+    }
+
+    public function test_unverified_login_redirects_to_verify_email(): void
+    {
+        $user = User::factory()->create(['status' => 'active', 'role' => 'user', 'email_verified_at' => null]);
+        $this->post('/accessaccount', ['email' => $user->email, 'password' => 'password'])
+            ->assertRedirect(route('verify-email'));
+    }
+
+    public function test_verify_email_resend_route_exists(): void
+    {
+        $this->post('/verify-email/resend')->assertRedirect('/login');
+    }
 }

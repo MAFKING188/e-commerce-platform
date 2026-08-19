@@ -13,8 +13,11 @@ class TwoFactorSchemaTest extends TestCase
 
     public function test_users_have_email_verified_at_column(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->unverified()->create();
         $this->assertNull($user->email_verified_at);
+
+        $verified = User::factory()->create();
+        $this->assertNotNull($verified->email_verified_at);
     }
 
     public function test_two_factor_type_enum_has_only_email(): void
