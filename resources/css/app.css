@@ -1541,6 +1541,80 @@ footer {
 .legal-prose p { color: var(--text-600); line-height: 1.8; font-size: 0.95rem; margin-bottom: 1rem; }
 
 /* ============================================================
+   PAGINATION (shared partial — styles live here, not in the blade)
+   ============================================================ */
+
+.luxury-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+}
+
+.pagination-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface-100);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    box-shadow: var(--shadow-sm);
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-num, .page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-decoration: none;
+    color: var(--text-600);
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.page-num:hover:not(.active) {
+    background: var(--surface-300);
+    color: var(--text-900);
+}
+
+.page-num.active {
+    background: var(--brand-primary);
+    color: var(--surface-100);
+}
+
+.page-btn {
+    color: var(--text-900);
+    border: 1px solid var(--border);
+}
+
+.page-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.page-btn:not(.disabled):hover {
+    background: var(--brand-accent);
+    color: white;
+    border-color: var(--brand-accent);
+}
+
+.page-dots { color: var(--text-400); }
+
+@media (max-width: 768px) {
+    .luxury-pagination { overflow-x: auto; }
+    .pagination-inner { flex-wrap: wrap; justify-content: center; gap: 0.75rem 0.5rem; padding: 0.75rem; border-radius: 1.5rem; }
+}
+
+/* ============================================================
    RESPONSIVE (moved from module blades)
    ============================================================ */
 
