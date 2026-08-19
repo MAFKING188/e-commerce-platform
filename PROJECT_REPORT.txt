@@ -666,3 +666,54 @@
 
 --------------------------------------------------------------------------------
 
+13. 2026-08-19 session (part 3) — enriched signup, password reset, full QA pass
+    Features added: signup enrichment (country + phone + confirm password +
+    newsletter opt-in + currency-from-country, commit 2cc2aae); password reset
+    flow (forgot/reset views, PasswordResetMail/PasswordChangedMail queued,
+    enumeration-safe controller responses, throttle:5,1 on POST, commit
+    645d32a); Google sign-up notice on auth forms. Both benchmarked against
+    Atlas-Learning (§5c) and verified live (see §5d/§5e email matrix).
+    Full suite: 86 tests / 335 assertions green.
+
+    BUGS FOUND & FIXED DURING QA:
+      BUG 2 (HIGH): Address & Security page save always failed — updateProfile()
+      required name/email, which the address form does not post. Fixed with
+      'sometimes|required' rules. Commit 08d8125. Regression test added.
+      BUG 3 (HIGH): Product/Category models had no $fillable -> partner/admin
+      product create returned MassAssignmentException 500. Fixed fillable.
+      Commit e03ef38. PartnerInventoryCreateTest added. Verified live.
+      BUG 4 (SECURITY/CRITICAL): 2fa.enrolled middleware only guarded the
+      IdentityAccess admin group; /admin/products, /admin/orders,
+      /admin/partners were reachable by an admin with NO 2FA (bypassing the
+      mandatory-2FA design). Added the gate to all three module admin groups.
+      Commit da3688e. Test extended to assert all five admin entry points.
+
+    QA MATRIX — all actors x all tasks, local (127.0.0.1:8001) + production:
+      GUEST: home/shop render, search, category filter, product detail, currency
+        switch (USD->EUR), guest add-to-bag -> login redirect, guest wishlist ->
+        login toast, signup via real form, forgot-password -> reset -> auto-login
+        end-to-end, Google notice render. All PASS (local + prod).
+      BUYER: wishlist toggle, cart add, checkout address form -> order store,
+        PayPal sandbox redirect + payments row (capture needs sandbox buyer creds
+        = external), order cancel, address save (after BUG 2 fix), password
+        change (alert mail queued), TOTP enroll/confirm/challenge/disable,
+        Google connect link render, review submit. All PASS.
+      PARTNER: dashboard, inventory create (after BUG 3 fix), edit stock, orders,
+        payouts. PASS local. Prod: console correctly requires a Partner registry
+        row (seeded example@gmail.com has none; real console belongs to the
+        owner account mafuletil@gmail.com) — gating verified.
+      ADMIN: 2FA gate redirects all five admin groups to /profile/settings until
+        enrollment (PASS local + prod after BUG 4 fix); dashboard, users,
+        products, orders, payouts, reviews render; approve flow covered by tests.
+
+    DEPLOYED: commits 08d8125, e03ef38, da3688e pushed and pulled to
+    smartshop-luwi.tech; verified live on prod (signup fields, reset page,
+    admin gate on /admin/dashboard + /admin/products + /admin/orders).
+    Server state backup before pull: /root/backups/smartshop/ (db dump
+    db_20260819_122528.sql + env + commit marker).
+
+    EXTERNAL DEPENDENCIES (require real accounts): PayPal sandbox capture (buyer
+    credentials), full Google OAuth loop (real Google account). Local admin 2FA
+    is enrolled for testing; production admin@test.com has NO 2FA — enroll it via
+    profile/settings before using the admin console there.
+--------------------------------------------------------------------------------
