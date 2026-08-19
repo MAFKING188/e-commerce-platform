@@ -76,3 +76,17 @@
         @endif
     @endif
 </div>
+
+<div class="profile-card">
+    <h2 class="pc-card__title">Google Account</h2>
+    @if ($user->google_id)
+        <p class="twofa-status">
+            Connected as
+            @if ($user->avatar) <img src="{{ $user->avatar }}" alt="" class="twofa-google-avatar"> @endif
+            <strong>{{ $user->email }}</strong>.
+        </p>
+    @else
+        <p class="twofa-status">Link your Google account to sign in without a password.</p>
+        <a href="{{ route('auth.google.redirect') }}" class="btn btn-primary">Connect Google Account</a>
+    @endif
+</div>

@@ -15,6 +15,9 @@ Route::post('/createaccount', [AuthController::class, 'register'])->middleware('
 Route::post('/accessaccount', [AuthController::class, 'login'])->middleware('throttle:auth');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/auth/google/redirect', [\Modules\IdentityAccess\Http\Controllers\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [\Modules\IdentityAccess\Http\Controllers\GoogleAuthController::class, 'handleCallback'])->name('auth.google.callback');
+
 Route::middleware(['2fa.pending'])->group(function () {
     Route::get('/2fa/challenge', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'challenge'])->name('2fa.challenge');
     Route::post('/2fa/challenge/verify', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'verify'])->middleware('throttle:2fa')->name('2fa.verify');

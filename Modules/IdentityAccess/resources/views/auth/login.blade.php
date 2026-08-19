@@ -27,6 +27,8 @@
             <button type="submit" class="auth-button">Sign In</button>
         </form>
 
+        @include('identityaccess::partials.auth-google')
+
         <p class="switch-auth">
             Don't have an account? <a href="{{ url('/signup') }}">Create one</a>
         </p>
