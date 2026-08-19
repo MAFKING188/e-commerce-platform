@@ -8,21 +8,27 @@ use Modules\MarketplacePipeline\Models\Cart;
 use Modules\MarketplacePipeline\Models\CartItem;
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\IdentityAccess\Services\OtpService;
 use Modules\MarketplacePipeline\Tests\TestCase;
 
 class CheckoutFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function deliveryPayload(): array
+    private function deliveryPayload(array $extra = []): array
     {
-        return [
+        return array_merge([
             'recipient_name' => 'Jane Doe',
             'recipient_phone' => '+1 555 0100',
             'shipping_line1' => 'Luxury Street 12',
             'shipping_city' => 'Milan',
             'shipping_country' => 'Italy',
-        ];
+        ], $extra);
+    }
+
+    private function verifiedPayload(User $user, array $extra = []): array
+    {
+        return $this->deliveryPayload($extra + ['code' => OtpService::issue($user)]);
     }
 
     private function makeCartWith(User $user, int $quantity): void
@@ -38,7 +44,7 @@ class CheckoutFlowTest extends TestCase
         $this->makeCartWith($user, 2);
 
         $this->actingAs($user)
-            ->post('/orders/store', $this->deliveryPayload())
+            ->post('/orders/store', $this->verifiedPayload($user))
             ->assertRedirect(route('orders.index'));
 
         $this->assertSame(1, Order::count());
@@ -54,7 +60,7 @@ class CheckoutFlowTest extends TestCase
         $this->makeCartWith($user, 1);
 
         $this->actingAs($user)
-            ->post('/orders/store', $this->deliveryPayload())
+            ->post('/orders/store', $this->verifiedPayload($user))
             ->assertRedirect(route('orders.index'));
 
         $order = Order::first();
@@ -87,7 +93,7 @@ class CheckoutFlowTest extends TestCase
         $this->product = Product::factory()->create(['price' => 10, 'stock' => 1]);
         $this->makeCartWith($user, 2);
 
-        $response = $this->actingAs($user)->post('/orders/store', $this->deliveryPayload());
+        $response = $this->actingAs($user)->post('/orders/store', $this->verifiedPayload($user));
 
         $response->assertSessionHasErrors();
         $this->assertSame(0, Order::count());
