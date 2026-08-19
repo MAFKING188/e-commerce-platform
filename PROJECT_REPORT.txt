@@ -717,3 +717,29 @@
     is enrolled for testing; production admin@test.com has NO 2FA — enroll it via
     profile/settings before using the admin console there.
 --------------------------------------------------------------------------------
+14. 2026-08-19 session (part 4) — Email-OTP 2FA for all risk tiers
+    Spec docs/superpowers/specs/2026-08-19-email-otp-2fa-design.md, plan
+    docs/superpowers/plans/2026-08-19-email-otp-2fa.md (7 tasks, TDD, commit per
+    task). Decision (owner): verification codes go BY EMAIL only — the
+    authenticator-app (TOTP) experience at login is removed entirely, and
+    verification is mandatory for all privileged actors.
+      - Challenge-before-login: Auth::login now only runs after a valid 6-digit
+        email code; admins and partners get the code at EVERY login with zero
+        enrollment setup. Ensure2faEnrolled middleware + 2fa.required flag
+        deleted (dead code). Admin route groups no longer carry 2fa.enrolled.
+      - Buyers: optional "Email Codes" login toggle (settings); MANDATORY
+        step-up code at checkout (StepUpService, 15-min verified marker),
+        password change, email change, and 2FA disable; MANDATORY email
+        verification at signup (verify-email page + resend, throttled).
+      - Schema: users.email_verified_at added; two_factor_secret dropped;
+        existing 'totp' rows converted to 'email'; pre-existing accounts
+        backfilled verified; Google sign-in users verified at creation.
+      - OtpMail fixed: markdown content() so the mail:: namespace renders under
+        MAIL_MAILER=array (was 500ing).
+      - Full suite: 99 tests / 333 assertions green.
+    Verified live: admin login -> email code -> challenge -> console; signup ->
+    verify page -> code -> verified; checkout -> code step -> order placed.
+    Deployed to smartshop-luwi.tech (migrate + route/config clear).
+    NOTE for owner: any session created before this deploy is invalid — sign in
+    again once; admins/partners get their code by email immediately, no setup.
+--------------------------------------------------------------------------------
