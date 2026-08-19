@@ -38,6 +38,27 @@ class ProfileTest extends TestCase
         $this->assertSame('Italy', $address->country);
     }
 
+    public function test_address_only_submission_from_security_page_saves_address(): void
+    {
+        $user = User::factory()->create(['status' => 'active']);
+
+        $this->actingAs($user)->put('/profile/update', [
+            'line1' => '88 Boulevard Mohammed V',
+            'line2' => 'Etage 2',
+            'city' => 'Casablanca',
+            'state' => 'Casablanca-Settat',
+            'zip' => '20000',
+            'country' => 'Morocco',
+        ])->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $address = Address::where('user_id', $user->id)->where('is_primary', true)->first();
+        $this->assertNotNull($address);
+        $this->assertSame('88 Boulevard Mohammed V', $address->line1);
+        $this->assertSame('Casablanca', $address->city);
+        $this->assertSame('Morocco', $address->country);
+    }
+
     public function test_profile_update_without_address_fields_leaves_address_untouched(): void
     {
         $user = User::factory()->create(['status' => 'active']);

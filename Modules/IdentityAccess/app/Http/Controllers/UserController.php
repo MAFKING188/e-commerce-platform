@@ -36,8 +36,8 @@ public function show()
         $user = Auth::user();
 
         $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'name' => 'sometimes|required|string|max:100',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:30',
 
             // Address validation (optional — set on the Address & Security page)
