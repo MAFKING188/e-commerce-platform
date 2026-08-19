@@ -166,6 +166,11 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isPartner(): bool
+    {
+        return $this->role === 'partner';
+    }
+
     public function twoFactorEnabled(): bool
     {
         return $this->two_factor_type !== null && $this->two_factor_confirmed_at !== null;
