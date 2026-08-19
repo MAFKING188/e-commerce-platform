@@ -28,7 +28,10 @@
         </form>
 
         <p class="switch-auth">
-            <a href="{{ url('/logout') }}">Not you? Sign out</a>
+            <form method="POST" action="{{ route('logout') }}" class="form-inline">
+                @csrf
+                <button type="submit" class="link-button">Not you? Sign out</button>
+            </form>
         </p>
     </div>
 </div>

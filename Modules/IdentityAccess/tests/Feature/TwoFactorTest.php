@@ -32,6 +32,16 @@ class TwoFactorTest extends TestCase
         $this->get('/2fa/challenge')->assertOk();
     }
 
+    public function test_challenge_sign_out_uses_post_form_not_get_link(): void
+    {
+        $admin = User::factory()->create(['status' => 'active', 'role' => 'admin']);
+        $this->post('/accessaccount', ['email' => $admin->email, 'password' => 'password']);
+        $response = $this->get('/2fa/challenge');
+        $response->assertOk()
+            ->assertSee('<form method="POST" action="' . route('logout'), false)
+            ->assertDontSee('href="' . url('/logout') . '"', false);
+    }
+
     public function test_admin_cannot_reach_admin_pages_before_challenge(): void
     {
         $admin = User::factory()->create(['status' => 'active', 'role' => 'admin']);
