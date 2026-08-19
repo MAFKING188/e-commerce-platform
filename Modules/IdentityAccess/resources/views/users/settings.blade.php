@@ -26,5 +26,9 @@
         </div>
     </section>
 
+    <section class="profile-section">
+        @include('identityaccess::partials.twofa-card', ['user' => $user])
+    </section>
+
 </x-profile-layout>
 </x-app-layout>
