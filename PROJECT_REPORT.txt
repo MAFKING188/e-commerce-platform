@@ -743,3 +743,13 @@
     NOTE for owner: any session created before this deploy is invalid — sign in
     again once; admins/partners get their code by email immediately, no setup.
 --------------------------------------------------------------------------------
+15. 2026-08-19 — Forgot-password "not sending" diagnosis
+    Root cause: queued mail (Mail::to()->queue()) + QUEUE_CONNECTION=database
+    with NO queue worker running locally -> every email (reset links, OTP codes,
+    confirmations) sat in the jobs table forever; the "reset link is on its way"
+    message is shown regardless. Local .env fixed to QUEUE_CONNECTION=sync.
+    Verified: forgot-password -> passwords.sent + token row + sync SMTP send;
+    reset link resolves 200. Prod: token created, worker processed the job
+    (0 pending), SMTP send OK. Reset tokens stored hashed (bcrypt) in DB;
+    email carries the broker plaintext token.
+--------------------------------------------------------------------------------
