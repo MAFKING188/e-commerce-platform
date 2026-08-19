@@ -39,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
+Route::middleware(['auth', 'admin', '2fa.enrolled'])->prefix('admin')->as('admin.')->group(function () {
     Route::get('/dashboard', [\Modules\IdentityAccess\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [\Modules\IdentityAccess\Http\Controllers\AdminProfileController::class, 'index'])->name('profile');
     Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show'])->names([

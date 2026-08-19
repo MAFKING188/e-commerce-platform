@@ -202,4 +202,41 @@ class TwoFactorTest extends TestCase
             ->assertSessionHasErrors('email');
         $this->assertGuest();
     }
+
+    /* ---------- admin enforcement ---------- */
+
+    public function test_admin_without_2fa_is_gated_from_admin_pages(): void
+    {
+        $admin = User::factory()->create(['status' => 'active', 'role' => 'admin']);
+
+        $this->post('/accessaccount', ['email' => $admin->email, 'password' => 'password'])
+            ->assertRedirect('/');
+        $this->assertTrue(session('2fa.required'));
+
+        $this->get('/admin/dashboard')->assertRedirect(route('profile.settings'));
+        $this->get('/admin/users')->assertRedirect(route('profile.settings'));
+    }
+
+    public function test_admin_2fa_flag_cleared_after_enrollment(): void
+    {
+        $admin = User::factory()->create(['status' => 'active', 'role' => 'admin']);
+
+        $this->post('/accessaccount', ['email' => $admin->email, 'password' => 'password']);
+        $this->assertTrue(session('2fa.required'));
+
+        $this->actingAs($admin)->post('/profile/settings/twofa/enable-totp', ['password' => 'password']);
+        $secret = $admin->fresh()->two_factor_secret;
+        $code = \PragmaRX\Google2FALaravel\Facade::getCurrentOtp($secret);
+        $this->actingAs($admin)->post('/profile/settings/twofa/confirm', ['code' => $code])->assertRedirect();
+
+        $this->assertNull(session('2fa.required'));
+        $this->actingAs($admin)->get('/admin/dashboard')->assertOk();
+    }
+
+    public function test_acting_as_admin_unaffected_by_gate(): void
+    {
+        $admin = User::factory()->create(['status' => 'active', 'role' => 'admin']);
+
+        $this->actingAs($admin)->get('/admin/dashboard')->assertOk();
+    }
 }
