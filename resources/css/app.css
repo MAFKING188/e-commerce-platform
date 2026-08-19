@@ -1563,6 +1563,9 @@ footer {
 .auth-google-btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: 0.75rem; background: var(--surface-100); color: var(--text-900); font-weight: 700; text-decoration: none; transition: all 0.3s ease; }
 .auth-google-btn:hover { border-color: var(--brand-primary); box-shadow: var(--shadow-sm); }
 .auth-google-icon { width: 20px; height: 20px; }
+.auth-google-notice { margin-top: 0.85rem; color: var(--text-400); font-size: 0.78rem; line-height: 1.5; text-align: center; }
+.auth-checkbox { display: flex; align-items: flex-start; gap: 0.5rem; margin: 1rem 0 1.25rem; color: var(--text-400); font-size: 0.85rem; line-height: 1.45; cursor: pointer; }
+.auth-checkbox input { margin-top: 0.2rem; accent-color: var(--brand-primary); }
 
 @media (max-width: 768px) {
     .twofa-options { grid-template-columns: 1fr; }

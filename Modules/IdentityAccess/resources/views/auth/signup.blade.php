@@ -19,8 +19,28 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" value="{{ old('phone') }}" required placeholder="+33 6 12 34 56 78" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <select name="country" class="form-input" required>
+                    <option value="" disabled {{ old('country') ? '' : 'selected' }}>Select your country</option>
+                    @foreach (\Modules\IdentityAccess\Support\Countries::all() as $code => $name)
+                        <option value="{{ $code }}" {{ old('country') === $code ? 'selected' : '' }}>{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Password</label>
                 <input type="password" name="password" required placeholder="Min. 8 characters" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" name="password_confirmation" required class="form-input">
             </div>
 
             <div class="form-group">
@@ -31,6 +51,11 @@
                     <option value="admin">System Administrator (Requires Confirmation)</option>
                 </select>
             </div>
+
+            <label class="auth-checkbox">
+                <input type="checkbox" name="newsletter_optin" value="1" {{ old('newsletter_optin') ? 'checked' : '' }}>
+                <span>Keep me updated on new acquisitions and exclusive offers.</span>
+            </label>
 
             <button type="submit" class="auth-button">Create Account</button>
         </form>

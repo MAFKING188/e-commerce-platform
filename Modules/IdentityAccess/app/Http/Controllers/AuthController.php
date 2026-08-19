@@ -20,8 +20,11 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'role' => 'required|in:user,partner,admin'
+            'password' => 'required|min:8|confirmed',
+            'role' => 'required|in:user,partner,admin',
+            'phone' => 'required|string|max:30',
+            'country' => 'required|string|size:2',
+            'newsletter_optin' => 'sometimes|boolean'
         ]);
 
         $status = ($data['role'] === 'user') ? 'active' : 'pending';
@@ -31,9 +34,19 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => $data['password'], // Password is hashed in the model cast
             'role' => $data['role'],
-            'status' => $status
+            'status' => $status,
+            'phone' => $data['phone'],
+            'country' => $data['country'],
+            'newsletter_optin' => $data['newsletter_optin'] ?? false
         ]);
         \Log::info('User Created:', $user->toArray());
+
+        $countryCurrency = [
+            'MA' => 'MAD', 'US' => 'USD', 'GB' => 'GBP',
+            'FR' => 'EUR', 'IT' => 'EUR', 'ES' => 'EUR', 'DE' => 'EUR',
+            'BE' => 'EUR', 'PT' => 'EUR', 'NL' => 'EUR',
+        ];
+        session(['currency' => $countryCurrency[$data['country']] ?? config('currency.default')]);
 
         // Partner artisan: scaffold their partner registry entry so the portal is immediately usable after approval
         if ($data['role'] === 'partner') {

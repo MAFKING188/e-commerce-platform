@@ -9,3 +9,8 @@
     </svg>
     Continue with Google
 </a>
+
+<p class="auth-google-notice">
+    Google sign-in creates a new member account automatically when your email isn't registered yet,
+    or links to an existing account with the same email. You can disconnect it anytime in Settings.
+</p>

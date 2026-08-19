@@ -17,6 +17,9 @@ class PartnerOnboardingTest extends TestCase
             'name' => 'New Artisan',
             'email' => 'newartisan@test.com',
             'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => '+212 6 00 00 00 00',
+            'country' => 'MA',
             'role' => 'partner'
         ]);
 
@@ -36,6 +39,9 @@ class PartnerOnboardingTest extends TestCase
             'name' => 'Regular Shopper',
             'email' => 'shopper@test.com',
             'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => '+212 6 00 00 00 00',
+            'country' => 'MA',
             'role' => 'user'
         ]);
 

@@ -31,6 +31,8 @@ class User extends Authenticatable
         'status',
         'avatars',
         'phone',
+        'country',
+        'newsletter_optin',
         'google_id',
         'avatar',
         'two_factor_secret',
@@ -56,6 +58,7 @@ class User extends Authenticatable
             'two_factor_secret' => 'encrypted',
             'two_factor_type' => \Modules\IdentityAccess\Enums\TwoFactorType::class,
             'two_factor_confirmed_at' => 'datetime',
+            'newsletter_optin' => 'boolean',
         ];
     }
 
