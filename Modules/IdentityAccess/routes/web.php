@@ -37,9 +37,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/security', [UserController::class, 'security'])->name('profile.security');
     Route::get('/profile/settings', [UserController::class, 'settings'])->name('profile.settings');
 
-    Route::post('/profile/settings/twofa/enable-totp', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'enableTotp'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.enable-totp');
     Route::post('/profile/settings/twofa/enable-email', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'enableEmail'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.enable-email');
-    Route::get('/profile/settings/twofa/qr', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'qr'])->name('profile.settings.twofa.qr');
     Route::post('/profile/settings/twofa/confirm', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'confirm'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.confirm');
     Route::post('/profile/settings/twofa/disable', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'disable'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.disable');
 
@@ -47,7 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
-Route::middleware(['auth', 'admin', '2fa.enrolled'])->prefix('admin')->as('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
     Route::get('/dashboard', [\Modules\IdentityAccess\Http\Controllers\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [\Modules\IdentityAccess\Http\Controllers\AdminProfileController::class, 'index'])->name('profile');
     Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show'])->names([

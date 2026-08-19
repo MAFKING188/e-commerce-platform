@@ -6,15 +6,11 @@
         <h1 class="auth-title">Verify Your Identity</h1>
         <p class="auth-subtitle">Enter the code to complete your sign-in.</p>
 
-        @if ($method === 'email')
-            <p class="twofa-hint">A 6-digit code was sent to <strong>{{ $user->email }}</strong>. It expires in 10 minutes.</p>
-            <form method="POST" action="{{ route('2fa.resend') }}" class="twofa-form">
-                @csrf
-                <button type="submit" class="btn btn-ghost">Resend Code</button>
-            </form>
-        @else
-            <p class="twofa-hint">Open your authenticator app and enter the current 6-digit code.</p>
-        @endif
+        <p class="twofa-hint">A 6-digit code was sent to <strong>{{ $user->email }}</strong>. It expires in 10 minutes.</p>
+        <form method="POST" action="{{ route('2fa.resend') }}" class="twofa-form">
+            @csrf
+            <button type="submit" class="btn btn-ghost">Resend Code</button>
+        </form>
 
         <form method="POST" action="{{ route('2fa.verify') }}">
             @csrf

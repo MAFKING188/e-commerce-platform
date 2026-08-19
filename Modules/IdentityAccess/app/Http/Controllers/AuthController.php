@@ -96,23 +96,18 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user->twoFactorEnabled()) {
+        if ($user->isAdmin() || $user->isPartner() || $user->twoFactorEnabled()) {
             session([
                 '2fa.pending' => $user->id,
                 '2fa.attempts' => 0,
-                '2fa.pending_method' => $user->twoFactorMethod(),
+                '2fa.pending_method' => 'email',
             ]);
-            if ($user->twoFactorMethod() === 'email') {
-                \Modules\IdentityAccess\Services\OtpService::send($user);
-            }
+            \Modules\IdentityAccess\Services\OtpService::send($user);
             return redirect()->route('2fa.challenge');
         }
 
         Auth::login($user);
         $request->session()->regenerate();
-        if ($user->isAdmin()) {
-            session(['2fa.required' => true]);
-        }
 
         return redirect()->intended('/');
     }

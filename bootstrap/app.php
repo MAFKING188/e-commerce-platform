@@ -19,7 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
         'admin' => \Modules\IdentityAccess\Http\Middleware\AdminMiddleware::class,
         'partner' => \Modules\IdentityAccess\Http\Middleware\PartnerMiddleware::class,
         '2fa.pending' => \Modules\IdentityAccess\Http\Middleware\Ensure2faChallenge::class,
-        '2fa.enrolled' => \Modules\IdentityAccess\Http\Middleware\Ensure2faEnrolled::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {

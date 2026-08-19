@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     })->name('paypal.cancel');
 });
 
-Route::prefix('admin')->middleware(['auth', 'admin', '2fa.enrolled'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');

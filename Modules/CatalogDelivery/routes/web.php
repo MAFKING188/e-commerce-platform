@@ -28,7 +28,7 @@ Route::get('/returns', fn () => app(LegalController::class)->show('returns'))->n
 | Administrative Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'admin', '2fa.enrolled'])->prefix('admin')->as('admin.')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(function () {
     Route::post('/products/{product}/reorder-images', [ProductController::class, 'reorderImages'])->name('products.reorder-images');
     Route::delete('/products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.delete-image');
     Route::resource('products', ProductController::class)->except(['show'])->names([

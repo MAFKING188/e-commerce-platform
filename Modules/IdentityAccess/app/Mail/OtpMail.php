@@ -30,6 +30,6 @@ class OtpMail extends Mailable implements ShouldQueue
 
     public function content(): Content
     {
-        return new Content(view: 'identityaccess::emails.otp');
+        return new Content(markdown: 'identityaccess::emails.otp');
     }
 }

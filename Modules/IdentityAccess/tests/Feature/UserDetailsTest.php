@@ -37,10 +37,10 @@ class UserDetailsTest extends TestCase
 
     public function test_two_factor_type_enum_round_trips(): void
     {
-        $user = User::factory()->create(['two_factor_type' => 'totp', 'two_factor_confirmed_at' => now()]);
+        $user = User::factory()->create(['two_factor_type' => 'email', 'two_factor_confirmed_at' => now()]);
 
         $this->assertTrue($user->twoFactorEnabled());
-        $this->assertSame('totp', $user->twoFactorMethod());
+        $this->assertSame('email', $user->twoFactorMethod());
     }
 
     public function test_two_factor_helpers_for_disabled_user(): void

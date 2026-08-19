@@ -72,8 +72,7 @@ class GoogleAuthTest extends TestCase
     {
         $user = User::factory()->create([
             'status' => 'active', 'email' => 'twofa@example.com',
-            'two_factor_secret' => 'ABCDEFGHIJKLMNOP',
-            'two_factor_type' => 'totp',
+            'two_factor_type' => 'email',
             'two_factor_confirmed_at' => now(),
         ]);
         $this->fakeGoogleUser('twofa@example.com');
