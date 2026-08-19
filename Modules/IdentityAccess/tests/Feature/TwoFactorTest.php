@@ -215,6 +215,9 @@ class TwoFactorTest extends TestCase
 
         $this->get('/admin/dashboard')->assertRedirect(route('profile.settings'));
         $this->get('/admin/users')->assertRedirect(route('profile.settings'));
+        $this->get('/admin/products')->assertRedirect(route('profile.settings'));
+        $this->get('/admin/orders')->assertRedirect(route('profile.settings'));
+        $this->get('/admin/partners')->assertRedirect(route('profile.settings'));
     }
 
     public function test_admin_2fa_flag_cleared_after_enrollment(): void
