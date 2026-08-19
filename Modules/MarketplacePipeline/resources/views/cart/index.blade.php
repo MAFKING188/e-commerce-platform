@@ -124,6 +124,19 @@
                 </div>
             </div>
         </div>
+    @if (session('stepup.pending') || $errors->has('code'))
+            <div class="delivery-section">
+                <div class="delivery-head">
+                    <h2>Verify Your Email</h2>
+                    <p>A 6-digit code was sent to <strong>{{ auth()->user()->email }}</strong>. Enter it to confirm your order. It expires in 10 minutes.</p>
+                </div>
+                <div class="form-group form-group--full">
+                    <label class="form-label" for="code">Verification Code</label>
+                    <input type="text" name="code" id="code" class="form-input" inputmode="numeric" maxlength="10" required autofocus>
+                    @error('code') <span class="form-error">{{ $message }}</span> @enderror
+                </div>
+            </div>
+        @endif
     </form>
 @else
     <div class="empty-state">

@@ -36,11 +36,25 @@ class OrderController extends Controller
             'delivery_notes' => 'nullable|string|max:1000',
         ]);
 
+        $user = auth()->user();
+        $session = $request->session();
+
+        if (! \Modules\IdentityAccess\Services\StepUpService::isVerified($session)) {
+            $code = trim((string) $request->input('code'));
+
+            if ($code === '' || ! \Modules\IdentityAccess\Services\OtpService::check($user, $code)) {
+                \Modules\IdentityAccess\Services\StepUpService::begin($user, $session);
+                return back()->withErrors(['code' => 'Enter the verification code sent to your email. A new code has been sent.']);
+            }
+
+            \Modules\IdentityAccess\Services\StepUpService::complete($session);
+        }
+
         try {
-            $order = $checkout->checkout(auth()->user(), $delivery);
+            $order = $checkout->checkout($user, $delivery);
 
             $order->load('items.product');
-            Mail::to(auth()->user())->send(new OrderConfirmed($order));
+            Mail::to($user)->send(new OrderConfirmed($order));
 
             return redirect()->route('orders.index')->with('status', 'Order placed successfully');
         } catch (\Exception $e) {
