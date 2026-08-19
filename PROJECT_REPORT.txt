@@ -209,16 +209,51 @@
      sign-in."). Audit events via Log::info (auth.2fa_* / auth.google_*).
    - Dependencies: laravel/socialite 5.30, pragmarx/google2fa-laravel 3.0.1,
      simplesoftwareio/simple-qrcode 4.2. Server needs php8.3-gd (installed).
-   - Config: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI
-     (empty until user creates Google Cloud OAuth credentials; button renders
-     and callback fails cleanly until then).
+- Config: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET set on the server .env;
+      authorized redirect URI https://smartshop-luwi.tech/auth/google/callback
+      (only required field; JS origins optional for the server-side flow).
+      The button is now fully functional on production.
 
 --------------------------------------------------------------------------------
-5c. PRODUCTION SIGNUP + PASSWORD RESET (2026-08-19)
+5c. ATLAS-LEARNING BLUEPRINT ANALYSIS (2026-08-19, read-only)
 --------------------------------------------------------------------------------
- Production-level account lifecycle additions, benchmarked against the
- Atlas-Learning blueprint (analyzed read-only: mailables, notifications,
- password broker, security settings):
+ Production-readiness benchmark: analyzed the sibling Laravel project
+ Atlas-Learning (/.../cours/LARAVEL/Atlas-Learning) WITHOUT modifying it.
+ Findings, and what was adopted vs. deferred:
+
+ ADOPTED (in this session):
+   - Password reset via Laravel's password broker (hashed 60-min tokens,
+     60s resend throttle, password_reset_tokens table) + dedicated
+     forgot/reset views (see 5d).
+   - Password-changed alert email on every change path (reset + settings).
+   - Queued markdown mailables for all new emails (Mail::to()->queue()),
+     matching Atlas's Mailable pattern.
+
+ DEFERRED / RECOMMENDED (matches Atlas production settings):
+   - config/mail.php default 'smtp' with 'failover' to log (Atlas uses
+     smtp->log failover) — currently Gmail SMTP direct.
+   - BCRYPT_ROUNDS=12 in .env (Atlas production intent).
+   - SESSION_SECURE_COOKIE=true in production (Atlas uses it).
+   - redis queue/session in production (Atlas) — currently database.
+   - Login audit (IP/UA + last_login_at) — Atlas records logins.
+   - Account status messages distinct per status (Atlas): pending/suspended
+     accounts get explicit notices at login.
+   - Admin-editable DB-driven email templates with {{placeholder}}
+     substitution + NotificationService (Atlas has a full admin email UI).
+   - jobs + failed_jobs tables + horizon-style failed-job cleanup: Atlas
+     ships both; we have jobs (queue worker) — failed_jobs exists in the
+     default migration but is unused/monitored.
+
+ EMAIL SCENARIOS Atlas covers (14): welcome, enrollment confirmation,
+ course completion, password reset, email verification, password changed,
+ dynamic admin email + contact form replies. Our e-commerce equivalents
+ are mapped in 5e below.
+
+--------------------------------------------------------------------------------
+5d. PRODUCTION SIGNUP + PASSWORD RESET (2026-08-19)
+--------------------------------------------------------------------------------
+ Production-level account lifecycle additions, adopting the priorities from
+ the Atlas-Learning blueprint (full analysis in 5c):
 
    - Signup /createaccount now collects: Full Name, Email, Phone (required,
      delivery contact), Country (ISO2 select, 23 curated countries, drives the
@@ -247,12 +282,12 @@
      tests; full suite 84 tests / 317 assertions green.
 
 --------------------------------------------------------------------------------
-5d. E-COMMERCE EMAIL SCENARIO MATRIX (next phase, derived from Atlas analysis)
+5e. E-COMMERCE EMAIL SCENARIO MATRIX (next phase, derived from Atlas analysis)
 --------------------------------------------------------------------------------
  Email scenarios a production e-commerce platform must cover; current state
  and priority (P0 = ship next, P1 = planned):
 
-   P0 Password reset / changed alerts .......... DONE (5c)
+   P0 Password reset / changed alerts .......... DONE (5d)
    P1 Email verification (verified email is the login gateway to password
       reset + order receipts) .................. MISSING
    P1 Order confirmation + receipt (buyer) ..... MISSING (OrderConfirmed exists
