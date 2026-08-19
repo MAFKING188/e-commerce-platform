@@ -214,6 +214,65 @@
      and callback fails cleanly until then).
 
 --------------------------------------------------------------------------------
+5c. PRODUCTION SIGNUP + PASSWORD RESET (2026-08-19)
+--------------------------------------------------------------------------------
+ Production-level account lifecycle additions, benchmarked against the
+ Atlas-Learning blueprint (analyzed read-only: mailables, notifications,
+ password broker, security settings):
+
+   - Signup /createaccount now collects: Full Name, Email, Phone (required,
+     delivery contact), Country (ISO2 select, 23 curated countries, drives the
+     currency session via a country->currency map: MA->MAD, US->USD, GB->GBP,
+     FR/IT/ES/DE/BE/PT/NL->EUR, else config default), Password + confirmation,
+     Account Type, and an opt-in newsletter checkbox (users.country +
+     users.newsletter_optin columns, migration 2026_08_19_120049).
+   - Google notice on login + signup (auth-google partial): explains auto-
+     create / auto-link behavior and how to disconnect in Settings.
+   - Password reset (previously MISSING): Laravel password broker
+     (password_reset_tokens table, 60-min expiry, hashed tokens, 60s resend
+     throttle) with:
+       GET/POST /forgot-password (name forgot-password / password.email,
+       POST throttled 5/min)
+       GET /reset-password/{token} + POST /reset-password (password.reset /
+       password.store).
+     Enumeration-safe: identical "If that email exists, a reset link is on its
+     way." response for unknown and known emails; no user-existence leak.
+   - Emails (markdown, queued): PasswordResetMail (branded button, 60-min
+     note) and PasswordChangedMail sent on BOTH reset and the existing
+     /profile/password settings change (which already regenerates the session
+     to kill other sessions).
+   - Login page: "Forgot password?" link; forgot-password / reset-password
+     views styled to the auth design system (zero inline styles).
+   - Tests: RegistrationTest (6) + PasswordResetTest (9) = 15 new feature
+     tests; full suite 84 tests / 317 assertions green.
+
+--------------------------------------------------------------------------------
+5d. E-COMMERCE EMAIL SCENARIO MATRIX (next phase, derived from Atlas analysis)
+--------------------------------------------------------------------------------
+ Email scenarios a production e-commerce platform must cover; current state
+ and priority (P0 = ship next, P1 = planned):
+
+   P0 Password reset / changed alerts .......... DONE (5c)
+   P1 Email verification (verified email is the login gateway to password
+      reset + order receipts) .................. MISSING
+   P1 Order confirmation + receipt (buyer) ..... MISSING (OrderConfirmed exists
+      but is not wired to the checkout flow)
+   P1 Order status emails (shipped/delivered) .. MISSING
+   P1 Order cancellation / refund .............. OrderCancelled mailable EXISTS
+      (needs wiring to cancellation path)
+   P1 New order notification (partner artisan) . MISSING
+   P2 Payout processed (partner) ............... MISSING
+   P2 Partner approval / rejection ............. UserStatusUpdated EXISTS
+      (verify it fires on approval)
+   P2 Account suspended / reactivated .......... UserStatusUpdated EXISTS
+   P2 Review request after delivery ............ MISSING
+   P2 Back-in-stock alert (wishlist) ........... MISSING
+   P2 Abandoned cart reminder .................. MISSING
+   P3 Low-stock alert (partner) ................ LowStockAlert EXISTS (wired to
+      admin inventory; extend to partner)
+   P3 Welcome email ............................ WelcomeMember EXISTS
+
+--------------------------------------------------------------------------------
 6. DESIGN SYSTEM & CODE CONVENTIONS
 --------------------------------------------------------------------------------
 
