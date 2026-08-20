@@ -71,7 +71,8 @@ class TwoFactorController extends Controller
         $userId = session('2fa.pending');
         $user = User::find($userId);
 
-        if (! $user || ! $user->twoFactorEnabled()) {
+        if (! $user || (! $user->twoFactorEnabled() && ! $user->isAdmin() && ! $user->isPartner())) {
+            session()->forget('2fa.pending');
             return redirect()->route('login');
         }
 
