@@ -84,7 +84,13 @@ class CartController extends Controller
 
     public function remove($id)
     {
-        $item = CartItem::findOrFail($id);
+        $item = CartItem::whereHas('cart', fn ($q) => $q->where('user_id', auth()->id()))
+            ->find($id);
+
+        if (! $item) {
+            abort(404);
+        }
+
         $item->delete();
 
         return back()->with('status', 'Item removed');
