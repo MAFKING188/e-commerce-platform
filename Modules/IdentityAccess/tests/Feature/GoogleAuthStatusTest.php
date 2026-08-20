@@ -3,8 +3,10 @@
 namespace Modules\IdentityAccess\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Modules\IdentityAccess\Mail\OtpMail;
 use Modules\IdentityAccess\Models\User;
 use Tests\TestCase;
 
@@ -43,6 +45,8 @@ class GoogleAuthStatusTest extends TestCase
 
     public function test_active_admin_without_2fa_is_forced_through_challenge(): void
     {
+        Mail::fake();
+
         $user = User::create([
             'name' => 'Admin',
             'email' => 'admin@test.com',
@@ -57,6 +61,7 @@ class GoogleAuthStatusTest extends TestCase
 
         $this->get('/auth/google/callback')
             ->assertRedirect(route('2fa.challenge'));
+        Mail::assertQueued(OtpMail::class);
         $this->assertGuest();
     }
 }

@@ -55,22 +55,20 @@ class GoogleAuthController extends Controller
             ]);
         }
 
-        Log::info('auth.google_linked', ['user' => $user->id]);
-
         if ($user->status !== 'active') {
             Log::warning('auth.google_status_blocked', ['user' => $user->id, 'status' => $user->status]);
             return redirect()->route('login')->withErrors(['email' => 'Your account is currently ' . $user->status . '. Please contact support.']);
         }
 
-        if ($user->twoFactorEnabled() || $user->isAdmin() || $user->isPartner()) {
+        Log::info('auth.google_linked', ['user' => $user->id]);
+
+        if ($user->isAdmin() || $user->isPartner() || $user->twoFactorEnabled()) {
             session([
                 '2fa.pending' => $user->id,
                 '2fa.attempts' => 0,
-                '2fa.pending_method' => $user->twoFactorMethod(),
+                '2fa.pending_method' => 'email',
             ]);
-            if ($user->twoFactorMethod() === 'email') {
-                OtpService::send($user);
-            }
+            OtpService::send($user);
             return redirect()->route('2fa.challenge');
         }
 
