@@ -21,6 +21,11 @@ class ViewController extends Controller
         ]);
     }
 
+    public function collection(CatalogQueryService $catalog)
+    {
+        return view('catalogdelivery::collection', $catalog->home());
+    }
+
     public function product($id, CatalogQueryService $catalog)
     {
         return view('catalogdelivery::product', $catalog->product($id));

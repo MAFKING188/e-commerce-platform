@@ -42,7 +42,7 @@
         <div class="nav-menu" id="nav-menu">
             <div class="nav-links">
                 <a href="{{ route('home') }}">Discovery</a>
-                <a href="{{ route('shop') }}">Collection</a>
+                <a href="{{ route('collection') }}">Collection</a>
                 <a href="{{ route('about') }}">Story</a>
                 <a href="{{ route('contact') }}">Support</a>
             </div>
@@ -153,8 +153,8 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="{{ route('shop') }}">All Products</a></li>
-                    <li><a href="#">New Arrivals</a></li>
-                    <li><a href="#">Featured</a></li>
+                    <li><a href="{{ route('collection') }}#new-arrivals">New Arrivals</a></li>
+                    <li><a href="{{ route('collection') }}#featured">Featured</a></li>
                 </ul>
             </div>
             <div class="footer-links">

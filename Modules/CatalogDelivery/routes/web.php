@@ -17,6 +17,7 @@ use Modules\CatalogDelivery\Http\Controllers\ViewController;
 */
 Route::get('/', [ViewController::class, 'home'])->name('home');
 Route::get('/shop', [ViewController::class, 'shop'])->name('shop');
+Route::get('/collection', [ViewController::class, 'collection'])->name('collection');
 Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.show');
 Route::get('/about', [ViewController::class, 'about'])->name('about');
 Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
