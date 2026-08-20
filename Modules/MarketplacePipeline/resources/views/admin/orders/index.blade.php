@@ -11,6 +11,7 @@
     </div>
 </div>
 
+@if($orders->isNotEmpty())
 <div class="pc-table-wrap">
     <table class="pc-table">
         <thead>
@@ -47,4 +48,14 @@
         </tbody>
     </table>
 </div>
+
+<div class="pc-pagination">
+    {{ $orders->links() }}
+</div>
+@else
+<div class="review-empty">
+    <svg class="review-empty-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <p>No orders recorded yet.</p>
+</div>
+@endif
 </x-app-layout>
