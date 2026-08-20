@@ -303,7 +303,7 @@ e-commerce-platform/
 - `OtpService` — 6-digit email OTP: `issue($user)` (returns plaintext, bcrypt-hashed in cache `2fa:otp:{id}`, TTL 600s, single-use), `check($user, $code)`, `send($user)`. Queues `OtpMail`.
 - `StepUpService` — step-up marker for sensitive buyer actions (checkout, password/email change, 2FA disable): `begin($user)` (15-min `stepup.verified` session flag), `isVerified`, `complete`, `invalidate`.
 
-### 6.6 Mailables (8) — 7 queued (ShouldQueue)
+### 6.6 Mailables (9) — 8 queued (ShouldQueue)
 - `WelcomeMember` (queued) — markdown `emails.members.welcome`
 - `OrderConfirmed` (queued) — markdown `emails.orders.confirmed` (⚠ template has stray trailing `tml>`)
 - `OrderCancelled` (queued) — markdown `emails.orders.cancelled`
@@ -312,6 +312,7 @@ e-commerce-platform/
 - `OtpMail` (queued) — markdown `emails.otp`; generic "Your LUWI verification code" (login challenge, signup verify, step-up)
 - `PasswordResetMail` (queued) — markdown `emails.password.reset`; link = `url('/reset-password/{token}')` (plaintext token)
 - `PasswordChangedMail` (queued) — markdown `emails.password.changed`
+- `ContactMessageMail` (queued) — markdown `emails.contact-message`; to `config('shop.contact_email')`, `Reply-To` = submitter
 
 ⚠ **Local dev:** `QUEUE_CONNECTION=sync` — no worker runs locally; `database` queue silently stalls all mail (see `PROJECT_REPORT.txt` §15).
 
@@ -336,6 +337,7 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | GET | `/artisan-profile/{id}` | ViewController@partnerProfile | `partner.profile` |
 | GET | `/about` | ViewController@about | `about` |
 | GET | `/contact` | ViewController@contact | `contact` |
+| POST | `/contact` | ContactController@store | `contact.store` (throttle:5,1 — persists to `contact_messages` + queues `ContactMessageMail`) |
 | GET | `/login` | closure → auth.login | `login` (guest) |
 | GET | `/signup` | closure → auth.signup | `signup` (guest) |
 | GET | `/forgot-password` | PasswordResetController@showForgotForm | `forgot-password` (guest) |
@@ -478,7 +480,7 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | `product.blade.php` | `product.show` | Gallery + thumbnails, add-to-bag POST → `cart.add`, reviews section (⚠ no submit form), related products |
 | `partner_profile.blade.php` | `partner.profile` | Public artisan page: name/description/website + products |
 | `wishlist.blade.php` | `profile.wishlist` | "Your Archive" via product cards (⚠ backed by broken controller) |
-| `about.blade.php`, `contact.blade.php` | about / contact | contact form is **dummy** (`action="#"`) — no backend |
+| `about.blade.php`, `contact.blade.php` | about / contact | contact form wired: POST `/contact` → `contact_messages` + queued mail + admin list (`admin/contacts`) |
 | `components/product-card.blade.php` | — (component) | Card with `@money`, partner attribution, wishlist heart → `toggleWishlist()` |
 
 ### 8.3 Auth views
@@ -572,7 +574,7 @@ Every rendered page and the backend it exercises:
 | # | Gap | Details |
 |---|---|---|
 | 1 | **API surface has no consumer/docs/tests** | `/api/login`, `/api/register`, `/api/catalog`, `/api/user` are registered but nothing in the UI uses them; no API tests; no docs. Fine as a design decision, but currently unverifiable. |
-| 2 | **Contact form is a dummy** | `contact.blade.php` uses `action="#"`; no backend endpoint handles messages. |
+| 2 | ~~Contact form dummy~~ **FIXED 2026-08-19** | `contact.blade.php` → POST `/contact`; messages persisted (`contact_messages`), queued to `config('shop.contact_email')` w/ reply-to submitter, admin list at `admin/contacts` |
 
 ### 🟡 Low
 | # | Gap | Details |
@@ -593,7 +595,7 @@ Every rendered page and the backend it exercises:
 | `ProductVariant` model + `product_variants` table | Modules/CatalogDelivery | Unused by design (future variant support) |
 | `emails/orders/confirmed.blade.php` stray `tml>` typo | Modules/MarketplacePipeline | Historical; harmless |
 | `AuthController@apiRegister/apiLogin` | Modules/IdentityAccess | Live but undocumented API surface |
-| `contact.blade.php` | Modules/CatalogDelivery | `action="#"` dummy (see §10) |
+| ~~`contact.blade.php` dummy~~ | Modules/CatalogDelivery | **fixed 2026-08-19** (see §10) |
 
 ---
 
@@ -616,7 +618,7 @@ Every rendered page and the backend it exercises:
 - ✅ Business rules in `config/shop.php` (commission rate, default currency)
 - ✅ Rate limiting on auth (5/min) and checkout (3/min) via `RateLimiter::for` in TelemetryPipeline
 - ✅ **Modular monolith migration executed** (commits `2b1cc33`..`da1e36f`; see §15.9)
-- ✅ **Email-OTP verification layer** (2026-08-19, commits `3ba967e`..`3b431e4`): mandatory email code challenge before login for admins + partners; buyer opt-in email codes; step-up codes at checkout, password/email change, 2FA disable; mandatory signup email verification; TOTP removed; `Ensure2faEnrolled` deleted; all five admin route groups gated (bug-fix `da3688e`). Full suite **100 tests / 336 assertions** green; deployed + live-verified on smartshop-luwi.tech (spec/plan in `docs/superpowers/`)
+- ✅ **Email-OTP verification layer** (2026-08-19, commits `3ba967e`..`3b431e4`): mandatory email code challenge before login for admins + partners; buyer opt-in email codes; step-up codes at checkout, password/email change, 2FA disable; mandatory signup email verification; TOTP removed; `Ensure2faEnrolled` deleted; all five admin route groups gated (bug-fix `da3688e`). Full suite **106 tests / 360 assertions** green; deployed + live-verified on smartshop-luwi.tech (spec/plan in `docs/superpowers/`)
 
 ### 12.2 Reported PENDING / TODO
 
@@ -640,7 +642,7 @@ Every rendered page and the backend it exercises:
 | 🟠 Stability | Contact form dummy (`action="#"`); `carts` down() typo (historical, migrate:fresh clean) |
 | 🟠 Ops | Local file storage (needs S3/Cloudinary); no async failure logging; `APP_DEBUG=true` |
 | 🟡 Code | Business logic still heavy in controllers (service layer only for payout/checkout/low-stock/currency); partner console filters validated in-controller; duplicate `pending/paid/completed/cancelled` status strings across modules (no shared enum) |
-| 🟡 Tests | 100 tests / 336 assertions (IdentityAccess: 2FA/OTP, signup verification, profiles, resets; MarketplacePipeline: checkout w/ step-up, payouts, wishlist, reviews) — no API tests, no rate-limiter test |
+| 🟡 Tests | 106 tests / 360 assertions (IdentityAccess: 2FA/OTP, signup verification, profiles, resets; MarketplacePipeline: checkout w/ step-up, payouts, wishlist, reviews) — no API tests, no rate-limiter test |
 
 ---
 

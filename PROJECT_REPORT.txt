@@ -756,3 +756,20 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
     (0 pending), SMTP send OK. Reset tokens stored hashed (bcrypt) in DB;
     email carries the broker plaintext token.
 --------------------------------------------------------------------------------
+16. 2026-08-19 session (part 5) — Working contact form + sender hygiene
+    - MAIL_FROM_ADDRESS changed on production to luiemafking@gmail.com (the
+      Gmail account whose SMTP sends all mail). Branded no-reply@smartshop-luwi.tech
+      requires Gmail "Send mail as" verification (DNS TXT or hosted file + SPF
+      include:_spf.google.com) — documented, not required for delivery.
+      The non-existent noreply@uca.ac.ma existed in no repo file here.
+    - Contact form (was dummy action="#") now: POST /contact (throttle:5,1),
+      validated, persisted to contact_messages (name/email/message/IP/UA),
+      queues ContactMessageMail to config('shop.contact_email')
+      (CONTACT_RECIPIENT env, default mafuletil@gmail.com) with Reply-To =
+      submitter; admin list + delete at admin/contacts (nav "Contacts").
+    - Bug found in live prod QA: Envelope replyTo must be Address objects
+      ([$email, $name] fails RFC 2822 "does not comply with addr-spec");
+      fixed + regression test (envelope introspection, not Mail::fake).
+    - Full suite: 106 tests / 360 assertions green. Live-verified local + prod
+      (message persisted, queued mail processed by worker, no new failures).
+--------------------------------------------------------------------------------
