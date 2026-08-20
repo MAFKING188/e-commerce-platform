@@ -136,6 +136,18 @@ public function show()
         return redirect()->back()->with('success', 'Password updated successfully');
     }
 
+    public function sendEmailCode()
+    {
+        \Modules\IdentityAccess\Services\OtpService::send(Auth::user());
+        return back()->with('status', 'A verification code was sent to your email. It expires in 10 minutes.');
+    }
+
+    public function sendPasswordCode()
+    {
+        \Modules\IdentityAccess\Services\OtpService::send(Auth::user());
+        return back()->with('status', 'A verification code was sent to your email. It expires in 10 minutes.');
+    }
+
     /**
      * ADMINISTRATIVE: Update any user (Role, Name, Email)
      */

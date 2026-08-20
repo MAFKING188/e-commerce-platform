@@ -45,6 +45,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/settings/twofa/confirm', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'confirm'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.confirm');
     Route::post('/profile/settings/twofa/disable', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'disable'])->middleware('throttle:2fa-enroll')->name('profile.settings.twofa.disable');
 
+    Route::post('/profile/send-email-code', [UserController::class, 'sendEmailCode'])->middleware('throttle:2fa-resend')->name('profile.send-email-code');
+    Route::post('/profile/send-password-code', [UserController::class, 'sendPasswordCode'])->middleware('throttle:2fa-resend')->name('profile.send-password-code');
+    Route::post('/profile/settings/twofa/send-disable-code', [\Modules\IdentityAccess\Http\Controllers\TwoFactorController::class, 'sendDisableCode'])->middleware('throttle:2fa-resend')->name('profile.settings.twofa.send-disable-code');
+
     Route::get('/archive', [WishlistController::class, 'index'])->name('profile.wishlist');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });

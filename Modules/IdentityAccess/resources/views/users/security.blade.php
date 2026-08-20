@@ -68,9 +68,13 @@
                         <label class="form-label">Verification Code</label>
                         <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10" required>
                         <p class="form-hint">A code is sent to your email to confirm this change.</p>
+                        <button type="button" class="btn btn-ghost" onclick="document.getElementById('send-password-code').submit()">Send Code</button>
                         @error('code') <p class="form-error">{{ $message }}</p> @enderror
                     </div>
                 <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+            <form id="send-password-code" action="{{ route('profile.send-password-code') }}" method="POST" class="inline-form">
+                @csrf
             </form>
         </div>
     </section>

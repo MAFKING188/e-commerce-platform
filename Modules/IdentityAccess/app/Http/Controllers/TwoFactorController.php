@@ -140,6 +140,12 @@ class TwoFactorController extends Controller
         return back()->with('status', 'Two-factor authentication is now active.');
     }
 
+    public function sendDisableCode(Request $request)
+    {
+        OtpService::send($request->user());
+        return back()->with('status', 'A verification code was sent to your email. It expires in 10 minutes.');
+    }
+
     /* ---------- disable ---------- */
 
     public function disable(Request $request)

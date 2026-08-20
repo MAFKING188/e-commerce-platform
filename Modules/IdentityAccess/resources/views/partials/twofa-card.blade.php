@@ -15,9 +15,13 @@
                 <label class="form-label">Verification Code</label>
                 <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10" required>
                 <p class="form-hint">A code is sent to your email to confirm disabling.</p>
+                <button type="button" class="btn btn-ghost" onclick="document.getElementById('send-disable-code').submit()">Send Code</button>
                 @error('code') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <button type="submit" class="btn btn-ghost btn-danger">Disable Two-Factor Authentication</button>
+        </form>
+        <form id="send-disable-code" action="{{ route('profile.settings.twofa.send-disable-code') }}" method="POST" class="inline-form">
+            @csrf
         </form>
     @else
         <p class="twofa-status">Your account is protected by a password only. Add a second verification step to keep it secure.</p>

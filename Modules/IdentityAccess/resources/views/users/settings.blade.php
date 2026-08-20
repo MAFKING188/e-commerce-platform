@@ -25,9 +25,13 @@
                     <label class="form-label">Verification Code</label>
                     <input type="text" name="code" class="form-input" inputmode="numeric" maxlength="10">
                     <p class="form-hint">Required only when changing your email address.</p>
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('send-email-code').submit()">Send Code</button>
                     @error('code') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
                 <button type="submit" class="btn btn-primary">Save Account Details</button>
+            </form>
+            <form id="send-email-code" action="{{ route('profile.send-email-code') }}" method="POST" class="inline-form">
+                @csrf
             </form>
         </div>
     </section>
