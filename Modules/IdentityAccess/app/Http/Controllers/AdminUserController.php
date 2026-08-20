@@ -106,7 +106,12 @@ class AdminUserController extends Controller
             return back()->with('error', 'Suicide is not a solution (You cannot delete yourself).');
         }
 
-        User::destroy($id);
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->with('error', 'Cannot purge this member: they have orders or partner records. Suspend the account instead.');
+        }
         $this->telemetry->log('admin.users.destroy', ['user_id' => $id]);
         return redirect()->back()->with('success', 'Member purged from registry.');
     }

@@ -133,6 +133,10 @@
         showToast("{{ session('status') ?? session('success') }}", 'success');
     @endif
 
+    @if(session('error'))
+        showToast("{{ session('error') }}", 'error');
+    @endif
+
     @if($errors->any())
         @foreach ($errors->all() as $error)
             showToast("{{ $error }}", 'error');

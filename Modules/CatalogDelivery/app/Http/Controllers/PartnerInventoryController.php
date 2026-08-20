@@ -48,13 +48,17 @@ class PartnerInventoryController extends Controller
         }
 
         if ($action === 'delete') {
-            $products = $partner->products()->whereIn('products.id', $ids)->get();
-            foreach ($products as $product) {
-                // Detach from partner and delete product
-                $partner->products()->detach($product->id);
-                $product->delete();
+            try {
+                $products = $partner->products()->whereIn('products.id', $ids)->get();
+                foreach ($products as $product) {
+                    // Detach from partner and delete product
+                    $partner->products()->detach($product->id);
+                    $product->delete();
+                }
+                return redirect()->back()->with('success', count($ids) . ' products removed from inventory.');
+            } catch (\Illuminate\Database\QueryException $e) {
+                return redirect()->back()->with('error', 'Some products could not be removed because they are referenced by orders, carts, or reviews.');
             }
-            return redirect()->back()->with('success', count($ids) . ' products removed from inventory.');
         }
 
         return redirect()->back()->with('error', 'Invalid bulk action.');
@@ -166,9 +170,14 @@ class PartnerInventoryController extends Controller
     {
         $partner = $this->getPartner();
         $product = $partner->products()->findOrFail($id);
-        
-        $partner->products()->detach($product->id);
-        $product->delete();
+
+        try {
+            $partner->products()->detach($product->id);
+            $product->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('partner.inventory.index')
+                ->with('error', 'Cannot delete this product: it is referenced by existing orders, carts, or reviews.');
+        }
 
         return redirect()->route('partner.inventory.index')->with('success', 'Product removed');
     }

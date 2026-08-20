@@ -48,8 +48,14 @@ class CategoryController extends Controller
     
     public function destroy($id)
     {
-        Category::destroy($id);
-        return redirect()->back()->with('success', 'Category deleted');
+        try {
+            $category = Category::findOrFail($id);
+            $category->delete();
+            return redirect()->back()->with('success', 'Category deleted');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->back()
+                ->with('error', 'Cannot delete this category: it still contains products.');
+        }
     }
 
 

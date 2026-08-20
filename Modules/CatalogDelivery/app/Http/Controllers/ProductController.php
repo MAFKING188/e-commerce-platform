@@ -105,7 +105,13 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        Product::destroy($id);
-        return redirect()->route('admin.products.index')->with('success', 'Product Removed successfully');
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
+            return redirect()->route('admin.products.index')->with('success', 'Product Removed successfully');
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('admin.products.index')
+                ->with('error', 'Cannot delete this product: it is referenced by existing orders, carts, or reviews.');
+        }
     }
 }
