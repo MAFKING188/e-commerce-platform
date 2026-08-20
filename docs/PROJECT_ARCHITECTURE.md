@@ -619,6 +619,7 @@ Every rendered page and the backend it exercises:
 - ✅ Rate limiting on auth (5/min) and checkout (3/min) via `RateLimiter::for` in TelemetryPipeline
 - ✅ **Modular monolith migration executed** (commits `2b1cc33`..`da1e36f`; see §15.9)
 - ✅ **Email-OTP verification layer** (2026-08-19, commits `3ba967e`..`3b431e4`): mandatory email code challenge before login for admins + partners; buyer opt-in email codes; step-up codes at checkout, password/email change, 2FA disable; mandatory signup email verification; TOTP removed; `Ensure2faEnrolled` deleted; all five admin route groups gated (bug-fix `da3688e`). Full suite **106 tests / 360 assertions** green; deployed + live-verified on smartshop-luwi.tech (spec/plan in `docs/superpowers/`)
+- ✅ **Coherent marketplace catalog + /collection page** (2026-08-20, commit `fa71ce1`): `/collection` editorial page (hero + New Arrivals + Featured) with nav/footer links; 8 faker categories removed; Beauty & Wellness, Sports & Outdoors, Toys & Games added (15 products each); every product renamed to a unique coherent name (zero duplicates; live DB 65→110 products); `CatalogInventory` seeder class is the single source of truth for `ProductSeeder` + live-DB migration `2026_08_19_170001_coherent_catalog`; no `href="#"` remains. Full suite **113 tests / 401 assertions** green; deployed + live-verified.
 
 ### 12.2 Reported PENDING / TODO
 
@@ -642,7 +643,7 @@ Every rendered page and the backend it exercises:
 | 🟠 Stability | Contact form dummy (`action="#"`); `carts` down() typo (historical, migrate:fresh clean) |
 | 🟠 Ops | Local file storage (needs S3/Cloudinary); no async failure logging; `APP_DEBUG=true` |
 | 🟡 Code | Business logic still heavy in controllers (service layer only for payout/checkout/low-stock/currency); partner console filters validated in-controller; duplicate `pending/paid/completed/cancelled` status strings across modules (no shared enum) |
-| 🟡 Tests | 106 tests / 360 assertions (IdentityAccess: 2FA/OTP, signup verification, profiles, resets; MarketplacePipeline: checkout w/ step-up, payouts, wishlist, reviews) — no API tests, no rate-limiter test |
+| 🟡 Tests | 113 tests / 401 assertions (IdentityAccess: 2FA/OTP, signup verification, profiles, resets; MarketplacePipeline: checkout w/ step-up, payouts, wishlist, reviews; CatalogDelivery: contact form, collection page, catalog coherence) — no API tests, no rate-limiter test |
 
 ---
 

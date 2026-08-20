@@ -773,3 +773,25 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
     - Full suite: 106 tests / 360 assertions green. Live-verified local + prod
       (message persisted, queued mail processed by worker, no new failures).
 --------------------------------------------------------------------------------
+17. 2026-08-20 session (part 1) — Coherent marketplace catalog + /collection page
+    Dead ends fixed: /collection now a real editorial page (was 404 while the
+    nav labeled a link "Collection"), footer New Arrivals/Featured anchors
+    pointed at "#", and the catalog was placeholder-grade (numbered duplicate
+    names like "Aether Pro Laptop 1..15", 8 faker junk categories).
+    - Multi-vendor platform: categories stay generic (Electronics, Clothing,
+      Home & Kitchen, Books kept; faker categories deleted).
+    - New categories: Beauty & Wellness, Sports & Outdoors, Toys & Games
+      (15 products each); every product now has a unique coherent name
+      (zero duplicates; live DB 65 -> 110 products).
+    - Single source of truth: Modules/CatalogDelivery/database/seeders/
+      CatalogInventory.php (7 categories, 105 names, shared Unsplash id set)
+      used by ProductSeeder AND the live-DB migration
+      (2026_08_19_170001_coherent_catalog: renames + junk cleanup + new cats).
+    - GET /collection -> ViewController@collection -> collection.blade.php
+      (hero + New Arrivals #new-arrivals + Featured #featured); nav
+      "Collection" link + footer links now target it; zero href="#" left.
+    - Tests: CollectionPageTest (page 200, sections, no dead links),
+      CatalogCoherenceTest (7 categories only, unique names, no numbered
+      placeholders, >=15 products/category). Full suite: 113 tests /
+      401 assertions green. Deployed + live-verified on prod.
+--------------------------------------------------------------------------------
