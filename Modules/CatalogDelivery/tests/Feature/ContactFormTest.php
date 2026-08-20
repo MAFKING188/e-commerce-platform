@@ -84,4 +84,24 @@ class ContactFormTest extends TestCase
         $user = User::factory()->create(['status' => 'active', 'role' => 'user']);
         $this->actingAs($user)->get('/admin/contacts')->assertRedirect();
     }
+
+    public function test_contact_message_mail_reply_to_uses_valid_rfc2822_address(): void
+    {
+        $message = ContactMessage::create([
+            'first_name' => 'Prod',
+            'last_name' => 'QA',
+            'email' => 'qa-prod@example.com',
+            'message' => 'Address validation regression check.',
+        ]);
+
+        $mail = new ContactMessageMail($message);
+        $replyTo = $mail->envelope()->replyTo;
+
+        $this->assertCount(1, $replyTo);
+        $this->assertSame('qa-prod@example.com', $replyTo[0]->address);
+        $this->assertSame('Prod QA', $replyTo[0]->name);
+
+        $rendered = $mail->render();
+        $this->assertStringContainsString('Prod QA', $rendered);
+    }
 }
