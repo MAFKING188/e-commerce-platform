@@ -15,10 +15,9 @@ class PartnerMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(auth()->user() && auth()->user()->role === 'partner')
-        {
+        if (auth()->user() && auth()->user()->role === 'partner' && auth()->user()->status === 'active') {
             return $next($request);
         }
-        return redirect()->route('home')->with('error', 'Access denied: Partner artisan access required.');
+        return redirect()->route('home')->with('error', 'Access denied');
     }
 }

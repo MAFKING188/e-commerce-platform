@@ -15,11 +15,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(auth()->user() && auth()->user()->role === 'admin')
-            {
-                return $next($request);
-            }
-        return redirect()->route('home')->with('error','Access denied');
+        if (auth()->user() && auth()->user()->role === 'admin' && auth()->user()->status === 'active') {
+            return $next($request);
+        }
+        return redirect()->route('home')->with('error', 'Access denied');
 
         /*
 
