@@ -38,6 +38,8 @@ class PartnerController extends Controller
             Log::info('Partner Store Request Data: ', $request->validated());
             $data = $request->validated();
             Partner::create($data);
+            $user = User::findOrFail($data['user_id']);
+            $user->forceFill(['role' => 'partner', 'status' => 'active'])->save();
             return redirect()->route('admin.partners.index')->with('success', 'Partner established successfully');
         } catch (\Exception $e) {
             Log::error("Partner Creation Error: " . $e->getMessage());

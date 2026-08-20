@@ -3,6 +3,7 @@
 namespace Modules\PartnerHub\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Modules\IdentityAccess\Models\User;
 
 class StorePartnerRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class StorePartnerRequest extends FormRequest
             'description' => 'nullable|string|max:2000',
             'contact_info' => 'nullable|string|max:1000',
             'website' => 'nullable|url|max:255',
-            'user_id' => 'required|exists:users,id'
+            'user_id' => 'required|exists:users,id|not_in:' . implode(',', User::where('role', 'admin')->pluck('id')->all())
         ];
     }
 
