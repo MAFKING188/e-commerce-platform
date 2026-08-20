@@ -57,7 +57,12 @@ class GoogleAuthController extends Controller
 
         Log::info('auth.google_linked', ['user' => $user->id]);
 
-        if ($user->twoFactorEnabled()) {
+        if ($user->status !== 'active') {
+            Log::warning('auth.google_status_blocked', ['user' => $user->id, 'status' => $user->status]);
+            return redirect()->route('login')->withErrors(['email' => 'Your account is currently ' . $user->status . '. Please contact support.']);
+        }
+
+        if ($user->twoFactorEnabled() || $user->isAdmin() || $user->isPartner()) {
             session([
                 '2fa.pending' => $user->id,
                 '2fa.attempts' => 0,
@@ -71,9 +76,6 @@ class GoogleAuthController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
-        if ($user->isAdmin()) {
-            session(['2fa.required' => true]);
-        }
 
         return redirect()->intended('/');
     }
