@@ -18,7 +18,7 @@
     </div>
 </section>
 
-<section class="luxury-section home-section-spaced">
+<section id="editor-choice" class="luxury-section home-section-spaced">
     <div class="home-section-head">
         <span class="home-eyebrow-sm">Curated Selection</span>
         <h2 class="home-section-title">Editor's Choice.</h2>
@@ -31,7 +31,7 @@
     </div>
 </section>
 
-<section class="luxury-section">
+<section id="new-arrivals" class="luxury-section">
     <div class="home-section-head-center">
         <span class="home-eyebrow-sm">New Arrivals</span>
         <h2 class="home-section-title">The Latest Drop.</h2>

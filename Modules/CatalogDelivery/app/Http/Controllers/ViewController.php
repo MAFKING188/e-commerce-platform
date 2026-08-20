@@ -23,7 +23,7 @@ class ViewController extends Controller
 
     public function collection(CatalogQueryService $catalog)
     {
-        return view('catalogdelivery::collection', $catalog->home());
+        return view('catalogdelivery::collection', $catalog->collection());
     }
 
     public function product($id, CatalogQueryService $catalog)

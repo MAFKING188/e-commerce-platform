@@ -249,6 +249,18 @@
 
 .shop-filter-btn { gap: 0.75rem; }
 
+.collection-jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.collection-jump-link {
+    border-radius: 99px;
+    padding: 0.75rem 1.5rem;
+}
+
 .shop-drawer-head {
     display: flex;
     justify-content: space-between;

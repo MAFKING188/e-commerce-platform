@@ -8,39 +8,36 @@
         <span class="home-eyebrow">The LUWI Collection</span>
         <h1>The Curated<br>Collection.</h1>
         <p class="home-hero-sub">
-            One marketplace, every craft. Explore what our artisans and curators are shipping right now.
+            Every piece, every artisan. Browse the full marketplace catalog by category.
         </p>
         <div class="home-hero-actions">
-            <a href="{{ route('shop') }}" class="btn btn-primary home-btn-solid">Browse Everything</a>
-            <a href="#new-arrivals" class="btn btn-ghost home-btn-outline">See What's New</a>
+            <a href="{{ route('shop') }}" class="btn btn-primary home-btn-solid">Filter Everything</a>
+            <a href="#electronics" class="btn btn-ghost home-btn-outline">Start Browsing</a>
         </div>
     </div>
 </section>
 
-<section id="new-arrivals" class="luxury-section home-section-spaced">
-    <div class="home-section-head">
-        <span class="home-eyebrow-sm">Fresh In</span>
-        <h2 class="home-section-title">New Arrivals.</h2>
-    </div>
-
-    <div class="collection-grid">
-        @foreach($latestProducts as $product)
-            @include('catalogdelivery::components.product-card', ['product' => $product])
+<section class="luxury-section home-section-spaced">
+    <div class="collection-jump">
+        @foreach($categories as $category)
+            <a href="#{{ \Illuminate\Support\Str::slug($category->name) }}" class="btn btn-ghost collection-jump-link">{{ $category->name }}</a>
         @endforeach
     </div>
 </section>
 
-<section id="featured" class="luxury-section">
-    <div class="home-section-head-center">
-        <span class="home-eyebrow-sm">Editor's Selection</span>
-        <h2 class="home-section-title">Featured Pieces.</h2>
-    </div>
+@foreach($categories as $category)
+    <section id="{{ \Illuminate\Support\Str::slug($category->name) }}" class="luxury-section home-section-spaced">
+        <div class="home-section-head">
+            <span class="home-eyebrow-sm">{{ $category->products->count() }} pieces</span>
+            <h2 class="home-section-title">{{ $category->name }}.</h2>
+        </div>
 
-    <div class="collection-grid">
-        @foreach($featuredProducts as $product)
-            @include('catalogdelivery::components.product-card', ['product' => $product])
-        @endforeach
-    </div>
-</section>
+        <div class="collection-grid">
+            @foreach($category->products as $product)
+                @include('catalogdelivery::components.product-card', ['product' => $product])
+            @endforeach
+        </div>
+    </section>
+@endforeach
 
 </x-app-layout>

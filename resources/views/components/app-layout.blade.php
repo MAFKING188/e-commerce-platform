@@ -153,8 +153,8 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="{{ route('shop') }}">All Products</a></li>
-                    <li><a href="{{ route('collection') }}#new-arrivals">New Arrivals</a></li>
-                    <li><a href="{{ route('collection') }}#featured">Featured</a></li>
+                    <li><a href="{{ route('home') }}#new-arrivals">New Arrivals</a></li>
+                    <li><a href="{{ route('home') }}#editor-choice">Featured</a></li>
                 </ul>
             </div>
             <div class="footer-links">

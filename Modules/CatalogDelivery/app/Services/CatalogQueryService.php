@@ -27,6 +27,15 @@ class CatalogQueryService
         return compact('latestProducts', 'featuredProducts');
     }
 
+    public function collection(): array
+    {
+        $categories = Category::with(['products' => fn ($q) => $q->with(['images', 'partners'])->latest()])
+            ->orderBy('name')
+            ->get();
+
+        return compact('categories');
+    }
+
     public function shop(\Illuminate\Http\Request $request): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = Product::with(['category', 'images', 'partners']);
