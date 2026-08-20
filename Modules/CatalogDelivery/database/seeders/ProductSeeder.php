@@ -14,7 +14,7 @@ class ProductSeeder extends Seeder
         foreach (CatalogInventory::CATALOG as $catName => $items) {
             $category = Category::updateOrCreate(['name' => $catName]);
 
-            foreach ($items as [$name, $imageIdx]) {
+            foreach ($items as [$name, $_]) {
                 $product = Product::create([
                     'name' => $name,
                     'price' => rand(300, 3500),
@@ -25,7 +25,8 @@ class ProductSeeder extends Seeder
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'url' => "https://images.unsplash.com/" . CatalogInventory::IMAGES[$imageIdx] . "?auto=format&fit=crop&w=800&q=80",
+                    'url' => CatalogInventory::imageFor($name)
+                        ?? "https://picsum.photos/seed/" . \Illuminate\Support\Str::slug($name) . "/800/600",
                 ]);
             }
         }

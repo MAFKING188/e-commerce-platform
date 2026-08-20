@@ -58,4 +58,31 @@ class CatalogCoherenceTest extends TestCase
             $this->assertGreaterThanOrEqual(15, $count, "{$categoryName} has too few products");
         }
     }
+
+    public function test_every_product_has_an_image(): void
+    {
+        foreach (Product::with('images')->get() as $product) {
+            $this->assertNotEmpty($product->images, "No image for: {$product->name}");
+        }
+    }
+
+    public function test_no_image_is_shared_across_categories(): void
+    {
+        $byUrl = Product::with(['category', 'images'])->get()
+            ->flatMap(fn ($p) => $p->images->map(fn ($img) => [$p->category->name, $img->url]))
+            ->groupBy(fn ($row) => $row[1]);
+
+        foreach ($byUrl as $url => $rows) {
+            $this->assertSame(1, $rows->pluck(0)->unique()->count(), "Image shared across categories: {$url}");
+        }
+    }
+
+    public function test_images_point_to_verified_unsplash_urls(): void
+    {
+        foreach (Product::with('images')->get() as $product) {
+            foreach ($product->images as $img) {
+                $this->assertStringStartsWith('https://images.unsplash.com/', $img->url, "Non-Unsplash image: {$product->name}");
+            }
+        }
+    }
 }
