@@ -24,27 +24,34 @@
     </div>
 
     <div class="contact-form-box">
-        <form action="#" method="POST">
+        <form action="{{ route('contact.store') }}" method="POST">
             @csrf
+            @if (session('success'))
+                <p class="form-success">{{ session('success') }}</p>
+            @endif
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="auth-input" placeholder="e.g. Jane">
+                    <label class="form-label" for="first_name">First Name</label>
+                    <input id="first_name" type="text" name="first_name" class="auth-input" placeholder="e.g. Jane" value="{{ old('first_name') }}" required>
+                    @error('first_name') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="auth-input" placeholder="e.g. Doe">
+                    <label class="form-label" for="last_name">Last Name</label>
+                    <input id="last_name" type="text" name="last_name" class="auth-input" placeholder="e.g. Doe" value="{{ old('last_name') }}" required>
+                    @error('last_name') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="auth-input" placeholder="jane@example.com">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input id="email" type="email" name="email" class="auth-input" placeholder="jane@example.com" value="{{ old('email') }}" required>
+                    @error('email') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
                 <div class="form-group full-width">
-                    <label class="form-label">Support Inquiry</label>
-                    <textarea class="auth-input no-resize" rows="5" placeholder="How can we assist you today?"></textarea>
+                    <label class="form-label" for="message">Support Inquiry</label>
+                    <textarea id="message" name="message" class="auth-input no-resize" rows="5" placeholder="How can we assist you today?" required>{{ old('message') }}</textarea>
+                    @error('message') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
             </div>
-            
+
             <button type="submit" class="btn btn-primary contact-submit-btn">
                 Submit Inquiry
             </button>

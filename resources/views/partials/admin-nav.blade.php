@@ -35,6 +35,10 @@
         <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
         Members
     </a>
+    <a href="{{ route('admin.contacts.index') }}" class="pc-nav__tab {{ request()->routeIs('admin.contacts.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Contacts
+    </a>
     <a href="{{ route('admin.profile') }}" class="pc-nav__tab {{ request()->routeIs('admin.profile') ? 'is-active' : '' }}">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
         Profile

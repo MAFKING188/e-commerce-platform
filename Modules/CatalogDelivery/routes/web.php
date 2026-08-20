@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\CatalogDelivery\Http\Controllers\AdminContactController;
 use Modules\CatalogDelivery\Http\Controllers\CategoryController;
+use Modules\CatalogDelivery\Http\Controllers\ContactController;
 use Modules\CatalogDelivery\Http\Controllers\LegalController;
 use Modules\CatalogDelivery\Http\Controllers\PartnerInventoryController;
 use Modules\CatalogDelivery\Http\Controllers\ProductController;
@@ -18,6 +20,7 @@ Route::get('/shop', [ViewController::class, 'shop'])->name('shop');
 Route::get('/product/{id}', [ViewController::class, 'product'])->name('product.show');
 Route::get('/about', [ViewController::class, 'about'])->name('about');
 Route::get('/contact', [ViewController::class, 'contact'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/privacy', fn () => app(LegalController::class)->show('privacy'))->name('privacy');
 Route::get('/terms', fn () => app(LegalController::class)->show('terms'))->name('terms');
 Route::get('/shipping', fn () => app(LegalController::class)->show('shipping'))->name('shipping');
@@ -53,6 +56,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
     Route::post('/reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    /* Contact Inquiries */
+    Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
+    Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
 });
 
 /*
