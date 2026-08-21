@@ -8,7 +8,9 @@ class SendEmailRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->user() && auth()->user()->role === 'admin';
+        $user = auth()->user();
+
+        return $user && in_array($user->role, ['admin', 'partner'], true);
     }
 
     public function rules(): array

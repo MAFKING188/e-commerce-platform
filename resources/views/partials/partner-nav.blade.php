@@ -23,6 +23,10 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
         Profile
     </a>
+    <a href="{{ route('partner.email.compose') }}" class="pc-nav__tab {{ request()->routeIs('partner.email.*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email Center
+    </a>
 </nav>
 
 @include('partials.partner.confirm-modal')
