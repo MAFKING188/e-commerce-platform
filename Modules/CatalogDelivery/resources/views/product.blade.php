@@ -25,6 +25,9 @@
     <!-- Right: Info -->
     <div class="product-info">
         <span class="product-category">{{ $product->category->name ?? 'Collection' }}</span>
+        @if($product->partners->isNotEmpty())
+            <span class="product-partner">By {{ $product->partners->first()->name }}</span>
+        @endif
         <h1>{{ $product->name }}</h1>
         
         @if($product->stock > 0)
