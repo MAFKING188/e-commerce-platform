@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         \Modules\CatalogDelivery\Database\Seeders\ProductSeeder::class,
         \Modules\CatalogDelivery\Database\Seeders\ReviewSeeder::class,
         \Modules\MarketplacePipeline\Database\Seeders\OrderSeeder::class,
+        \Modules\EmailCenter\Database\Seeders\EmailTemplateSeeder::class,
     ]);
 }
 }
