@@ -795,3 +795,78 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
       placeholders, >=15 products/category). Full suite: 113 tests /
       401 assertions green. Deployed + live-verified on prod.
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+ 18. 2026-08-20 session (part 2) — Catalog images, /collection full catalog, mobile filter, sweep fixes E1–E8
+ --------------------------------------------------------------------------------
+ This follow-up session addressed the root causes found after the catalog overhaul
+ (part 1 above) and the full-app audit:
+
+ - **Catalog images (spec §A):** Product names already matched categories; the
+   bug was image mismatch — an 18-photo Unsplash pool reused arbitrarily across
+   categories (Beauty showed book photos, Toys showed vase photos, Sports
+   showed shirt photos; 5 products had no image). Fixed by curating 115 distinct
+   Unsplash URLs (one per product), all curl-verified HTTP 200, zero
+   cross-category reuse. Migration `2026_08_20_180001_curated_product_images`
+   repairs the live DB. `CatalogInventory::IMAGES` is now a `name => URL` map
+   with `imageFor()` helper; ProductSeeder and live migration both use it.
+   Tests: 3 new coherence tests (every product has image, no cross-category
+   reuse, all Unsplash URLs).
+
+ - **Collection = full catalog (spec §C):** `/collection` is now the complete
+   browsable catalog (7 category sections, anchored jump nav, all products via
+   existing `product-card` component). Homepage "Editor's Choice" and "Latest
+   Drop" sections get `id="editor-choice"` / `id="new-arrivals"`; footer
+   anchors changed from `collection#...` to `home#...`. Tests: 3 CollectionPageTest
+   assertions (category sections present, all products rendered, footer links).
+
+ - **Mobile filter drawer (spec §D):** `.filter-drawer` gained `height:100dvh`
+   + `overflow-y:auto` + mobile `padding-bottom: calc(1.5rem + env(safe-area-inset-bottom))`.
+   Browser-verified at 390×844 viewport (Apply Filter reachable).
+
+ - **E1 — Middleware status gate:** AdminMiddleware/PartnerMiddleware now
+   require `status === 'active'` (closes role-escalation hole where pending
+   signups with role=admin/partner could reach admin/partner routes). UserFactory
+   defaults `status=active`.
+
+ - **E2 — Google login alignment:** Google callback now enforces `status`
+   check and challenges admins/partners regardless of 2FA enrollment (mirrors
+   AuthController: hardcoded `email` method + unconditional OTP send). Dead
+   `2fa.required` session line removed.
+
+ - **E3 — FK-safe deletes:** Five delete paths (Product, Category,
+   PartnerInventory destroy + bulkAction, AdminUser destroy) wrapped in
+   try/catch `QueryException` with friendly flashes. Global toast now renders
+   `session('error')` flashes.
+
+ - **E4 — Admin orders pagination:** Pagination links + empty state added to
+   admin/orders/index.blade.php (mirroring admin/reviews pattern).
+
+ - **E5 — Cart IDOR:` `CartController::remove` scopes lookup to the
+   authenticated user's cart (`whereHas('cart', fn($q) => $q->where('user_id', auth()->id()))`);
+   non-owners get 404.
+
+ - **E6 — Challenge resend:** Guard widened to allow admins/partners without
+   2FA enrollment to resend the OTP.
+
+ - **E7 — Send-code buttons:** Three new POST routes + buttons on the
+   settings/security forms (email change, password change, 2FA disable) that
+   issue an OTP and flash a status message.
+
+ - **E8 — Partner promotion:** `PartnerController::store` promotes the chosen
+   user to `role=partner` + `status=active`; admin `user_id` rejected via
+   `not_in` validation on `StorePartnerRequest`.
+
+ **Commit range:** b947b6d (plan) .. 8c84441 (implementation).
+ **Tests:** 113/401 → 134/912 (+21 tests, +511 assertions).
+ **Deployed:** Pushed to smartshop-luwi.tech, migrated, route/config/queue
+ cleared. Live-verified: /collection 200 with 7 sections, /shop mobile drawer,
+ admin login via mafuletil@gmail.com (password + email OTP), admin orders
+ pagination, pending user blocked from /admin/*, partner portal access.
+
+ **Deferred:** PayPal capture match verification, dead show/edit routes 500,
+ partner profile stat mismatch, hardcoded contact info, placeholder fallback,
+ mobile-menu auto-close, status badges, empty states, "Collection / 26" drift,
+ boilerplate descriptions, remember-me flag, Google disconnect, apiLogin
+ hardening, seeded-account verification.
+

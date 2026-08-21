@@ -379,6 +379,9 @@ No `Events/`, `Listeners/`, `Jobs/`, `Notifications/`, `Console/Commands/`, `Exc
 | PUT | `/profile/password` | UserController@updatePassword | `profile.password` (step-up code required) |
 | GET | `/profile/security` | UserController@security | `profile.security` |
 | GET | `/profile/settings` | UserController@settings | `profile.settings` |
+| POST | `/profile/send-email-code` | UserController@sendEmailCode | `profile.send-email-code` (throttle:2fa-resend) |
+| POST | `/profile/send-password-code` | UserController@sendPasswordCode | `profile.send-password-code` (throttle:2fa-resend) |
+| POST | `/profile/settings/twofa/send-disable-code` | TwoFactorController@sendDisableCode | `profile.settings.twofa.send-disable-code` (throttle:2fa-resend) |
 | POST | `/profile/settings/twofa/enable-email` | TwoFactorController@enableEmail | `profile.settings.twofa.enable-email` (throttle:2fa-enroll) |
 | POST | `/profile/settings/twofa/confirm` | TwoFactorController@confirm | `profile.settings.twofa.confirm` (throttle:2fa-enroll) |
 | POST | `/profile/settings/twofa/disable` | TwoFactorController@disable | `profile.settings.twofa.disable` (throttle:2fa-enroll; password + step-up code required) |
@@ -620,6 +623,7 @@ Every rendered page and the backend it exercises:
 - ✅ **Modular monolith migration executed** (commits `2b1cc33`..`da1e36f`; see §15.9)
 - ✅ **Email-OTP verification layer** (2026-08-19, commits `3ba967e`..`3b431e4`): mandatory email code challenge before login for admins + partners; buyer opt-in email codes; step-up codes at checkout, password/email change, 2FA disable; mandatory signup email verification; TOTP removed; `Ensure2faEnrolled` deleted; all five admin route groups gated (bug-fix `da3688e`). Full suite **106 tests / 360 assertions** green; deployed + live-verified on smartshop-luwi.tech (spec/plan in `docs/superpowers/`)
 - ✅ **Coherent marketplace catalog + /collection page** (2026-08-20, commit `fa71ce1`): `/collection` editorial page (hero + New Arrivals + Featured) with nav/footer links; 8 faker categories removed; Beauty & Wellness, Sports & Outdoors, Toys & Games added (15 products each); every product renamed to a unique coherent name (zero duplicates; live DB 65→110 products); `CatalogInventory` seeder class is the single source of truth for `ProductSeeder` + live-DB migration `2026_08_19_170001_coherent_catalog`; no `href="#"` remains. Full suite **113 tests / 401 assertions** green; deployed + live-verified.
+- ✅ **Catalog images, /collection full catalog, mobile filter, sweep fixes E1–E8** (2026-08-20, commits b947b6d..8c84441): Curated 115 Unsplash URLs (all 200-verified, zero cross-category reuse); `/collection` = full browsable catalog (7 sections, anchored jump nav); mobile filter drawer `100dvh` + `overflow-y:auto` + safe-area padding (browser-verified 390×844); E1 middleware status gate; E2 Google status/challenge alignment; E3 five FK-safe deletes + error toast; E4 admin orders pagination + empty state; E5 cart IDOR fix; E6 challenge resend widened; E7 three send-code POST routes + buttons; E8 partner promotion + admin rejection. Full suite **134 tests / 912 assertions** green; deployed + live-verified on prod.
 
 ### 12.2 Reported PENDING / TODO
 
