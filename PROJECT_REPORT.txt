@@ -870,3 +870,34 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
  boilerplate descriptions, remember-me flag, Google disconnect, apiLogin
  hardening, seeded-account verification.
 
+
+--------------------------------------------------------------------------------
+ 19. 2026-08-21 session — Email Center module (+ storage link & product-partner fixes)
+ --------------------------------------------------------------------------------
+ New Modules/EmailCenter (modular monolith, nwidart pattern):
+   - Admin: email template CRUD (/admin/email-templates, 3 seeded templates),
+     compose & send (/admin/email-compose: groups all/admins/partners/members/
+     newsletter + opt-in toggle + individual user search, {name}/{email}
+     placeholders, 100-recipient cap, throttle:email), send history
+     (/admin/email-logs with status filter + search).
+   - Partner: /partner/email-compose restricted to THEIR OWN buyers only
+     (non-buyer ids silently dropped; empty state before first orders) +
+     /partner/email-logs. Read-only access to the shared template library.
+   - Delivery: queued markdown PlatformMail (<x-mail::message> branded layout),
+     per-recipient placeholder resolution, full audit trail in
+     email_center_logs (batch_id, sender+role snapshot, status pending->sent/
+     failed). Separate table because TelemetryPipeline owns email_logs.
+   - Nav tabs added to admin-nav and partner-nav. Module assets wired per the
+     AppLayout convention (scss/js pair + vite.config.js — a missing pair breaks
+     the whole suite's Vite manifest).
+   - Tests: 32 new (resolver, mailable, CRUD, admin send, partner scoping, logs).
+     Full suite: 166 tests / 1006 assertions green.
+
+ Also fixed this session:
+   - Production storage symlink was MISSING (public/storage was a real dir):
+     recreated via php artisan storage:link -> partner product images and
+     profile avatar uploads now serve at /storage/... on smartshop-luwi.tech.
+   - Product detail page now shows "By <partner>" attribution under the
+     category label (product-card already had it).
+   - Deployed to smartshop-luwi.tech; migrate --force + route/config clear +
+     queue restart; live-verified.

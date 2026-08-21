@@ -109,3 +109,27 @@ Legend: HIGH (security or broken core flow) / MEDIUM (real defect, limited blast
 - Dead `show`/`edit` routes 500.
 - Partner profile "Archived pieces" stat mismatch.
 - Hardcoded contact info, via.placeholder.com fallback, mobile-menu auto-close, status badges, empty states, "Collection / 26" drift, boilerplate descriptions, remember-me flag, Google disconnect, apiLogin hardening, seeded-account verification.
+---
+## 6. Email Center (shipped 2026-08-21)
+
+New `Modules/EmailCenter` module (nwidart pattern, own routes/providers/assets/tests):
+
+- **Tables:** `email_templates` (name/subject/body_markdown/created_by), `email_center_logs`
+  (batch_id uuid, sender_user_id+role snapshot, recipient_email, template_id nullOnDelete,
+  subject/body snapshots, status pending|sent|failed, error). Named `email_center_logs`
+  because TelemetryPipeline already owns the simpler `email_logs` table.
+- **Admin:** `/admin/email-templates` CRUD (seeded with 3 starter templates),
+  `/admin/email-compose` (template select w/ prefill, group pickers
+  all/admins/partners/members/newsletter + opt-in-only toggle, individual user search
+  via `GET /admin/users/search?q=`, 100-recipient cap, throttle:email 5/min),
+  `/admin/email-logs` (status filter + search, paginated).
+- **Partner:** `/partner/email-compose` — recipients strictly intersected with their own
+  buyers (`Order::whereHas('items.product.partners')` pattern); non-buyer ids silently
+  dropped; empty-state when no buyers yet. Own send history at `/partner/email-logs`.
+- **Mailable:** queued markdown `PlatformMail` (`emailcenter::emails.platform`,
+  `<x-mail::message>` layout) with per-recipient `{name}`/`{email}` placeholder
+  resolution; every dispatch writes a log row (pending → sent/failed at dispatch time).
+- **Nav:** admin-nav "Email Center" tab (active on `admin.email-*`), partner-nav tab.
+- **Tests:** RecipientResolverTest (7), PlatformMailRenderTest (2), EmailTemplateCrudTest (8),
+  AdminSendTest (7), PartnerSendTest (4), EmailLogTest (4) = 32 new tests.
+  Full suite: 166 tests / 1006 assertions green.
