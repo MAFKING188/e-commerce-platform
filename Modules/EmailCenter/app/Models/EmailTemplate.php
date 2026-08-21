@@ -2,16 +2,24 @@
 
 namespace Modules\EmailCenter\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\IdentityAccess\Models\User;
 
 class EmailTemplate extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name', 'subject', 'body_markdown', 'created_by'];
 
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    protected static function newFactory()
+    {
+        return \Modules\EmailCenter\Database\Factories\EmailTemplateFactory::new();
     }
 }

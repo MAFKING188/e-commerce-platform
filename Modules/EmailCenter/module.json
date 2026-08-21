@@ -1,0 +1,8 @@
+{
+    "name": "EmailCenter",
+    "alias": "emailcenter",
+    "providers": [
+        "Modules\\EmailCenter\\Providers\\EmailCenterServiceProvider"
+    ],
+    "files": []
+}
