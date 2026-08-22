@@ -2,7 +2,7 @@
 
 ## Local development
 - Serve: `php artisan serve --port=8001` (nohup, log to /tmp/opencode/serve.log).
-- Tests: `php artisan test` (full suite ~4s, 100 tests / 336 assertions).
+- Tests: `php artisan test` (full suite ~9s, 167 tests / 1121 assertions).
 - **Queue**: local `.env` uses `QUEUE_CONNECTION=sync` so queued mail (reset
   links, OTP codes, order confirmations) is sent immediately. Do NOT set it back
   to `database` locally — there is no queue worker running, and mail would pile
