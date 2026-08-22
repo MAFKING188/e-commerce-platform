@@ -3,6 +3,8 @@
         <div class="img-container shimmer">
             <img src="{{ $product->image_url }}" 
                  alt="" 
+                 loading="lazy" 
+                 decoding="async"
                  onerror="this.src='https://images.unsplash.com/photo-1441984904996-e0b6ba687e12?w=800'; this.onerror=null;">
         </div>
         <div class="info-wrap">

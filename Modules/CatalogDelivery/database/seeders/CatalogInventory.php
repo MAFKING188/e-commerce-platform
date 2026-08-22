@@ -5,9 +5,14 @@ namespace Modules\CatalogDelivery\Database\Seeders;
 class CatalogInventory
 {
     /**
-     * Product name => verified Unsplash image URL. One entry per product in
+     * Product name => verified source image URL. One entry per product in
      * CATALOG; every URL curl-verified to return 200. No URL is shared across
      * categories (see test_no_image_is_shared_across_categories).
+     *
+     * The URLs are the DOWNLOAD SOURCE for the self-hosted copies in
+     * storage/app/public/products/curated/<slug>.jpg (mirrored on every
+     * environment — see docs + download script). imageFor() returns that LOCAL
+     * path so seeded/live rows serve same-origin instead of hotlinking.
      */
     public const IMAGES = [
         // Electronics
@@ -281,7 +286,19 @@ class CatalogInventory
         return array_map(fn ($item) => $item[0], self::CATALOG[$category]);
     }
 
+    /**
+     * Local storage path (relative to the public disk) of the self-hosted
+     * copy of the curated image for $name. Null when the name is unknown.
+     */
     public static function imageFor(string $name): ?string
+    {
+        return isset(self::IMAGES[$name])
+            ? 'products/curated/' . \Illuminate\Support\Str::slug($name) . '.jpg'
+            : null;
+    }
+
+    /** Absolute source URL of the curated image for $name (download origin). */
+    public static function sourceUrlFor(string $name): ?string
     {
         return self::IMAGES[$name] ?? null;
     }

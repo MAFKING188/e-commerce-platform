@@ -77,11 +77,29 @@ class CatalogCoherenceTest extends TestCase
         }
     }
 
-    public function test_images_point_to_verified_unsplash_urls(): void
+    public function test_images_are_self_hosted_curated_paths(): void
     {
         foreach (Product::with('images')->get() as $product) {
             foreach ($product->images as $img) {
-                $this->assertStringStartsWith('https://images.unsplash.com/', $img->url, "Non-Unsplash image: {$product->name}");
+                $this->assertStringStartsWith(
+                    'products/curated/',
+                    ltrim($img->url, '/'),
+                    "Non-curated image path: {$product->name} ({$img->url})"
+                );
+            }
+        }
+    }
+
+    public function test_every_curated_path_has_a_downloaded_file(): void
+    {
+        foreach (Product::with('images')->get() as $product) {
+            foreach ($product->images as $img) {
+                $disk = \Illuminate\Support\Facades\Storage::disk('public');
+                $path = ltrim($img->url, '/');
+
+                if (str_starts_with($path, 'products/curated/')) {
+                    $this->assertTrue($disk->exists($path), "Missing curated file for {$product->name}: {$path}");
+                }
             }
         }
     }

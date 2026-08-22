@@ -8,14 +8,14 @@
     <!-- Left: Gallery -->
     <div class="gallery">
         <div class="main-image-container">
-            <img id="mainImage" src="{{ $product->image_url }}" alt="{{ $product->name }}">
+            <img id="mainImage" src="{{ $product->image_url }}" alt="{{ $product->name }}" decoding="async">
         </div>
 
         @if($product->images->count() > 1)
             <div class="thumbnails">
                 @foreach($product->images as $image)
                     <div class="thumbnail {{ $loop->first ? 'active' : '' }}" onclick="updateMainImage(this, '{{ $image->resolved_url }}')">
-                        <img src="{{ $image->resolved_url }}" alt="Thumbnail">
+                        <img src="{{ $image->resolved_url }}" alt="Thumbnail" loading="lazy" decoding="async">
                     </div>
                 @endforeach
             </div>
@@ -114,7 +114,7 @@
                     <div class="product-reviewer">
                         <div class="product-avatar">
                             @if ($review->user->avatarUrl())
-                                <img src="{{ $review->user->avatarUrl() }}" alt="{{ $review->user->name }}" class="product-avatar__img">
+                                <img src="{{ $review->user->avatarUrl() }}" alt="{{ $review->user->name }}" class="product-avatar__img" loading="lazy" decoding="async">
                             @else
                                 {{ substr($review->user->name, 0, 1) }}
                             @endif
