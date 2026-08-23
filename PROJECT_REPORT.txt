@@ -901,3 +901,90 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
      category label (product-card already had it).
    - Deployed to smartshop-luwi.tech; migrate --force + route/config clear +
      queue restart; live-verified.
+
+--------------------------------------------------------------------------------
+ 20. 2026-08-22/23 session — Production-hardening pass: the 10-point roadmap
+ --------------------------------------------------------------------------------
+ Sweep report docs/PROJECT_SWEEP_2026-08-22.md ranked 10 improvements; ALL are now
+ implemented, tested, deployed. Suite: 167 -> 200 tests / 1221 assertions.
+
+ 1) PAYMENT CAPTURE GUARDED (money + security hole closed)
+    PaymentController::capture resolves the pending Payment by PayPal token BEFORE
+    any external call; ownership gate (403 on foreign payments), idempotency guard
+    (already-paid -> friendly redirect, never double-emails), DB::transaction around
+    payment+order settle, receipt queued to the ORDER OWNER instead of whoever
+    clicked last. Provider resolved via app() so tests can mock it.
+
+ 2) GITHUB ACTIONS CI (.github/workflows/ci.yml)
+    Two jobs on push/PR: (a) PHP 8.3 + composer install + php artisan test;
+    (b) Node 22 + npm install/build of Vite assets. Turns the 200-test suite from
+    "exists" into "enforced".
+
+ 3) SESSION REGENERATION AFTER PASSWORD RESET
+    PasswordResetController rotates the session id at auto-login: a stolen
+    pre-reset session id dies exactly when security should improve.
+
+ 4) CREDENTIAL/DEBUG LOGGING REMOVED
+    AuthController registration dumps (raw request incl. passwords), AdminUserController
+    DEBUG lines, PasswordResetController debug line — all deleted.
+
+ 5) API SURFACE HARDENED (+ sweep section-4 fix)
+    /api/login enforces active-status AND verified-email (403 mirrors web gates);
+    token login no longer leaks a web session; throttled via throttle:auth.
+    /api/register REMOVED: self-serve token issuance bypassed verification entirely;
+    registration stays web-only until an API verify flow exists. ApiAuthTest = 8 paths.
+
+ 6) PARTNER FULFILLMENT SHIPPED (biggest product gap closed)
+    Order lifecycle now pending -> paid -> SHIPPED (partner action) -> completed (admin).
+    PATCH partner.orders.ship is partner-scoped (Partner::orders()), only from 'paid',
+    queues OrderShipped markdown mail to buyer, writes telemetry audit event.
+    Admin complete accepts paid OR shipped. Buyer order history renders a 4-step
+    progress timeline (orders/_progress.blade.php + module scss). Status badge map
+    gained 'shipped'. PartnerFulfillmentTest covers ship/guards/completion+payouts.
+
+ 7) MONEY CLUSTER TESTED (was zero coverage)
+    MoneyClusterTest (9 tests): capture guards (guest, unknown token, foreign user,
+    idempotent replay, success path with mocked PayPal provider, declined capture)
+    and cancellation (stock restored, foreign order rejected, paid orders refused).
+
+ 8) IMAGE VARIANT PIPELINE (zero new dependencies)
+    ProductImageService (ext-gd) writes a 480px '-card' derivative next to every
+    uploaded original; ProductImage@card_url serves it with graceful fallback;
+    product-card blade uses card_url. Wired into admin AND partner upload flows
+    (4 call sites). ProductImageServiceTest generates real GD fixtures and asserts
+    dimensions. One-off backfill generated variants for all 105 eligible curated
+    images on prod (~85KB -> ~24KB per grid image).
+
+ 9) STOREFRONT QUERY CACHE + INVALIDATION
+    CatalogQueryService::home/collection cached 10 min; related() cached 30 min per
+    product (also kills the inRandomOrder full scan and its N+1). CatalogCache::flush()
+    hooked into every catalog mutation (admin products CRUD, partner inventory
+    store/update/destroy, category CRUD). CatalogCacheTest locks the contract.
+
+ 10) OPS: BACKUPS + FAILURE ALERTING + SCHEDULER
+    app:backup-database command: mysqldump --single-transaction | gzip into
+    storage/app/backups, keeps newest N (MYSQL_PWD via env so it never shows in ps).
+    Scheduled nightly 02:30; queue batch/failed pruning scheduled too; cron entry
+    installed on prod (* * * * * php artisan schedule:run). First prod backup taken.
+    Queue::failing listener logs to a dedicated daily 'alerts' channel and emails
+    CONTACT_RECIPIENT max once/hour/failure-kind (backlog-storm safe).
+
+ BONUS FIX FOUND DURING DEPLOY (production incident):
+    /collection returned 500 on warm cache. Root cause chain:
+      config/cache.php shipped 'serializable_classes' => false (original skeleton).
+      On the DATABASE cache store this passes allowed_classes=false to unserialize,
+      turning every cached Eloquent model into __PHP_Incomplete_Class. Local dev
+      never noticed because local .env uses CACHE_STORE=file, whose reader ignores
+      the flag. Also discovered the framework cache/sessions tables use TEXT columns
+      (64KB) which silently truncate large payloads -> upsized both to MEDIUMTEXT
+      (migration 2026_08_23_140001).
+    Fix: 'serializable_classes' env-driven, default true, documented trade-off in
+    config comment. Verified end-to-end on prod (cold+warm /collection 200).
+
+ DEPLOY STATE: all commits pushed (through 90d2979); prod pulled; npm build run on
+ server; supervisor worker restarted; cron installed; backups seeded; card variants
+ generated; live checks green (/collection cold+warm 200, home 200, card image 200).
+
+ REMAINING from roadmap (deliberately not in this pass): Sentry-style hosted error
+ monitoring (needs an account/Dsn decision), invoice/receipt PDFs, back-in-stock
+ wishlist alerts, search FULLTEXT index.
