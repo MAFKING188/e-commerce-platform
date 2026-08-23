@@ -24,4 +24,21 @@ class Review extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    /**
+     * Scope to get approved reviews + current user's pending reviews.
+     */
+    public function scopeApprovedForUser($query, $userId = null)
+    {
+        $query->where('status', 'approved');
+
+        if ($userId) {
+            $query->orWhere(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->where('status', 'pending');
+            });
+        }
+
+        return $query;
+    }
 }

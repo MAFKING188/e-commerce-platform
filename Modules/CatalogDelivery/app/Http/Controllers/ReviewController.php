@@ -25,7 +25,7 @@ class ReviewController extends Controller
             'comment' => 'required|string|min:3|max:1000'
         ]);
 
-        Review::create([
+        $review = Review::create([
             'user_id' => auth()->id(),
             'product_id' => $request->product_id,
             'rating' => $request->rating,
@@ -33,8 +33,17 @@ class ReviewController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->back()
-            ->with('success', 'Review submitted successfully');
+        $message = 'Review submitted for moderation.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => $message,
+                'review' => $review->load('user'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function destroy($id)
