@@ -4,7 +4,6 @@ namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\CatalogDelivery\Models\Review;
-use Modules\CatalogDelivery\Models\Product;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -16,13 +15,6 @@ class ReviewController extends Controller
                          ->paginate(10);
 
         return view('catalogdelivery::admin.reviews.index', compact('reviews'));
-    }
-
-    public function create($productId)
-    {
-        $product = Product::findOrFail($productId);
-
-        return view('reviews.create', compact('product'));
     }
 
     public function store(Request $request)
@@ -43,28 +35,6 @@ class ReviewController extends Controller
 
         return redirect()->back()
             ->with('success', 'Review submitted successfully');
-    }
-
-    public function edit($id)
-    {
-        $review = Review::findOrFail($id);
-
-        return view('reviews.edit', compact('review'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $review = Review::findOrFail($id);
-
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string'
-        ]);
-
-        $review->update($request->only(['rating', 'comment']));
-
-        return redirect()->back()
-            ->with('success', 'Review updated successfully');
     }
 
     public function destroy($id)

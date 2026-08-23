@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\MarketplacePipeline\Http\Controllers\MarketplacePipelineController;
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('marketplacepipelines', MarketplacePipelineController::class)->names('marketplacepipeline');
-});
+// No MarketplacePipeline API yet — commerce flows are web-session + CSRF
+// protected by design. Add token-scoped endpoints only with a real consumer.

@@ -26,9 +26,4 @@ class StepUpService
         $session->put('stepup.verified', time());
         $session->forget('stepup.pending');
     }
-
-    public static function invalidate(SessionStore $session): void
-    {
-        $session->forget(['stepup.pending', 'stepup.verified']);
-    }
 }
