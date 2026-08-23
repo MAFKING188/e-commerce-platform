@@ -106,6 +106,14 @@ Totals: **38 controllers · 21 models · 11 services · 11 mailables · 42 migra
 
 ## 4. Backend NOT Wired to the UI (verified 2026-08-22)
 
+> **RESOLVED same day** (commits up to `7526944`, deployed): Sanctum API gates fixed +
+> registration endpoint removed · dead scaffolding deleted (variant table/model, review
+> CRUD stubs, orphan/scaffold controllers, legacy `user` table) · member **Edit page**
+> wired (role+status) · categories/inventory `show` routes dropped · **Audit Trail**
+> and **Outbound Mail** admin viewers shipped (`/admin/audit-logs`, `/admin/outbound-mail`)
+> · `shop.low_stock_threshold` config added · queue-pruning scheduler registered.
+> Section kept below as the original findings record.
+
 Each item below was re-verified against current code (file:line evidence checked).
 
 ### 4.1 The Sanctum API — exists, zero consumers
