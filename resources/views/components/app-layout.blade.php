@@ -153,7 +153,10 @@
     <div class="container">
         <div class="footer-content">
             <div class="footer-brand">
-                <h2>SmartShop</h2>
+                <a href="{{ route('home') }}" class="footer-logo">
+                    <img src="{{ asset('images/logo.png') }}" alt="SmartShop" class="logo-img">
+                    <span class="logo-text">SmartShop</span>
+                </a>
                 <p>Curating exceptional products with a focus on quality, sustainability, and timeless design.</p>
             </div>
             <div class="footer-links">
