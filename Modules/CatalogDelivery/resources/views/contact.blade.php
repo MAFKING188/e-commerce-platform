@@ -10,11 +10,7 @@
         <div class="contact-methods">
             <div class="method-item">
                 <h4>General Inquiries</h4>
-                <p>m.luwi0049@uca.ca.ma</p>
-            </div>
-            <div class="method-item">
-                <h4>Studio Address</h4>
-                <p>124 Design District, <br>Marrakech, Morocco</p>
+                <p>support@smartshop-luwi.tech</p>
             </div>
             <div class="method-item">
                 <h4>Client Support</h4>
