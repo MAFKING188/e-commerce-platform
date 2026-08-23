@@ -31,7 +31,10 @@
 
 <nav>
     <div class="container">
-        <a href="{{ route('home') }}" class="logo">SmartShop</a>
+        <a href="{{ route('home') }}" class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="SmartShop" class="logo-img">
+            <span class="logo-text">SmartShop</span>
+        </a>
         
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
             <span></span>
