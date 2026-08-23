@@ -62,12 +62,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * TODO: BUSINESS LOGIC - ORDER CANCELLATION
-     * Implement a method to cancel an order.
-     * Requirement: If an order is cancelled, you MUST restore the stock to the products.
-     * Hint: Use a DB::transaction(), loop through $order->items, and increment product stock.
-     */
     public function cancel($id, CheckoutService $checkout)
     {
         try {

@@ -3,13 +3,14 @@
 namespace Modules\MarketplacePipeline\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\MarketplacePipeline\Models\Order;
-use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Http\Request;
-use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Modules\MarketplacePipeline\Mail\PaymentSuccess;
-use Illuminate\Support\Facades\Log;
+use Modules\MarketplacePipeline\Models\Order;
+use Modules\MarketplacePipeline\Models\Payment;
+use Srmklive\PayPal\Services\PayPal as PayPalClient;
 
 class PaymentController extends Controller
 {
@@ -93,44 +94,54 @@ class PaymentController extends Controller
     }
 
     /**
-     * 💡 SENIOR TIP: WEBHOOKS & PERSISTENCE
+     * Capture flow (PayPal return URL). The `token` query param carries the
+     * PayPal order id, which is also our pending payments.transaction_id — so
+     * every guard runs BEFORE any external API call.
      */
     public function capture(Request $request)
     {
-        // Initialize PayPal
-        $provider = new PayPalClient;
+        $payment = Payment::with('order.user')
+            ->where('transaction_id', (string) $request->query('token'))
+            ->first();
+
+        if (! $payment) {
+            Log::warning('PayPal Capture: no matching payment record', ['token' => (string) $request->query('token')]);
+            return redirect()->route('orders.index')->withErrors('Payment record not found.');
+        }
+
+        // 🔒 Ownership gate: only the buyer may complete this flow.
+        if ($payment->order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // 🔁 Idempotency: PayPal can re-deliver the return URL; never double-settle.
+        if ($payment->status === 'paid') {
+            return redirect()
+                ->route('orders.index')
+                ->with('status', 'Payment was already completed.');
+        }
+
+        $provider = app(PayPalClient::class);
         $provider->setApiCredentials(config('paypal'));
         $provider->getAccessToken();
 
-        // Capture payment from PayPal
-        $response = $provider->capturePaymentOrder($request->token);
+        $response = $provider->capturePaymentOrder((string) $request->query('token'));
 
-        // Verify successful payment
-        if (isset($response['status']) && $response['status'] === 'COMPLETED') {
-
-            // Find payment record
-            $payment = Payment::where('transaction_id', $response['id'])->first();
-
-            if (!$payment) {
-                Log::error('PayPal Capture Error: Payment record not found', ['transaction_id' => $response['id']]);
-                return redirect()->route('orders.index')->withErrors('Payment record not found.');
-            }
-
-            // Update payment status
-            $payment->update(['status' => 'paid']);
-
-            // Update order status
-            $payment->order->update(['status' => 'paid']);
-
-            // 📧 Trigger Payment Success Email
-            Mail::to(auth()->user())->send(new PaymentSuccess($payment));
-
-            return redirect()
-                ->route('orders.index')
-                ->with('status', 'Payment completed successfully');
+        if (! isset($response['status']) || $response['status'] !== 'COMPLETED') {
+            Log::error('PayPal Capture Failure', ['payment_id' => $payment->id, 'response' => $response]);
+            return redirect()->route('orders.index')->withErrors('Payment verification failed.');
         }
 
-        Log::error('PayPal Capture Failure', ['response' => $response]);
-        return redirect()->route('orders.index')->withErrors('Payment verification failed.');
+        DB::transaction(function () use ($payment) {
+            $payment->update(['status' => 'paid']);
+            $payment->order->update(['status' => 'paid']);
+        });
+
+        // 📧 Receipt goes to the order owner (not whoever clicked last).
+        Mail::to($payment->order->user)->send(new PaymentSuccess($payment));
+
+        return redirect()
+            ->route('orders.index')
+            ->with('status', 'Payment completed successfully');
     }
 }
