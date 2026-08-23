@@ -188,7 +188,6 @@
             <div class="footer-links">
                 <h4>Support</h4>
                 <ul>
-                    <li><a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" class="footer-cta">Support This Project</a></li>
                     <li><a href="{{ route('shipping') }}">Shipping</a></li>
                     <li><a href="{{ route('returns') }}">Returns</a></li>
                     <li><a href="{{ route('privacy') }}">Privacy</a></li>
