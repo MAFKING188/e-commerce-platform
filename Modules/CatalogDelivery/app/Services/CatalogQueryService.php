@@ -15,18 +15,23 @@ class CatalogQueryService
     public function home(): array
     {
         return Cache::remember('catalog:home', now()->addMinutes(10), function () {
-            $latestProducts = Product::with(['images', 'partners'])
-                ->latest()
-                ->take(8)
-                ->get();
-
-            $featuredProducts = Product::with(['images', 'partners'])
+            $editorChoiceProducts = Product::with(['images', 'partners'])
+                ->where('is_featured', true)
                 ->where('stock', '>', 0)
                 ->latest()
                 ->take(6)
                 ->get();
 
-            return compact('latestProducts', 'featuredProducts');
+            $editorChoiceIds = $editorChoiceProducts->pluck('id');
+
+            $latestProducts = Product::with(['images', 'partners'])
+                ->whereNotIn('id', $editorChoiceIds)
+                ->where('stock', '>', 0)
+                ->latest()
+                ->take(8)
+                ->get();
+
+            return compact('editorChoiceProducts', 'latestProducts');
         });
     }
 

@@ -14,6 +14,8 @@
     <meta property="og:image" content="@yield('og_image', asset('favicon.ico'))">
     <meta name="twitter:card" content="summary_large_image">
     
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <!-- Google Fonts: Geist or Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(array_merge(['resources/css/app.css'], $moduleAssets))
@@ -64,6 +66,20 @@
                         @endforeach
                     </select>
                 </form>
+                
+                <a href="{{ route('cart.index') }}" class="theme-toggle cart-link" aria-label="Shopping Bag">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    @if(auth()->check() && auth()->user()->cart)
+                        <span class="cart-count">{{ auth()->user()->cart->items->sum('quantity') }}</span>
+                    @elseif(session('cart'))
+                        <span class="cart-count">{{ collect(session('cart'))->sum('quantity') }}</span>
+                    @endif
+                </a>
+                
                 <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn" aria-label="Toggle dark mode">
                     <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
                 </button>

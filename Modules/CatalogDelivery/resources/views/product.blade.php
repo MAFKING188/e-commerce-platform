@@ -45,7 +45,7 @@
 
         @if($product->stock > 0)
             <div class="cart-form">
-                <form action="{{ route('cart.add') }}" method="POST">
+                <form id="addToCartForm" data-product-id="{{ $product->id }}">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     
@@ -107,7 +107,7 @@
                 <div class="product-review-card">
                     <div class="product-stars">
                         @for($i = 0; $i < 5; $i++)
-                            <svg width="16" height="16" fill="{{ $i < $review->rating ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            <svg width="16" height="16" fill="{{ $i < $review->rating ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-.363 1.118l1.518-4.674c-.783.57-1.838-.197-1.538-1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         @endfor
                     </div>
                     <p class="product-review-text">"{{ $review->comment }}"</p>
@@ -150,6 +150,57 @@
         document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove('active'));
         thumb.classList.add('active');
     }
+
+    // AJAX Add to Cart
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('addToCartForm');
+        if (!form) return;
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Adding...';
+
+            const formData = new FormData(form);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+            try {
+                const response = await fetch('{{ route('cart.add') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showToast(data.message || 'Product added to bag', 'success');
+                    
+                    // Update cart count badge
+                    const cartCountEl = document.querySelector('.cart-count');
+                    if (cartCountEl && data.cart_count !== undefined) {
+                        cartCountEl.textContent = data.cart_count;
+                        cartCountEl.style.display = 'flex';
+                    }
+                } else {
+                    showToast(data.message || 'Failed to add to bag', 'error');
+                }
+            } catch (error) {
+                console.error('Add to cart error:', error);
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    });
 </script>
 
 </x-app-layout>

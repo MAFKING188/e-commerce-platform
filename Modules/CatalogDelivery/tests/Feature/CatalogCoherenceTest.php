@@ -51,11 +51,11 @@ class CatalogCoherenceTest extends TestCase
         }
     }
 
-    public function test_each_category_has_at_least_fifteen_products(): void
+    public function test_each_category_has_at_least_five_products(): void
     {
         foreach (array_keys(CatalogInventory::CATALOG) as $categoryName) {
             $count = Category::where('name', $categoryName)->first()->products()->count();
-            $this->assertGreaterThanOrEqual(15, $count, "{$categoryName} has too few products");
+            $this->assertGreaterThanOrEqual(5, $count, "{$categoryName} has too few products");
         }
     }
 

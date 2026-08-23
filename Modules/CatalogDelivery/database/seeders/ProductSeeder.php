@@ -14,13 +14,14 @@ class ProductSeeder extends Seeder
         foreach (CatalogInventory::CATALOG as $catName => $items) {
             $category = Category::updateOrCreate(['name' => $catName]);
 
-            foreach ($items as [$name, $_]) {
+            foreach ($items as $index => [$name, $_]) {
                 $product = Product::create([
                     'name' => $name,
                     'price' => rand(300, 3500),
                     'category_id' => $category->id,
                     'stock' => rand(10, 50),
                     'description' => "Experience the pinnacle of LUWI craftsmanship. The {$name} is a masterclass in modern design.",
+                    'is_featured' => $index < 2, // First 2 products per category are featured
                 ]);
 
                 ProductImage::create([
