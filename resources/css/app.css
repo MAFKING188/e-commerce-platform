@@ -120,25 +120,50 @@ nav .container {
 .logo-img {
     height: 40px;
     width: auto;
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .logo-img:hover {
     transform: scale(1.05);
 }
 
-[data-theme="light"] .logo-img,
-:root:not([data-theme="dark"]) .logo-img {
-    filter: brightness(0) invert(1);
+/* Logo theme variants */
+.logo-img.logo-light {
+    display: block;
+}
+
+.logo-img.logo-dark {
+    display: none;
+}
+
+[data-theme="dark"] .logo-img.logo-light,
+[data-theme="dark"] .footer-logo-img.logo-light {
+    display: none;
+}
+
+[data-theme="dark"] .logo-img.logo-dark,
+[data-theme="dark"] .footer-logo-img.logo-dark {
+    display: block;
+}
+
+:root:not([data-theme="dark"]) .logo-img.logo-dark,
+:root:not([data-theme="dark"]) .footer-logo-img.logo-dark {
+    display: none;
+}
+
+:root:not([data-theme="dark"]) .logo-img.logo-light,
+:root:not([data-theme="dark"]) .footer-logo-img.logo-light {
+    display: block;
 }
 
 .footer-logo .logo-img {
     height: 36px;
 }
 
-[data-theme="light"] .footer-logo .logo-img,
-:root:not([data-theme="dark"]) .footer-logo .logo-img {
-    filter: brightness(0) invert(1);
+.footer-logo-img {
+    height: 36px;
+    width: auto;
+    transition: opacity 0.3s ease;
 }
 
 .logo-text {

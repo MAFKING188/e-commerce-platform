@@ -32,7 +32,8 @@
 <nav>
     <div class="container">
         <a href="{{ route('home') }}" class="logo">
-            <img src="{{ asset('images/logo.png') }}" alt="SmartShop" class="logo-img">
+            <img src="{{ asset('images/logo-dark.png') }}" alt="SmartShop" class="logo-img logo-dark">
+            <img src="{{ asset('images/logo-light.png') }}" alt="SmartShop" class="logo-img logo-light">
             <span class="logo-text">SmartShop</span>
         </a>
         
@@ -154,7 +155,8 @@
         <div class="footer-content">
             <div class="footer-brand">
                 <a href="{{ route('home') }}" class="footer-logo">
-                    <img src="{{ asset('images/logo.png') }}" alt="SmartShop" class="logo-img">
+                    <img src="{{ asset('images/logo-dark.png') }}" alt="SmartShop" class="logo-img footer-logo-img logo-dark">
+                    <img src="{{ asset('images/logo-light.png') }}" alt="SmartShop" class="logo-img footer-logo-img logo-light">
                     <span class="logo-text">SmartShop</span>
                 </a>
                 <p>Curating exceptional products with a focus on quality, sustainability, and timeless design.</p>
