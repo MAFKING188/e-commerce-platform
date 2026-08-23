@@ -54,7 +54,6 @@ class AdminUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        \Log::info('DEBUG: Raw Request Input:', $request->all());
         $user = User::findOrFail($id);
         $oldStatus = $user->status;
 
@@ -79,7 +78,6 @@ class AdminUserController extends Controller
             Mail::to($user->email)->send(new UserStatusUpdated($user));
         }
 
-        \Log::info('User Updated:', $user->fresh()->toArray());
 
         return redirect()->back()->with('success', 'Member credentials refined.');
     }

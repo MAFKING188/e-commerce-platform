@@ -16,7 +16,6 @@ class AuthController extends Controller
     /* REGISTER */
     public function register(Request $request)
     {
-        \Log::info('Registration Request:', $request->all());
         $data = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
@@ -39,7 +38,6 @@ class AuthController extends Controller
             'country' => $data['country'],
             'newsletter_optin' => $data['newsletter_optin'] ?? false
         ]);
-        \Log::info('User Created:', $user->toArray());
 
         $countryCurrency = [
             'MA' => 'MAD', 'US' => 'USD', 'GB' => 'GBP',

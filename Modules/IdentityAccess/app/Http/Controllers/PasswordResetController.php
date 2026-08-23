@@ -31,7 +31,6 @@ class PasswordResetController extends Controller
             }
         );
 
-        \Log::debug('RESET_STATUS: ' . $status);
 
         return back()->with('status', 'If that email exists, a reset link is on its way.');
     }
@@ -56,6 +55,8 @@ class PasswordResetController extends Controller
                 $user->setRememberToken(Str::random(60));
                 Mail::to($user)->queue(new PasswordChangedMail($user));
                 Auth::login($user);
+                // Rotate the session id so a stolen pre-reset session id dies here.
+                request()->session()->regenerate();
             }
         );
 

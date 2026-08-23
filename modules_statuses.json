@@ -3,5 +3,6 @@
     "CatalogDelivery": true,
     "MarketplacePipeline": true,
     "PartnerHub": true,
-    "TelemetryPipeline": true
+    "TelemetryPipeline": true,
+    "EmailCenter": true
 }
