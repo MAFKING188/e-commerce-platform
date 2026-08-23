@@ -11,3 +11,6 @@ use Illuminate\Support\Facades\Schedule;
 // Housekeeping for the database queue driver.
 Schedule::command('queue:prune-batches --hours=48')->dailyAt('03:10');
 Schedule::command('queue:prune-failed --hours=720')->weeklyOn(1, '03:20');
+
+// Nightly database backup (keeps the last 7 dumps).
+Schedule::command('app:backup-database --keep=7')->dailyAt('02:30');

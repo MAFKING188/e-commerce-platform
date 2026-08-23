@@ -3,6 +3,7 @@
         'pending' => 'warn',
         'processing' => 'warn',
         'paid' => 'ok',
+        'shipped' => 'ok',
         'completed' => 'ok',
         'processed' => 'ok',
         'cancelled' => 'danger',
