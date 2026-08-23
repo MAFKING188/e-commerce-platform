@@ -121,31 +121,7 @@ class AuthController extends Controller
         return redirect()->intended('/');
     }
 
-    /* API REGISTER */
-    public function apiRegister(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
-        ]);
-
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'role' => 'user'
-        ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
-    }
-
-    /* API LOGIN */
+    /* API LOGIN — mirrors web gates: active status + verified email required */
     public function apiLogin(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
@@ -155,6 +131,20 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
+
+        Auth::logout();
+
+        if ($user->status !== 'active') {
+            return response()->json([
+                'message' => 'Your account is currently ' . $user->status . '. Please contact support.'
+            ], 403);
+        }
+
+        if (is_null($user->email_verified_at)) {
+            return response()->json([
+                'message' => 'Your email address is not verified. Please verify your email first.'
+            ], 403);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

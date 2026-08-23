@@ -2,6 +2,5 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('api')->prefix('api/emailcenter')->name('api.emailcenter.')->group(function () {
-    // API routes for EmailCenter (if needed in future)
-});
+// No public EmailCenter API yet. Compose/send flows are web-session + CSRF
+// protected by design; add token-scoped endpoints only with a real consumer.
