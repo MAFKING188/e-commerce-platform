@@ -120,11 +120,25 @@ nav .container {
 .logo-img {
     height: 40px;
     width: auto;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 .logo-img:hover {
     transform: scale(1.05);
+}
+
+[data-theme="light"] .logo-img,
+:root:not([data-theme="dark"]) .logo-img {
+    filter: brightness(0) invert(1);
+}
+
+.footer-logo .logo-img {
+    height: 36px;
+}
+
+[data-theme="light"] .footer-logo .logo-img,
+:root:not([data-theme="dark"]) .footer-logo .logo-img {
+    filter: brightness(0) invert(1);
 }
 
 .logo-text {
