@@ -1,7 +1,7 @@
 <div class="card-wrapper">
     <a href="{{ route('product.show', $product->id) }}" class="card-luxury">
         <div class="img-container shimmer">
-            <img src="{{ $product->image_url }}" 
+            <img src="{{ $product->images->first()?->card_url ?? $product->image_url }}"
                  alt="" 
                  loading="lazy" 
                  decoding="async"

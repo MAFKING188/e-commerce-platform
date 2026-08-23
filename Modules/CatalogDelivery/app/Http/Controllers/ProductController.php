@@ -3,6 +3,7 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CatalogDelivery\Services\ProductImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\Category;
@@ -33,6 +34,7 @@ class ProductController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
                 $path = $file->store('products', 'public');
+                ProductImageService::makeCardVariant($path);
                 ProductImage::create([
                     'product_id' => $product->id,
                     'url' => 'storage/' . $path,
@@ -69,6 +71,7 @@ class ProductController extends Controller
             $lastPosition = $product->images()->max('position') ?? -1;
             foreach ($request->file('images') as $index => $file) {
                 $path = $file->store('products', 'public');
+                ProductImageService::makeCardVariant($path);
                 ProductImage::create([
                     'product_id' => $product->id,
                     'url' => 'storage/' . $path,

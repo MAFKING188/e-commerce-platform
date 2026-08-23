@@ -3,6 +3,7 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CatalogDelivery\Services\ProductImageService;
 use Modules\PartnerHub\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\CatalogDelivery\Models\Category;
@@ -83,6 +84,7 @@ class PartnerInventoryController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $file) {
                 $path = $file->store('products', 'public');
+                ProductImageService::makeCardVariant($path);
                 ProductImage::create([
                     'product_id' => $product->id,
                     'url' => 'storage/' . $path,
@@ -123,6 +125,7 @@ class PartnerInventoryController extends Controller
             $lastPosition = $product->images()->max('position') ?? -1;
             foreach ($request->file('images') as $index => $file) {
                 $path = $file->store('products', 'public');
+                ProductImageService::makeCardVariant($path);
                 ProductImage::create([
                     'product_id' => $product->id,
                     'url' => 'storage/' . $path,
