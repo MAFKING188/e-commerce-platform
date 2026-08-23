@@ -50,7 +50,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->as('admin.')->group(funct
         'edit' => 'categories.edit',
         'update' => 'categories.update',
         'destroy' => 'categories.destroy',
-    ]);
+    ])->except(['show']);
 
     /* Community Moderation */
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
@@ -72,5 +72,5 @@ Route::middleware(['auth', 'partner'])->prefix('partner')->as('partner.')->group
     Route::post('inventory/bulk-action', [PartnerInventoryController::class, 'bulkAction'])->name('inventory.bulk-action');
     Route::post('inventory/{product}/reorder-images', [PartnerInventoryController::class, 'reorderImages'])->name('inventory.reorder-images');
     Route::delete('inventory/{product}/images/{image}', [PartnerInventoryController::class, 'deleteImage'])->name('inventory.delete-image');
-    Route::resource('inventory', PartnerInventoryController::class);
+    Route::resource('inventory', PartnerInventoryController::class)->except(['show']);
 });

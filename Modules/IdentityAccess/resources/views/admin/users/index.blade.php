@@ -57,6 +57,7 @@
                     </td>
                     <td class="is-right">
                         <div class="pc-row-actions pc-row-actions--end">
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="pc-btn-sm">Edit</a>
                             @if($user->status == 'pending')
                                 <form action="{{ route('admin.users.approve', $user->id) }}" method="POST">
                                     @csrf

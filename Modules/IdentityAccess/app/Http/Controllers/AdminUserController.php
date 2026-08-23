@@ -40,6 +40,16 @@ class AdminUserController extends Controller
     }
 
     /**
+     * Edit a member's access credentials (role + status).
+     */
+    public function edit($id)
+    {
+        $user = User::findOrFail($id);
+
+        return view('identityaccess::admin.users.edit', compact('user'));
+    }
+
+    /**
      * Update user role and status.
      */
     public function update(Request $request, $id)
