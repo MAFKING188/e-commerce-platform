@@ -25,7 +25,7 @@ class AdminOrderController extends Controller
     {
         $order = Order::with('items.product.partners')->findOrFail($id);
 
-        if ($order->status === 'paid') {
+        if (in_array($order->status, ['paid', 'shipped'], true)) {
             \DB::transaction(function () use ($order, $payouts) {
                 $order->update(['status' => 'completed']);
                 $payouts->settle($order);

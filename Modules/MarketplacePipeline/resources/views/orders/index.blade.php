@@ -41,6 +41,8 @@
                     </div>
                 </div>
 
+                @include('marketplacepipeline::orders._progress', ['order' => $order])
+
                 <div class="order-items-table-wrap">
                     <table class="order-items-table">
                         <thead>

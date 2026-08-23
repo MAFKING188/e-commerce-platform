@@ -340,3 +340,14 @@
 .items-table th { padding: 1.5rem; background: var(--surface-200); text-align: left; font-size: 0.85rem; font-weight: 700; color: var(--text-600); border-bottom: 1px solid var(--border); }
 .items-table td { padding: 1.5rem; border-bottom: 1px solid var(--border); }
 .product-img { width: 64px; height: 64px; border-radius: 0.75rem; object-fit: cover; }
+/* Order fulfillment progress (buyer order history) */
+.order-progress { display: flex; align-items: center; gap: 0.5rem; padding: 0 1.5rem 1.25rem; }
+.order-progress__step { display: flex; align-items: center; gap: 0.4rem; }
+.order-progress__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); transition: background .3s; }
+.order-progress__step.is-done .order-progress__dot { background: var(--accent, #16a34a); }
+.order-progress__step.is-current .order-progress__dot { background: var(--accent, #16a34a); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #16a34a) 20%, transparent); }
+.order-progress__label { font-size: 0.72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-400); }
+.order-progress__step.is-current .order-progress__label,
+.order-progress__step.is-done .order-progress__label { color: var(--text-700); }
+.order-progress__bar { flex: 1 1 auto; height: 2px; min-width: 24px; background: var(--border); }
+.order-progress__bar.is-done { background: var(--accent, #16a34a); }

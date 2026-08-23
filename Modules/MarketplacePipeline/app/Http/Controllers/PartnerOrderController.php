@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use Modules\MarketplacePipeline\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Modules\MarketplacePipeline\Mail\OrderShipped;
 
 class PartnerOrderController extends Controller
 {
     /** @var list<string> */
-    protected array $statuses = ['pending', 'paid', 'completed', 'cancelled'];
+    protected array $statuses = ['pending', 'paid', 'shipped', 'completed', 'cancelled'];
 
     protected function getPartner()
     {
@@ -64,7 +66,32 @@ class PartnerOrderController extends Controller
             fn ($item) => $item->product->partners->contains('id', $partner->id)
         );
         $partnerSubtotal = $partnerItems->sum(fn ($item) => $item->price * $item->quantity);
-        
+
         return view('marketplacepipeline::partner.orders.show', compact('order', 'partnerItems', 'partnerSubtotal'));
+    }
+
+    /**
+     * Fulfillment transition: paid → shipped, restricted to orders that
+     * actually contain this partner's items. Buyer is notified by email.
+     */
+    public function ship($id)
+    {
+        $partner = $this->getPartner();
+
+        $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
+
+        if ($order->status !== 'paid') {
+            return back()->withErrors('Only paid orders can be marked as shipped.');
+        }
+
+        \DB::transaction(function () use ($order) {
+            $order->update(['status' => 'shipped']);
+        });
+
+        Mail::to($order->user)->queue(new OrderShipped($order->load('items.product')));
+
+        (new \Modules\TelemetryPipeline\Services\TelemetryService)->log('partner.orders.shipped', ['order_id' => $order->id]);
+
+        return back()->with('status', 'Order marked as shipped — the collector has been notified.');
     }
 }

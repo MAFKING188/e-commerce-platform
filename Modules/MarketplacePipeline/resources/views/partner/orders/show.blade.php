@@ -27,7 +27,16 @@
     </div>
     <div class="pc-card pc-meta">
         <span class="pc-meta__label">Fulfillment Status</span>
-        <div class="pc-meta__value">@include('partials.partner.status-badge', ['status' => $order->status])</div>
+        <div class="pc-meta__value">
+            @include('partials.partner.status-badge', ['status' => $order->status])
+            @if($order->status === 'paid')
+                <form action="{{ route('partner.orders.ship', $order->id) }}" method="POST" class="inline-form" data-confirm="Mark this order as shipped? The collector will be notified by email.">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="btn btn-primary pc-btn-sm">Mark as Shipped</button>
+                </form>
+            @endif
+        </div>
     </div>
     <div class="pc-card pc-meta">
         <span class="pc-meta__label">Client Reference</span>

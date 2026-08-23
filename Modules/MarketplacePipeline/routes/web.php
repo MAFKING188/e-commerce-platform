@@ -35,6 +35,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
 });
 
 Route::prefix('partner')->middleware(['auth', 'partner'])->name('partner.')->group(function () {
+    Route::patch('/orders/{id}/ship', [PartnerOrderController::class, 'ship'])->name('orders.ship');
     Route::get('/orders', [PartnerOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [PartnerOrderController::class, 'show'])->name('orders.show');
 
