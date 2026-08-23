@@ -4,6 +4,7 @@ namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\CatalogDelivery\Models\Category;
+use Modules\CatalogDelivery\Services\CatalogCache;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -24,8 +25,10 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100'
         ]);
-        
+
         Category::create($validated);
+        CatalogCache::flush();
+
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully');
     }
     
@@ -43,14 +46,18 @@ class CategoryController extends Controller
 
         $category = Category::findOrFail($id);
         $category->update($validated);
+        CatalogCache::flush();
+
         return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully');
     }
-    
+
     public function destroy($id)
     {
         try {
             $category = Category::findOrFail($id);
             $category->delete();
+            CatalogCache::flush();
+
             return redirect()->back()->with('success', 'Category deleted');
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect()->back()

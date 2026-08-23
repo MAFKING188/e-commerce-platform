@@ -3,6 +3,7 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CatalogDelivery\Services\CatalogCache;
 use Modules\CatalogDelivery\Services\ProductImageService;
 use Modules\PartnerHub\Models\Partner;
 use Modules\CatalogDelivery\Models\Product;
@@ -101,6 +102,7 @@ class PartnerInventoryController extends Controller
             ]);
         }
 
+        CatalogCache::flush();
         return redirect()->route('partner.inventory.index')->with('success', 'Product added to inventory');
     }
 
@@ -134,6 +136,7 @@ class PartnerInventoryController extends Controller
             }
         }
 
+        CatalogCache::flush((int) $id);
         return redirect()->route('partner.inventory.index')->with('success', 'Product updated');
     }
 
@@ -182,6 +185,7 @@ class PartnerInventoryController extends Controller
                 ->with('error', 'Cannot delete this product: it is referenced by existing orders, carts, or reviews.');
         }
 
+        CatalogCache::flush((int) $id);
         return redirect()->route('partner.inventory.index')->with('success', 'Product removed');
     }
 }

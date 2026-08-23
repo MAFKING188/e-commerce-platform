@@ -3,6 +3,7 @@
 namespace Modules\CatalogDelivery\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CatalogDelivery\Services\CatalogCache;
 use Modules\CatalogDelivery\Services\ProductImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +51,7 @@ class ProductController extends Controller
             ]);
         }
 
+        CatalogCache::flush();
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully');
     }
 
@@ -80,6 +82,7 @@ class ProductController extends Controller
             }
         }
 
+        CatalogCache::flush((int) $id);
         return redirect()->route('admin.products.index')->with('success', 'Product updated');
     }
 
@@ -111,6 +114,7 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($id);
             $product->delete();
+            CatalogCache::flush((int) $id);
             return redirect()->route('admin.products.index')->with('success', 'Product Removed successfully');
         } catch (\Illuminate\Database\QueryException $e) {
             return redirect()->route('admin.products.index')

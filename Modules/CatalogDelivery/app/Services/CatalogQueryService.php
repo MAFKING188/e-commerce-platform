@@ -2,6 +2,7 @@
 
 namespace Modules\CatalogDelivery\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Modules\CatalogDelivery\Models\Category;
 use Modules\CatalogDelivery\Models\Product;
 
@@ -13,27 +14,31 @@ class CatalogQueryService
     }
     public function home(): array
     {
-        $latestProducts = Product::with(['images', 'partners'])
-            ->latest()
-            ->take(8)
-            ->get();
+        return Cache::remember('catalog:home', now()->addMinutes(10), function () {
+            $latestProducts = Product::with(['images', 'partners'])
+                ->latest()
+                ->take(8)
+                ->get();
 
-        $featuredProducts = Product::with(['images', 'partners'])
-            ->where('stock', '>', 0)
-            ->latest()
-            ->take(6)
-            ->get();
+            $featuredProducts = Product::with(['images', 'partners'])
+                ->where('stock', '>', 0)
+                ->latest()
+                ->take(6)
+                ->get();
 
-        return compact('latestProducts', 'featuredProducts');
+            return compact('latestProducts', 'featuredProducts');
+        });
     }
 
     public function collection(): array
     {
-        $categories = Category::with(['products' => fn ($q) => $q->with(['images', 'partners'])->latest()])
-            ->orderBy('name')
-            ->get();
+        return Cache::remember('catalog:collection', now()->addMinutes(10), function () {
+            $categories = Category::with(['products' => fn ($q) => $q->with(['images', 'partners'])->latest()])
+                ->orderBy('name')
+                ->get();
 
-        return compact('categories');
+            return compact('categories');
+        });
     }
 
     public function shop(\Illuminate\Http\Request $request): \Illuminate\Pagination\LengthAwarePaginator
@@ -91,10 +96,14 @@ class CatalogQueryService
 
     public function related(Product $product, int $limit = 4): \Illuminate\Database\Eloquent\Collection
     {
-        return Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->inRandomOrder()
-            ->limit($limit)
-            ->get();
+        // Cached per product: also avoids a full-table random scan per view.
+        return Cache::remember("catalog:related:{$product->id}", now()->addMinutes(30), function () use ($product, $limit) {
+            return Product::with(['images', 'partners'])
+                ->where('category_id', $product->category_id)
+                ->where('id', '!=', $product->id)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get();
+        });
     }
 }
