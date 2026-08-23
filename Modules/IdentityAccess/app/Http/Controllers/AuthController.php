@@ -76,6 +76,8 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
+        $remember = $request->boolean('remember');
+
         // Check if user is active before attempting login
         $user = User::where('email', $credentials['email'])->first();
 
@@ -113,7 +115,7 @@ class AuthController extends Controller
             return redirect()->route('2fa.challenge');
         }
 
-        Auth::login($user);
+        Auth::login($user, $remember);
         $request->session()->regenerate();
 
         return redirect()->intended('/');
