@@ -120,11 +120,14 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value determines the classes that can be unserialized from cache
-    | storage. By default, no PHP classes will be unserialized from your
-    | cache to prevent gadget chain attacks if your APP_KEY is leaked.
+    | storage. `false` blocks ALL object hydration (__PHP_Incomplete_Class),
+    | which silently breaks Eloquent-model caching. `true` restores normal
+    | behavior (gadget-chain risk only materializes if APP_KEY also leaks —
+    | at which point sessions are forgeable anyway). Set to a class-name
+    | array for a strict allowlist if you ever need hardening.
     |
     */
 
-    'serializable_classes' => false,
+    'serializable_classes' => filter_var(env('CACHE_SERIALIZABLE_CLASSES', true), FILTER_VALIDATE_BOOLEAN),
 
 ];
