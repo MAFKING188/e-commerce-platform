@@ -20,6 +20,7 @@
                 <th>Customer</th>
                 <th>Total</th>
                 <th>Status</th>
+                <th>Proof</th>
                 <th>Date</th>
                 <th class="is-right">Actions</th>
             </tr>
@@ -31,14 +32,22 @@
                 <td>{{ $order->user->name }}</td>
                 <td class="is-strong">@money($order->total_price)</td>
                 <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
+                <td>
+                    @if($order->status === 'pending_payment')
+                        @if($order->payment && $order->payment->proof_path)
+                            <a href="{{ asset('storage/' . $order->payment->proof_path) }}" target="_blank" class="pc-btn-sm">View</a>
+                        @endif
+                    @endif
+                </td>
                 <td class="is-muted">{{ $order->created_at->format('M d, H:i') }}</td>
                 <td class="is-right">
                     <div class="pc-row-actions">
-                        <a href="{{ route('admin.orders.show', $order->id) }}" class="pc-btn-sm">View</a>
-                        @if($order->status === 'paid')
-                            <form action="{{ route('admin.orders.complete', $order->id) }}" method="POST">
+                        @if($order->status === 'pending_payment')
+                            <form action="{{ route('admin.orders.validate-payment', $order->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="pc-btn-sm pc-btn-sm--ok">Mark Shipped</button>
+                                @method('POST')
+                                <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok">Approve</button>
+                                <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error">Reject</button>
                             </form>
                         @endif
                     </div>

@@ -78,9 +78,38 @@
                         <td colspan="2" class="is-right">Total:</td>
                         <td class="is-right is-strong">${{ number_format($order->total_price, 2) }}</td>
                     </tr>
-                </tfoot>
+                </tbody>
             </table>
         </div>
     </div>
+
+    @if($order->status === 'pending_payment')
+        <div class="pc-card pc-card--warning">
+            <div class="pc-card__head">
+                <h2 class="pc-card__title">Validate Payment</h2>
+            </div>
+            <div class="pc-card__body">
+                <p>Order is pending bank transfer proof validation.</p>
+                <p class="text-muted small">Maximum 24 hours for validation.</p>
+                <form action="{{ route('admin.orders.validate-payment', $order->id) }}" method="POST">
+                    @csrf
+                    @method('POST')
+                    <div class="form-group">
+                        <select name="action" class="form-input">
+                            <option value="approve">Approve</option>
+                            <option value="reject">Reject</option>
+                        </select>
+                    </div>
+                    @if(request('action') === 'reject')
+                        <div class="form-group">
+                            <textarea name="reason" class="form-input" rows="3" required></textarea>
+                            <span class="form-error">Reason is required when rejecting</span>
+                        </div>
+                    @endif
+                    <button type="submit" class="btn btn-primary">Validate</button>
+                </form>
+            </div>
+        </div>
+    @endif
 </div>
 </x-app-layout>

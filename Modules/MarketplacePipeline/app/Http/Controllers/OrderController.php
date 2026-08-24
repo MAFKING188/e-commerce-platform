@@ -39,6 +39,8 @@ class OrderController extends Controller
         $user = auth()->user();
         $session = $request->session();
 
+        $paymentMethod = $request->input('payment_method', 'paypal');
+
         if (! \Modules\IdentityAccess\Services\StepUpService::isVerified($session)) {
             $code = trim((string) $request->input('code'));
 
@@ -51,9 +53,16 @@ class OrderController extends Controller
         }
 
         try {
-            $order = $checkout->checkout($user, $delivery);
+            $order = $checkout->checkout($user, $delivery, $paymentMethod);
 
             $order->load('items.product');
+
+            // Determine redirect based on payment method
+            if ($paymentMethod === 'bank_transfer') {
+                return redirect()->route('upload-proof', ['order' => $order->id])
+                    ->with('status', 'Order created. Please upload proof of payment within 24 hours.');
+            }
+
             Mail::to($user)->send(new OrderConfirmed($order));
 
             return redirect()->route('orders.index')->with('status', 'Order placed successfully');

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutService
 {
-    public function checkout(User $user, array $delivery = []): Order
+    public function checkout(User $user, array $delivery = [], $paymentMethod = 'paypal'): Order
     {
         $cart = Cart::with('items')->where('user_id', $user->id)->first();
 
@@ -20,7 +20,10 @@ class CheckoutService
             throw new \RuntimeException('Cart is empty');
         }
 
-        return DB::transaction(function () use ($cart, $user, $delivery) {
+        // Determine order status based on payment method
+        $orderStatus = $paymentMethod === 'bank_transfer' ? 'pending_payment' : 'pending';
+
+        return DB::transaction(function () use ($cart, $user, $delivery, $paymentMethod, $orderStatus) {
             $total = 0;
             $products = [];
 
@@ -43,7 +46,7 @@ class CheckoutService
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_price' => $total,
-                'status' => 'pending',
+                'status' => $orderStatus,
             ] + array_intersect_key($delivery, array_flip([
                 'recipient_name',
                 'recipient_phone',
@@ -70,6 +73,16 @@ class CheckoutService
             }
 
             $cart->items()->delete();
+
+            // Create payment record based on method
+            if ($paymentMethod === 'bank_transfer') {
+                Payment::create([
+                    'order_id' => $order->id,
+                    'method' => 'bank_transfer',
+                    'status' => 'pending',
+                    'amount' => $total
+                ]);
+            }
 
             return $order;
         });

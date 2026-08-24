@@ -96,4 +96,24 @@
         Please ensure all pieces are inspected for quality before dispatch. Once shipped, please update the central logistics hub.
     </p>
 </div>
+
+@if($order->status === 'pending_payment')
+    <div class="pc-card pc-card--warning">
+        <div class="pc-card__head">
+            <h2 class="pc-card__title">Validate Payment</h2>
+        </div>
+        <div class="pc-card__body">
+            <p>Order is pending bank transfer proof validation.</p>
+            <p class="text-muted small">Maximum 24 hours for validation.</p>
+            <form action="{{ route('partner.orders.show', $order->id) }}" method="POST" class="inline-form" data-confirm="Validate this payment?">
+                @csrf
+                @method('POST')
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn btn-primary pc-btn-sm">Approve</button>
+                <button type="submit" name="action" value="reject" class="btn btn-danger pc-btn-sm">Reject</button>
+            </form>
+        </div>
+    </div>
+@endif
+
 </x-app-layout>

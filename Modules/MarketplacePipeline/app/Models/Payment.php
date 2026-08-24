@@ -11,7 +11,11 @@ class Payment extends Model
         'transaction_id',
         'status',
         'amount',
-        'method'
+        'method',
+        'proof_path',
+        'validated_at',
+        'validated_by',
+        'validation_notes'
     ];
 
     public function order()

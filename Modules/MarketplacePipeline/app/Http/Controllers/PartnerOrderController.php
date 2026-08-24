@@ -12,7 +12,7 @@ use Modules\MarketplacePipeline\Mail\OrderShipped;
 class PartnerOrderController extends Controller
 {
     /** @var list<string> */
-    protected array $statuses = ['pending', 'paid', 'shipped', 'completed', 'cancelled'];
+    protected array $statuses = ['pending', 'pending_payment', 'paid', 'shipped', 'completed', 'cancelled'];
 
     protected function getPartner()
     {
@@ -93,5 +93,64 @@ class PartnerOrderController extends Controller
         (new \Modules\TelemetryPipeline\Services\TelemetryService)->log('partner.orders.shipped', ['order_id' => $order->id]);
 
         return back()->with('status', 'Order marked as shipped — the collector has been notified.');
+    }
+
+    /**
+     * Validate bank transfer payment: approve or reject.
+     */
+    public function validatePayment($id, Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'reason' => 'required_if:action,reject',
+        ]);
+
+        $partner = $this->getPartner();
+        
+        // Ensure the order actually contains items from this partner
+        $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
+        $order->load(['items.product.partners', 'payment']);
+
+        if ($order->status !== 'pending_payment') {
+            return back()->withErrors('Only pending payment orders can be validated.');
+        }
+
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $payment = $order->payment;
+
+        if ($request->action === 'approve') {
+            DB::transaction(function () use ($payment, $order) {
+                $payment->update([
+                    'status' => 'paid',
+                    'validated_at' => now(),
+                    'validated_by' => auth()->id(),
+                ]);
+                $order->update(['status' => 'paid']);
+            });
+
+            // Send email to user
+            Mail::to($order->user)->send(new PaymentValidated($order));
+
+            return back()->with('status', 'Payment approved — order confirmed.');
+        }
+
+        // Reject action
+        $reason = $request->reason;
+
+        DB::transaction(function () use ($payment, $order, $reason) {
+            $payment->update([
+                'status' => 'rejected',
+                'validation_notes' => $reason,
+            ]);
+            // Order status stays pending_payment
+        });
+
+        // Send email to user
+        Mail::to($order->user)->send(new PaymentRejected($order, $reason));
+
+        return back()->with('status', 'Payment rejected. User notified to re-upload proof.');
     }
 }

@@ -23,6 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/paypal/cancel', function () {
         return redirect()->route('orders.index')->withErrors('Payment cancelled');
     })->name('paypal.cancel');
+
+    // Bank Transfer
+    Route::post('/bank-transfer/store', [PaymentController::class, 'storeBankTransfer'])->name('bank-transfer.store');
+    Route::get('/orders/{order}/upload-proof', [PaymentController::class, 'uploadProof'])->name('upload-proof');
+    Route::post('/orders/{order}/upload-proof', [PaymentController::class, 'handleUploadProof'])->name('handle-upload-proof');
 });
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
@@ -30,12 +35,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
+    Route::post('/admin/orders/{id}/validate-payment', [AdminOrderController::class, 'validatePayment'])->name('admin.orders.validate-payment');
+
     Route::get('/payouts', [AdminPayoutController::class, 'index'])->name('payouts.index');
     Route::post('/payouts/{id}/process', [AdminPayoutController::class, 'process'])->name('payouts.process');
 });
 
 Route::prefix('partner')->middleware(['auth', 'partner'])->name('partner.')->group(function () {
     Route::patch('/orders/{id}/ship', [PartnerOrderController::class, 'ship'])->name('orders.ship');
+    Route::patch('/orders/{id}/validate-payment', [PartnerOrderController::class, 'validatePayment'])->name('orders.validate-payment');
     Route::get('/orders', [PartnerOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [PartnerOrderController::class, 'show'])->name('orders.show');
 

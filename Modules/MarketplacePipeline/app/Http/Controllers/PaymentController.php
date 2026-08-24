@@ -144,4 +144,96 @@ class PaymentController extends Controller
             ->route('orders.index')
             ->with('status', 'Payment completed successfully');
     }
+
+    /**
+     * Bank transfer store flow.
+     * Creates order with pending_payment status and payment record.
+     */
+    public function storeBankTransfer(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+
+        // 🚨 Prevent paying another user's order
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // 🚨 Prevent payment for invalid order states
+        if ($order->status === 'paid') {
+            return back()->withErrors('Order is already paid.');
+        }
+
+        if ($order->status === 'cancelled') {
+            return back()->withErrors('Cannot pay for a cancelled order.');
+        }
+
+        if ($order->status !== 'pending') {
+            return back()->withErrors('Order status must be pending to proceed with payment.');
+        }
+
+        // Create pending payment record for bank transfer
+        Payment::create([
+            'order_id' => $order->id,
+            'method' => 'bank_transfer',
+            'status' => 'pending',
+            'amount' => $order->total_price
+        ]);
+
+        // Redirect to upload proof page
+        return redirect()->route('upload-proof', ['order' => $order->id])
+            ->with('status', 'Order created. Please upload proof of payment within 24 hours.');
+    }
+
+    /**
+     * Show the upload proof page.
+     */
+    public function uploadProof($id)
+    {
+        $order = Order::with('payment')->findOrFail($id);
+
+        // 🚨 Ownership gate: only the buyer may upload proof
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return view('marketplacepipeline::payments.upload-proof', compact('order'));
+    }
+
+    /**
+     * Handle proof upload.
+     */
+    public function handleUploadProof(Request $request, $id)
+    {
+        $request->validate([
+            'proof_image' => 'required|image|max:5000', // 5MB max
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        // 🚨 Ownership gate: only the buyer may upload proof
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($order->status !== 'pending_payment') {
+            return back()->withErrors('Proof can only be uploaded for pending payment orders.');
+        }
+
+        $path = $request->file('proof_image')->store('proofs', 'public');
+
+        // Update payment record
+        $order->payment->update([
+            'proof_path' => $path,
+        ]);
+
+        // Send email to admin notifying new proof
+        // Mail::to('admin@example.com')->queue(new ProofReceived($order));
+
+        return back()
+            ->with('status', 'Proof uploaded successfully. Our team will validate within 24 hours.');
+    }
 }

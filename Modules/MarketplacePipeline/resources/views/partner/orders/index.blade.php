@@ -35,6 +35,7 @@
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Proof</th>
                 <th class="is-right">Action</th>
             </tr>
         </thead>
@@ -44,13 +45,29 @@
                     <td class="is-numeric">#{{ $order->id }}</td>
                     <td class="is-muted">{{ $order->created_at->format('M d, Y') }}</td>
                     <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
+                    <td>
+                        @if($order->status === 'pending_payment')
+                            @if($order->payment && $order->payment->proof_path)
+                                <a href="{{ asset('storage/' . $order->payment->proof_path) }}" target="_blank" class="pc-btn-sm">View</a>
+                            @endif
+                        @endif
+                    </td>
                     <td class="is-right">
-                        <a href="{{ route('partner.orders.show', $order->id) }}" class="pc-section-link">View Details</a>
+                        @if($order->status === 'pending_payment')
+                            @if($order->payment && !$order->payment->validated_at)
+                                <form action="{{ route('partner.orders.show', $order->id) }}" method="POST" style="display:inline">
+                                    @csrf
+                                    @method('POST')
+                                    <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error">Reject</button>
+                                </form>
+                            @endif
+                        @endif
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                         @include('partials.partner.empty-state', [
                             'icon' => request()->hasAny(['search', 'status']) ? 'search' : 'receipt',
                             'title' => request()->hasAny(['search', 'status']) ? 'No matching orders' : 'No orders yet',
