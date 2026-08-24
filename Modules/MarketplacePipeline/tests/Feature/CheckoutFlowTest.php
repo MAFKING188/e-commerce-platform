@@ -45,7 +45,7 @@ class CheckoutFlowTest extends TestCase
 
         $this->actingAs($user)
             ->post('/orders/store', $this->verifiedPayload($user))
-            ->assertRedirect(route('orders.index'));
+            ->assertRedirect(route('orders.confirmation', ['order' => 1]));
 
         $this->assertSame(1, Order::count());
         $this->assertSame(100.0, (float) Order::first()->total_price);
@@ -61,7 +61,7 @@ class CheckoutFlowTest extends TestCase
 
         $this->actingAs($user)
             ->post('/orders/store', $this->verifiedPayload($user))
-            ->assertRedirect(route('orders.index'));
+            ->assertRedirect(route('orders.confirmation', ['order' => 1]));
 
         $order = Order::first();
         $this->assertSame('Jane Doe', $order->recipient_name);

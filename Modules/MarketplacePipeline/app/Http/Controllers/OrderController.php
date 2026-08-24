@@ -65,10 +65,26 @@ class OrderController extends Controller
 
             Mail::to($user)->send(new OrderConfirmed($order));
 
-            return redirect()->route('orders.index')->with('status', 'Order placed successfully');
+            return redirect()->route('orders.confirmation', ['order' => $order->id]);
         } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage());
+            // Make the failure visible AND recoverable: re-send a fresh code so
+            // the burned single-use OTP never strands the user mid-checkout.
+            \Modules\IdentityAccess\Services\StepUpService::begin($user, $session);
+
+            return back()->withErrors(['checkout' => 'We could not place your order: ' . $e->getMessage() . ' A fresh verification code has been emailed to you — please try again.']);
         }
+    }
+
+    /**
+     * Post-purchase confirmation page: the receipt a buyer actually sees.
+     */
+    public function confirmation($id)
+    {
+        $order = Order::with(['items.product', 'payment'])
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        return view('marketplacepipeline::orders.confirmation', compact('order'));
     }
 
     public function cancel($id, CheckoutService $checkout)

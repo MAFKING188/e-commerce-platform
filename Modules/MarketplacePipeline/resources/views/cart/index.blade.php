@@ -76,6 +76,9 @@
 
         <form method="POST" action="{{ route('orders.store') }}" id="checkout-form">
         @csrf
+        @if ($errors->has('checkout'))
+            <div class="form-error checkout-error" role="alert">{{ $errors->first('checkout') }}</div>
+        @endif
 
         <!-- Delivery Details -->
         <div class="delivery-section">

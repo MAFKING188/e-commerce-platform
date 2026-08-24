@@ -179,4 +179,65 @@ class MoneyClusterTest extends TestCase
 
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'paid']);
     }
+
+    public function test_confirmation_page_shows_receipt_to_owner_only(): void
+    {
+        $buyer = User::factory()->create();
+        $order = Order::create(['user_id' => $buyer->id, 'total_price' => 50, 'status' => 'pending']);
+        $product = Product::factory()->create(['name' => 'Confirmation Piece']);
+        $order->items()->create(['product_id' => $product->id, 'quantity' => 1, 'price' => 50]);
+
+        $this->actingAs($buyer)
+            ->get(route('orders.confirmation', $order->id))
+            ->assertOk()
+            ->assertSee('your order is confirmed')
+            ->assertSee('Confirmation Piece');
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('orders.confirmation', $order->id))
+            ->assertNotFound();
+    }
+
+    public function test_checkout_failure_surfaces_error_and_fresh_code(): void
+    {
+        Mail::fake();
+        $buyer = User::factory()->create();
+        $product = Product::factory()->create(['stock' => 5]);
+        $cart = \Modules\MarketplacePipeline\Models\Cart::create(['user_id' => $buyer->id]);
+        $cart->items()->create(['product_id' => $product->id, 'quantity' => 2, 'price' => $product->price]);
+        $product->update(['stock' => 1]); // insufficient at checkout time
+
+        $code = \Modules\IdentityAccess\Services\OtpService::issue($buyer);
+
+        $this->actingAs($buyer)
+            ->post('/orders/store', [
+                'recipient_name' => 'Test Buyer',
+                'recipient_phone' => '+212600000000',
+                'shipping_line1' => '1 Test Way',
+                'shipping_city' => 'Testville',
+                'shipping_country' => 'MA',
+                'code' => $code,
+            ])
+            ->assertRedirect();
+
+        $this->followingRedirects()
+            ->get('/cart')
+            ->assertOk()
+            ->assertSee('We could not place your order')
+            ->assertSee('fresh verification code');
+    }
+
+    private function verifiedPayload(User $user): array
+    {
+        $code = \Modules\IdentityAccess\Services\OtpService::issue($user);
+
+        return [
+            'recipient_name' => 'Test Buyer',
+            'recipient_phone' => '+212600000000',
+            'shipping_line1' => '1 Test Way',
+            'shipping_city' => 'Testville',
+            'shipping_country' => 'MA',
+            'code' => $code,
+        ];
+    }
 }

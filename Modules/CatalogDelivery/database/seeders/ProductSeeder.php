@@ -17,7 +17,7 @@ class ProductSeeder extends Seeder
             foreach ($items as $index => [$name, $_]) {
                 $product = Product::create([
                     'name' => $name,
-                    'price' => rand(300, 3500),
+                    'price' => CatalogInventory::priceFor($catName, $name),
                     'category_id' => $category->id,
                     'stock' => rand(10, 50),
                     'description' => "Experience the pinnacle of LUWI craftsmanship. The {$name} is a masterclass in modern design.",

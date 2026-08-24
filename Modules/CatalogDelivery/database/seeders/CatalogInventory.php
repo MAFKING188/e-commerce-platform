@@ -212,6 +212,35 @@ class CatalogInventory
     }
 
     /**
+     * Realistic per-category price bands (USD). Deterministic per product name
+     * so seeder, migrations, and re-runs all agree on the same price.
+     */
+    public const PRICE_BANDS = [
+        'Electronics' => [29, 899],
+        'Clothing' => [19, 179],
+        'Home & Kitchen' => [24, 229],
+        'Books' => [9, 45],
+        'Beauty & Wellness' => [12, 79],
+        'Sports & Outdoors' => [19, 189],
+        'Toys & Games' => [14, 89],
+    ];
+
+    public static function priceFor(string $category, string $name): float
+    {
+        [$min, $max] = self::PRICE_BANDS[$category] ?? [19, 149];
+
+        // Stable pseudo-random position inside the band.
+        $seed = hexdec(substr(md5($name), 0, 6));
+        $price = $min + ($seed % 1000 / 1000) * ($max - $min);
+
+        // Charming retail endings (.99 / .49 / .00).
+        $base = floor($price);
+        $ending = [0.00, 0.49, 0.99][$seed % 3];
+
+        return round($base + $ending, 2);
+    }
+
+    /**
      * Local storage path (relative to the public disk) of the self-hosted
      * copy of the curated image for $name. Null when the name is unknown.
      */
