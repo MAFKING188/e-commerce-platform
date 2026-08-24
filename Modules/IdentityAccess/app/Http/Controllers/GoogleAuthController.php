@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Modules\IdentityAccess\Models\User;
 use Modules\IdentityAccess\Services\OtpService;
@@ -51,8 +52,14 @@ class GoogleAuthController extends Controller
                 'status' => 'active',
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
-                'email_verified_at' => now(),
             ]);
+
+            // Google has proven email ownership — mark verified. forceFill
+            // because email_verified_at is deliberately not mass-assignable.
+            $user->forceFill(['email_verified_at' => now()])->save();
+
+            // Welcome parity with password signups.
+            Mail::to($user)->queue(new \Modules\IdentityAccess\Mail\WelcomeMember($user));
         }
 
         if ($user->status !== 'active') {

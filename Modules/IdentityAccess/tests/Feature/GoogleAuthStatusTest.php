@@ -64,4 +64,21 @@ class GoogleAuthStatusTest extends TestCase
         Mail::assertQueued(OtpMail::class);
         $this->assertGuest();
     }
+
+    public function test_new_google_registration_is_verified_and_welcomed(): void
+    {
+        Mail::fake();
+
+        $this->mockGoogle('fresh.google@test.com');
+
+        $this->get('/auth/google/callback')
+            ->assertRedirect('/');
+
+        $user = User::where('email', 'fresh.google@test.com')->first();
+        $this->assertNotNull($user, 'Google user was created');
+        $this->assertNotNull($user->email_verified_at, 'Google user must be verified at creation');
+        $this->assertNull($user->password, 'Google-only account has no password');
+
+        Mail::assertQueued(\Modules\IdentityAccess\Mail\WelcomeMember::class, fn ($m) => $m->user->email === 'fresh.google@test.com');
+    }
 }
