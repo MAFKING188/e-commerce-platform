@@ -35,7 +35,7 @@
         </div>
 
         <!-- Summary -->
-        <div class="summary-card">
+<div class="summary-card">
             <h2>Order Summary</h2>
             <div class="summary-row">
                 <span>Subtotal</span>
@@ -51,6 +51,20 @@
                 <span>@money($total)</span>
             </div>
 
+            <!-- Payment Method Selection -->
+            <div class="payment-methods">
+                <h3>Payment Method</h3>
+                <div class="payment-method-radio">
+                    <input type="radio" id="paypal" name="payment_method" value="paypal" checked>
+                    <label for="paypal">PayPal (recommended)</label>
+                </div>
+                <div class="payment-method-radio">
+                    <input type="radio" id="bank-transfer" name="payment_method" value="bank_transfer">
+                    <label for="bank-transfer">Bank Transfer</label>
+                    <span class="payment-method-note">Validation within 24 hours</span>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-checkout" form="checkout-form">
                 Confirm & Checkout
             </button>
@@ -59,9 +73,8 @@
                 Secure Checkout Powered by LUWI
             </p>
         </div>
-    </div>
 
-    <form method="POST" action="{{ route('orders.store') }}" id="checkout-form">
+        <form method="POST" action="{{ route('orders.store') }}" id="checkout-form">
         @csrf
 
         <!-- Delivery Details -->
