@@ -351,3 +351,7 @@
 .order-progress__step.is-done .order-progress__label { color: var(--text-700); }
 .order-progress__bar { flex: 1 1 auto; height: 2px; min-width: 24px; background: var(--border); }
 .order-progress__bar.is-done { background: var(--accent, #16a34a); }
+
+/* In-form checkout submit: always reachable at the end of the delivery form
+   (the sticky summary card scrolls out of range on tall forms). */
+.btn-checkout--inline { width: 100%; margin-top: 1.5rem; padding: 1rem 2rem; font-size: 1rem; }

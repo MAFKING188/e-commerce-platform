@@ -137,6 +137,10 @@
                 </div>
             </div>
         @endif
+
+        <button type="submit" class="btn btn-primary btn-checkout btn-checkout--inline">
+            @if (session('stepup.pending') || $errors->has('code')) Confirm & Place Order @else Confirm & Checkout @endif
+        </button>
     </form>
 @else
     <div class="empty-state">
