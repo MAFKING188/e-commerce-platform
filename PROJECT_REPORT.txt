@@ -988,3 +988,63 @@ Role model:  user (buyer) | partner (seller/artisan) | admin (platform operator)
  REMAINING from roadmap (deliberately not in this pass): Sentry-style hosted error
  monitoring (needs an account/Dsn decision), invoice/receipt PDFs, back-in-stock
  wishlist alerts, search FULLTEXT index.
+
+--------------------------------------------------------------------------------
+ 21. 2026-08-24 session — Production UI/UX evaluation + the 5 credibility fixes
+ --------------------------------------------------------------------------------
+ Full persona sweep of LIVE smartshop-luwi.tech (guest/buyer/partner/admin, desktop
+ + mobile 390x844, light+dark). Report: docs/UI-UX-EVALUATION-2026-08-24.md.
+ Screenshots: /tmp/opencode/prod-eval/ (13 captures).
+
+ CRITICAL BUG FOUND & FIXED LIVE (was blocking ALL purchases):
+   The only checkout submit button lived in the sticky .summary-card; on tall
+   delivery forms the sticky card scrolled out of range (measured y=-1098px) —
+   users could not check out by clicking at all. Fix: in-form submit button
+   (btn-checkout--inline) at the end of checkout-form (commit a8c1aea).
+   Verified end-to-end on prod with a real order + OTP.
+
+ THE 5 EVALUATION FIXES (all deployed + live-verified):
+   1) REALISTIC PRICING — CatalogInventory::priceFor() (per-category bands,
+      deterministic per name: Electronics 29-899, Books 9-45, Beauty 12-79...),
+      ProductSeeder uses it; migration 2026_08_24_100001 re-priced the live DB.
+      Bamboo Toothbrush Set: $2,999 -> $56.49. Shop grid now shows $11-$188.
+   2) ADMIN-FREE SIGNUP — "System Administrator" option removed from
+      signup.blade.php; AuthController@register validates in:user,partner.
+      Partner option relabelled "Reviewed Before Activation".
+   3) CHECKOUT ERROR SURFACING + OTP RECOVERY — catch branch now re-runs
+      StepUpService::begin (fresh code auto-emailed; burned OTP never strands
+      the user) and files the error under 'checkout', rendered in a styled
+      alert at the top of checkout-form (was invisible bare withErrors).
+   4) ORDER CONFIRMATION PAGE — GET orders/{id}/confirmation
+      (owner-scoped 404 otherwise): receipt summary, delivery target,
+      what-happens-next steps, live progress timeline, Track/Continue CTAs.
+      store() now redirects there (was: order history + toast).
+   5) IMAGE CONTENT FIXES (2 worst mismatches, visually verified):
+      - Carbon Road Helmet: cyclist WEARING a road helmet
+        (unsplash photo-1614889997399-ffaa0cdb2427)
+      - Climbing Chalk Bag: climber reaching into chalk pouch
+        (pexels 7590964)
+      Same slugs -> zero DB changes; card variants regenerated local+prod.
+      Sourcing recipe for the rest: websearch "<product> unsplash/pexels" ->
+      extract images.unsplash.com|images.pexels.com URLs from citing pages ->
+      curl-verify 200 -> eyeball -> overwrite same-slug file -> regen card.
+
+ COPY DE-SLOP (distinct voice per surface, no more triple-duplicated sentence):
+   - Meta description: marketplace/verification/delivery-tracking specifics.
+   - Footer: "independent marketplace... named artisan... arrival guarantee".
+   - Hero sub: "Independent artisans. Verified one-of-a-kind pieces. Free
+     returns within 30 days — no questions asked."
+   - Hero eyebrow: "<N> pieces in stock, ready to ship" (meaningful, dynamic).
+   - Cart badge: "SSL-secured payment · Full refund if your piece does not
+     arrive as described" (replaces fake "Powered by LUWI" trust badge).
+   - LOGO "SINCE 2026" KEPT per owner decision (real founding year).
+
+ Suite: 202 tests / 848 assertions. Deployed (migrate+build+cache clear);
+ live-verified: shop prices realistic, new images 200, signup has no admin
+ role, new copy renders.
+
+ REMAINING (owner eyeball recommended): ~8 more image-content mismatches
+ (LED Bike Lights->circuit board, Portable Camping Stove->tent, Rose Quartz
+ Facial Roller->eyeshadow palette, etc.) — use the sourcing recipe above.
+ Test artifacts on prod: users buyer/partner/admin.evaluation@smartshop-luwi.tech
+ (ids 5/6/7), Order #2 shipped, 1 evaluation partner record.
