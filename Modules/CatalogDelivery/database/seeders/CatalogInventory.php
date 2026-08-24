@@ -112,7 +112,7 @@ class CatalogInventory
 
         // Sports & Outdoors
         'Alpine Trekking Poles' => 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=800&q=80',
-        'Carbon Road Helmet' => 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80',
+        'Carbon Road Helmet' => 'https://images.unsplash.com/photo-1614889997399-ffaa0cdb2427?auto=format&fit=crop&w=800&q=80', // cyclist wearing helmet (verified 2026-08-24)
         'Yoga Mat Pro' => 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80',
         'Insulated Water Bottle' => 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
         'Trail Running Shoes' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
@@ -123,7 +123,7 @@ class CatalogInventory
         'LED Bike Lights' => 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?auto=format&fit=crop&w=800&q=80',
         'Portable Camping Stove' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80',
         'Waterproof Backpack' => 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-        'Climbing Chalk Bag' => 'https://images.unsplash.com/photo-1603796846097-bee99e4a601f?auto=format&fit=crop&w=800&q=80',
+        'Climbing Chalk Bag' => 'https://images.pexels.com/photos/7590964/pexels-photo-7590964.jpeg?auto=compress&cs=tinysrgb&w=800', // climber reaching into chalk pouch (verified 2026-08-24)
         'Folding Camp Chair' => 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&w=800&q=80',
         'Swim Training Fins' => 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=800&q=80',
 
