@@ -70,7 +70,7 @@
             </button>
 
             <p class="checkout-secure-note">
-                Secure Checkout Powered by LUWI
+                SSL-secured payment · Full refund if your piece does not arrive as described
             </p>
         </div>
 

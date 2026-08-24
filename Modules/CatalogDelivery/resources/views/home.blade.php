@@ -152,10 +152,10 @@
     <!-- Using ID 1027 (Luxury Watch) for guaranteed Hero display -->
     <img src="https://picsum.photos/id/1027/2000/1200" class="hero-image-bg" alt="">
     <div class="hero-overlay">
-        <span class="home-eyebrow">Collection / {{ \Modules\CatalogDelivery\Models\Product::where('stock', '>', 0)->count() }}</span>
+        <span class="home-eyebrow">{{ \Modules\CatalogDelivery\Models\Product::where('stock', '>', 0)->count() }} pieces in stock, ready to ship</span>
         <h1>Beyond <br>The Ordinary.</h1>
         <p class="home-hero-sub">
-            A relentless pursuit of craftsmanship. Discover pieces that define a new era of personal style.
+            Independent artisans. Verified one-of-a-kind pieces. Free returns within 30 days — no questions asked.
         </p>
         <div class="home-hero-actions">
             <a href="{{ route('shop') }}" class="btn btn-primary home-btn-solid">Enter Shop</a>

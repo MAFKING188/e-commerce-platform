@@ -6,9 +6,9 @@
     <title>@yield('title', 'SmartShop | Premium Collection')</title>
     
     <!-- SEO & OpenGraph -->
-    <meta name="description" content="@yield('description', 'SmartShop: High-Fidelity E-Commerce Ecosystem. Curating exceptional products with a focus on quality and timeless design.')">
+    <meta name="description" content="@yield('description', 'SmartShop is an independent marketplace for handcrafted pieces — browse verified artisans, order in minutes, and follow your delivery step by step.')">
     <meta property="og:title" content="@yield('title', 'SmartShop | Premium Collection')">
-    <meta property="og:description" content="@yield('description', 'SmartShop: High-Fidelity E-Commerce Ecosystem. Curating exceptional products with a focus on quality and timeless design.')">
+    <meta property="og:description" content="@yield('description', 'SmartShop is an independent marketplace for handcrafted pieces — browse verified artisans, order in minutes, and follow your delivery step by step.')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:image" content="@yield('og_image', asset('favicon.ico'))">
@@ -175,7 +175,7 @@
                     <img src="{{ asset('images/logo-light.png') }}" alt="SmartShop" class="logo-img footer-logo-img logo-light">
                     <span class="logo-text">SmartShop</span>
                 </a>
-                <p>Curating exceptional products with a focus on quality, sustainability, and timeless design.</p>
+                <p>An independent marketplace. Every piece is made and shipped by a named artisan — and every order is covered by our arrival guarantee.</p>
             </div>
             <div class="footer-links">
                 <h4>Explore</h4>
