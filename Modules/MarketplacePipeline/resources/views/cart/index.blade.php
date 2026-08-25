@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
 
             <!-- Vendor Bank Details (shown when Bank Transfer selected) -->
-            <div id="vendor-bank-details" class="vendor-bank-details" style="display: none; margin-top: 1.5rem;">
-                <h3>Vendor Bank Details</h3>
-                <p class="text-muted small">You will pay each vendor directly. Transfer to each vendor's account and upload proof of payment.</p>
+            <div id="vendor-bank-details" class="vendor-bank-details" style="display: none; margin-top: 1rem; max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Vendor Bank Details</h3>
+                <p class="text-muted small" style="margin-bottom: 0.75rem;">Transfer to each vendor's account and upload proof of payment.</p>
 
                 @php
                     $vendors = $cart->items->groupBy(function($item) {
@@ -116,17 +116,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     @endphp
 
                     @if($vendor && $bankDetail && $bankDetail->is_active)
-                    <div class="vendor-bank-card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa;">
-                        <h4>{{ $vendor->name }}</h4>
-                        <p class="text-muted small">Amount: <strong>@money($vendorTotal)</strong></p>
+                    <div class="vendor-bank-card" style="border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; background: #fafafa;">
+                        <h4 style="font-size: 0.85rem; margin-bottom: 0.25rem;">{{ $vendor->name }}</h4>
+                        <p class="text-muted small" style="margin-bottom: 0.25rem;">Amount: <strong>@money($vendorTotal)</strong></p>
 
                         @if($bankDetail->bank_details_image)
                             <a href="{{ asset('storage/' . $bankDetail->bank_details_image) }}" target="_blank">
-                                <img src="{{ asset('storage/' . $bankDetail->bank_details_image) }}" alt="Bank Details for {{ $vendor->name }}" style="max-width: 100%; max-height: 200px; border-radius: 4px; margin: 0.5rem 0;">
+                                <img src="{{ asset('storage/' . $bankDetail->bank_details_image) }}" alt="Bank Details for {{ $vendor->name }}" style="max-width: 100%; max-height: 120px; border-radius: 4px; margin: 0.25rem 0;">
                             </a>
                         @endif
 
-                        <div class="bank-details-text" style="font-size: 0.875rem; line-height: 1.6;">
+                        <div class="bank-details-text" style="font-size: 0.8rem; line-height: 1.5;">
                             @if($bankDetail->account_holder)
                                 <strong>Account Holder:</strong> {{ $bankDetail->account_holder }}<br>
                             @endif
@@ -147,11 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="text-muted small" style="margin-top: 0.5rem;">Reference: <code>ORDER-{{ $cart->id ?? 'XXXX' }}-{{ $vendor->id }}</code></p>
                     </div>
                     @elseif($vendor)
-                    <div class="vendor-bank-card" style="border: 1px solid #ffcccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff5f5;">
-                        <h4>{{ $vendor->name }}</h4>
+                    <div class="vendor-bank-card" style="border: 1px solid #ffcccc; border-radius: 6px; padding: 0.75rem; margin-bottom: 0.75rem; background: #fff5f5;">
+                        <h4 style="font-size: 0.85rem;">{{ $vendor->name }}</h4>
                         <p class="text-muted small">Amount: <strong>@money($vendorTotal)</strong></p>
-                        <div class="pc-alert pc-alert--warning" style="margin-top: 0.5rem;">
-                            This vendor has not configured bank details yet. Please contact them or use PayPal.
+                        <div class="pc-alert pc-alert--warning" style="margin-top: 0.25rem; font-size: 0.8rem;">
+                            No bank details configured. Please use PayPal.
                         </div>
                     </div>
                     @endif
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <form method="POST" action="{{ route('orders.store') }}" id="checkout-form">
         @csrf
-        <input type="hidden" name="payment_method" id="hidden-payment-method" value="paypal">
+        <input type="hidden" name="payment_method" id="hidden-payment-method" value="{{ old('payment_method', 'paypal') }}">
         @if ($errors->has('checkout'))
             <div class="form-error checkout-error" role="alert">{{ $errors->first('checkout') }}</div>
         @endif
