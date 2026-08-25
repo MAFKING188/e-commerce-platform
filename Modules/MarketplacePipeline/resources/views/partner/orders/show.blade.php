@@ -105,12 +105,28 @@
         <div class="pc-card__body">
             <p>Order is pending bank transfer proof validation.</p>
             <p class="text-muted small">Maximum 24 hours for validation.</p>
-            <form action="{{ route('partner.orders.show', $order->id) }}" method="POST" class="inline-form" data-confirm="Validate this payment?">
+            <form action="{{ route('partner.orders.validate-payment', $order->id) }}" method="POST" class="inline-form" data-confirm="Validate this payment?">
                 @csrf
-                @method('POST')
+                @method('PATCH')
                 <input type="hidden" name="action" value="approve">
                 <button type="submit" class="btn btn-primary pc-btn-sm">Approve</button>
                 <button type="submit" name="action" value="reject" class="btn btn-danger pc-btn-sm">Reject</button>
+            </form>
+        </div>
+    </div>
+@endif
+
+@if(in_array($order->status, ['paid', 'shipped']))
+    <div class="pc-card pc-card--success">
+        <div class="pc-card__head">
+            <h2 class="pc-card__title">Mark as Completed</h2>
+        </div>
+        <div class="pc-card__body">
+            <p>Once the order has been delivered, mark it as completed to release payment.</p>
+            <form action="{{ route('partner.orders.complete', $order->id) }}" method="POST" class="inline-form" data-confirm="Mark this order as completed?">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn btn-primary pc-btn-sm">Mark as Completed</button>
             </form>
         </div>
     </div>

@@ -189,7 +189,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Show the upload proof page.
+     * Show the upload proof page (legacy - order level).
      */
     public function uploadProof($id)
     {
@@ -204,7 +204,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Handle proof upload.
+     * Handle proof upload (legacy - order level).
      */
     public function handleUploadProof(Request $request, $id)
     {
@@ -235,5 +235,64 @@ class PaymentController extends Controller
 
         return back()
             ->with('status', 'Proof uploaded successfully. Our team will validate within 24 hours.');
+    }
+
+    /**
+     * Show the upload proof page for a specific payment.
+     */
+    public function uploadProofPayment(Payment $payment)
+    {
+        // 🚨 Ownership gate: only the buyer may upload proof
+        if ($payment->order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Only allow for bank transfer payments in pending status
+        if ($payment->method !== 'bank_transfer' || $payment->status !== 'pending') {
+            abort(403);
+        }
+
+        return view('marketplacepipeline::payments.upload-proof-payment', compact('payment'));
+    }
+
+    /**
+     * Handle proof upload for a specific payment.
+     */
+    public function handleUploadProofPayment(Request $request, Payment $payment)
+    {
+        $request->validate([
+            'proof_image' => 'required|image|max:5000', // 5MB max
+        ]);
+
+        // 🚨 Ownership gate: only the buyer may upload proof
+        if ($payment->order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Only allow for bank transfer payments in pending status
+        if ($payment->method !== 'bank_transfer' || $payment->status !== 'pending') {
+            return back()->withErrors('Invalid payment for proof upload.');
+        }
+
+        $path = $request->file('proof_image')->store('proofs', 'public');
+
+        // Update payment record
+        $payment->update([
+            'proof_path' => $path,
+        ]);
+
+        // Check if all vendor payments for this order have proofs
+        $order = $payment->order;
+        $allPaymentsHaveProof = $order->payments()
+            ->where('method', 'bank_transfer')
+            ->whereNotNull('proof_path')
+            ->count() === $order->payments()->where('method', 'bank_transfer')->count();
+
+        if ($allPaymentsHaveProof) {
+            $order->update(['status' => 'pending_payment']);
+        }
+
+        return back()
+            ->with('status', 'Proof uploaded successfully. Vendor will validate within 24 hours.');
     }
 }

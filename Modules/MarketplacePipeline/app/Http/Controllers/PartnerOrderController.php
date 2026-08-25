@@ -5,9 +5,13 @@ namespace Modules\MarketplacePipeline\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Modules\PartnerHub\Models\Partner;
 use Modules\MarketplacePipeline\Models\Order;
+use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Modules\MarketplacePipeline\Mail\OrderShipped;
+use Modules\MarketplacePipeline\Mail\PaymentValidated;
+use Modules\MarketplacePipeline\Mail\PaymentRejected;
 
 class PartnerOrderController extends Controller
 {
@@ -71,6 +75,29 @@ class PartnerOrderController extends Controller
     }
 
     /**
+     * Mark order as completed (delivered). Restricted to orders that
+     * actually contain this partner's items. Buyer is notified by email.
+     */
+    public function complete($id)
+    {
+        $partner = $this->getPartner();
+
+        $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
+
+        if (!in_array($order->status, ['paid', 'shipped'])) {
+            return back()->withErrors('Only paid or shipped orders can be marked as completed.');
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->update(['status' => 'completed']);
+        });
+
+        (new \Modules\TelemetryPipeline\Services\TelemetryService)->log('partner.orders.completed', ['order_id' => $order->id]);
+
+        return back()->with('status', 'Order marked as completed — payment released to vendor.');
+    }
+
+    /**
      * Fulfillment transition: paid → shipped, restricted to orders that
      * actually contain this partner's items. Buyer is notified by email.
      */
@@ -96,7 +123,7 @@ class PartnerOrderController extends Controller
     }
 
     /**
-     * Validate bank transfer payment: approve or reject.
+     * Validate bank transfer payment: approve or reject (legacy - order level).
      */
     public function validatePayment($id, Request $request)
     {
@@ -129,6 +156,72 @@ class PartnerOrderController extends Controller
                     'validated_by' => auth()->id(),
                 ]);
                 $order->update(['status' => 'paid']);
+            });
+
+            // Send email to user
+            Mail::to($order->user)->send(new PaymentValidated($order));
+
+            return back()->with('status', 'Payment approved — order confirmed.');
+        }
+
+        // Reject action
+        $reason = $request->reason;
+
+        DB::transaction(function () use ($payment, $order, $reason) {
+            $payment->update([
+                'status' => 'rejected',
+                'validation_notes' => $reason,
+            ]);
+            // Order status stays pending_payment
+        });
+
+        // Send email to user
+        Mail::to($order->user)->send(new PaymentRejected($order, $reason));
+
+        return back()->with('status', 'Payment rejected. User notified to re-upload proof.');
+    }
+
+    /**
+     * Validate bank transfer payment for a specific vendor payment.
+     */
+    public function validatePaymentForPayment(Payment $payment, Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'reason' => 'required_if:action,reject',
+        ]);
+
+        $partner = $this->getPartner();
+        
+        // Ensure the payment belongs to this partner
+        if ($payment->partner_id !== $partner->id) {
+            abort(403);
+        }
+
+        // Only validate pending bank transfer payments
+        if ($payment->method !== 'bank_transfer' || $payment->status !== 'pending') {
+            return back()->withErrors('Only pending bank transfer payments can be validated.');
+        }
+
+        $order = $payment->order;
+
+        if ($request->action === 'approve') {
+            DB::transaction(function () use ($payment, $order) {
+                $payment->update([
+                    'status' => 'paid',
+                    'validated_at' => now(),
+                    'validated_by' => auth()->id(),
+                ]);
+                
+                // Check if all vendor payments for this order are paid
+                $allPaid = $order->payments()
+                    ->where('method', 'bank_transfer')
+                    ->where('status', 'paid')
+                    ->count() === $order->payments()->where('method', 'bank_transfer')->count();
+                
+                if ($allPaid) {
+                    $order->update(['status' => 'paid']);
+                }
             });
 
             // Send email to user

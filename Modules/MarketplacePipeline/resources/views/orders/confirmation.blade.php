@@ -28,6 +28,25 @@
             <span>Delivery to</span>
             <span>{{ $order->recipient_name }}, {{ $order->shipping_city }}, {{ $order->shipping_country }}</span>
         </div>
+
+        @if($order->status === 'pending_payment')
+            @php
+                $bankPayment = $order->payments()->where('method', 'bank_transfer')->first();
+            @endphp
+            @if($bankPayment)
+                <div class="summary-row" style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+                    <div>
+                        <strong style="color: #f59e0b;">Action Required: Upload Proof of Payment</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-600); margin-top: 0.25rem;">
+                            Please upload a screenshot of your bank transfer receipt to complete your order.
+                        </p>
+                        <a href="{{ route('payment.upload-proof', $bankPayment->id) }}" class="btn btn-primary" style="margin-top: 0.75rem; display: inline-block;">
+                            Upload Proof of Payment
+                        </a>
+                    </div>
+                </div>
+            @endif
+        @endif
     </div>
 
     <div class="confirmation-side">

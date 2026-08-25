@@ -34,7 +34,10 @@
             <tr>
                 <th>Order ID</th>
                 <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
                 <th>Status</th>
+                <th>Payment</th>
                 <th>Proof</th>
                 <th class="is-right">Action</th>
             </tr>
@@ -44,30 +47,53 @@
                 <tr>
                     <td class="is-numeric">#{{ $order->id }}</td>
                     <td class="is-muted">{{ $order->created_at->format('M d, Y') }}</td>
+                    <td>{{ $order->user->name }} ({{ $order->user->email }})</td>
+                    <td>
+                        @foreach($order->items as $item)
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;">
+                                <div style="font-size: 0.8rem; line-height: 1.2;">
+                                    <div style="font-weight: 500;">{{ $item->product->name }}</div>
+                                    <div style="color: #64748b;">×{{ $item->quantity }} — ${{ number_format($item->price, 2) }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </td>
                     <td>@include('partials.partner.status-badge', ['status' => $order->status])</td>
                     <td>
-                        @if($order->status === 'pending_payment')
-                            @if($order->payment && $order->payment->proof_path)
-                                <a href="{{ asset('storage/' . $order->payment->proof_path) }}" target="_blank" class="pc-btn-sm">View</a>
+                        @foreach($order->payments as $payment)
+                            <div class="payment-badge" style="display: inline-block; margin: 0.125rem; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; background: {{ $payment->status === 'paid' ? '#d4edda' : ($payment->status === 'pending' ? '#fff3cd' : '#f8d7da') }}; color: {{ $payment->status === 'paid' ? '#155724' : ($payment->status === 'pending' ? '#856404' : '#721c24') }};">
+                                {{ $payment->partner->name ?? 'Platform' }}: {{ $payment->amount }} ({{ ucfirst($payment->status) }})
+                            </div>
+                        @endforeach
+                    </td>
+                    <td>
+                        @foreach($order->payments as $payment)
+                            @if($payment->status === 'pending' && $payment->method === 'bank_transfer')
+                                @if($payment->proof_path)
+                                    <a href="{{ asset('storage/' . $payment->proof_path) }}" target="_blank" class="pc-btn-sm" style="display: inline-block; margin: 0.125rem; font-size: 0.7rem;">View Proof</a>
+                                @else
+                                    <span class="pc-text-muted" style="font-size: 0.75rem;">No proof</span>
+                                @endif
                             @endif
-                        @endif
+                        @endforeach
                     </td>
                     <td class="is-right">
-                        @if($order->status === 'pending_payment')
-                            @if($order->payment && !$order->payment->validated_at)
-                                <form action="{{ route('partner.orders.show', $order->id) }}" method="POST" style="display:inline">
+                        @foreach($order->payments as $payment)
+                            @if($payment->status === 'pending' && $payment->method === 'bank_transfer' && $payment->partner_id && !$payment->validated_at)
+                                <form action="{{ route('partner.payments.validate', $payment) }}" method="POST" style="display:inline; margin: 0.125rem;">
                                     @csrf
-                                    @method('POST')
-                                    <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok">Approve</button>
-                                    <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error">Reject</button>
+                                    @method('PATCH')
+                                    <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Reject</button>
                                 </form>
                             @endif
-                        @endif
+                        @endforeach
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">
+                    <td colspan="8">
                         @include('partials.partner.empty-state', [
                             'icon' => request()->hasAny(['search', 'status']) ? 'search' : 'receipt',
                             'title' => request()->hasAny(['search', 'status']) ? 'No matching orders' : 'No orders yet',
