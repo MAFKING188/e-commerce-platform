@@ -1,4 +1,4 @@
-@extends('layouts.app')
+<x-app-layout>
 
 @section('title', 'Add Bank Details | Vendor Dashboard')
 
@@ -91,3 +91,4 @@
     </div>
 </form>
 @endsection
+</x-app-layout>
