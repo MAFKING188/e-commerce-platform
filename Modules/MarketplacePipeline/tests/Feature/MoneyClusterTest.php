@@ -131,6 +131,23 @@ class MoneyClusterTest extends TestCase
         Mail::assertNothingQueued();
     }
 
+    public function test_duplicate_paypal_checkout_is_rejected(): void
+    {
+        $buyer = User::factory()->create();
+        [$order] = $this->makePendingOrderWithPayment($buyer);
+
+        // A pending PayPal payment already exists for this order — a second
+        // checkout attempt (e.g. double-click) must be blocked before any
+        // external PayPal call happens.
+        $this->actingAs($buyer)
+            ->post(route('paypal.store'), ['order_id' => $order->id])
+            ->assertRedirect()
+            ->assertSessionHasErrors();
+
+        // Exactly one (the pre-existing) pending PayPal payment remains.
+        $this->assertDatabaseCount('payments', 1);
+    }
+
     // ---------- cancellation guards ----------
 
     public function test_buyer_can_cancel_own_pending_order_and_stock_is_restored(): void

@@ -7,16 +7,19 @@
         <h1>Your Orders</h1>
     </div>
 
-    <div class="support-banner">
-        <div class="support-banner__text">
-            <h3>Enjoying SmartShop?</h3>
-            <p>If you enjoy this project, consider supporting its growth. Your contributions help fund server costs and future architectural experiments.</p>
+    @if (session('error'))
+        <div class="checkout-error" role="alert" style="margin-bottom: 1rem;">
+            {{ session('error') }}
         </div>
-        <a href="https://www.paypal.com/ncp/payment/Q3SN7Q7K8YDEU" target="_blank" class="btn btn-primary btn-support">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-            Support Project
-        </a>
-    </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="checkout-error" role="alert" style="margin-bottom: 1rem;">
+            @foreach ($errors->all() as $message)
+                <div>{{ $message }}</div>
+            @endforeach
+        </div>
+    @endif
 
     @if($orders->count())
         @foreach($orders as $order)
@@ -103,7 +106,7 @@
                             <button type="submit" class="btn-cancel">Cancel Order</button>
                         </form>
 
-                        <form method="POST" action="{{ route('paypal.store') }}">
+                        <form method="POST" action="{{ route('paypal.store') }}" class="paypal-checkout-form">
                             @csrf
                             <input type="hidden" name="order_id" value="{{ $order->id }}">
                             <button type="submit" class="btn-paypal">
@@ -123,5 +126,20 @@
         </div>
     @endif
 </div>
+
+@section('scripts')
+<script>
+    // Prevent double-submission of the PayPal button (avoid duplicate pending payments).
+    document.querySelectorAll('form.paypal-checkout-form').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var btn = form.querySelector('button[type="submit"]');
+            if (!btn) return;
+            btn.disabled = true;
+            btn.dataset.original = btn.innerHTML;
+            btn.innerHTML = 'Redirecting to PayPal…';
+        });
+    });
+</script>
+@endsection
 
 </x-app-layout>

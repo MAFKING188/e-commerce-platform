@@ -3223,4 +3223,57 @@ To achieve high-fidelity user management and administrative scalability, I imple
     \textit{With these refinements, SmartShop has achieved a mature, secure, and highly scalable administrative architecture ready for production-level member management.}
 \end{center}
 
+% ==================================================
+\section{Phase 8: Multi-Vendor Payment Architecture}
+
+\subsection{1. Payment Routing Decision (Platform-Mediated vs. Direct)}
+
+For a multi-vendor marketplace the core question is where money settles. Two models were evaluated:
+
+\begin{itemize}
+    \item \textbf{Direct-to-vendor (split at source):} the buyer pays each vendor's account directly. PayPal standard Checkout cannot split one cart across N receivers without PayPal Marketplace / connected partner accounts (partner approval + per-vendor KYC + PayPal partner status), which is impractical here. It also multiplies captures, refunds and chargebacks.
+    \item \textbf{Platform-mediated (collect then distribute):} the platform receives the full amount, then the existing \texttt{PayoutService} distributes to vendors minus the 10\% commission. Single transaction, clean reconciliation, central dispute handling.
+\end{itemize}
+
+\textbf{Decision:} PayPal is \textbf{platform-mediated} (collect $\rightarrow$ payout engine distributes). Bank transfer remains \textbf{direct-to-vendor} (customer pays each vendor's uploaded bank details; vendor validates the proof). This produces a deliberate hybrid:
+
+\begin{itemize}
+    \item \textit{PayPal} $\rightarrow$ single payment to platform, commission taken at payout.
+    \item \textit{Bank transfer} $\rightarrow$ one \texttt{Payment} per vendor with \texttt{partner\_id}, validated by that vendor within 24h.
+\end{itemize}
+
+The inconsistency is accepted for now: instant methods go through the platform, manual methods go direct. A future unification (both methods landing in a platform-held \texttt{Payment}) is noted as a candidate refactor.
+
+\subsection{2. Per-Vendor Bank Transfer Implementation}
+
+Bank transfer was implemented as a second payment method alongside PayPal, with each vendor supplying their own payment details.
+
+\begin{itemize}
+    \item \textbf{\texttt{vendor\_bank\_details} table:} \texttt{partner\_id}, \texttt{bank\_details\_image} (screenshot upload), \texttt{is\_active}. Initially scoped with extra structured fields (account holder, IBAN, SWIFT) but simplified to the image-only model per product-owner request.
+    \item \textbf{Models:} \texttt{VendorBankDetail} with \texttt{Partner::bankDetails()} relation; \texttt{Payment} gained \texttt{partner\_id}, \texttt{proof\_path}, \texttt{validated\_at}, \texttt{validated\_by}, \texttt{validation\_notes}.
+    \item \textbf{Controller \& routes:} \texttt{VendorBankDetailController} (full CRUD) under \texttt{partner.bank-details.*}; partner nav link added in \texttt{partials/partner-nav.blade.php}.
+    \item \textbf{Checkout:} \texttt{CheckoutService} creates one \texttt{Payment} per vendor when bank transfer is selected; checkout is blocked if a vendor lacks active bank details. Cart view shows each vendor's bank details.
+    \item \textbf{Customer proof upload:} per-payment upload at \texttt{/payments/\{payment\}/upload-proof} (\texttt{payment.upload-proof} / \texttt{payment.handle-upload-proof}).
+    \item \textbf{Vendor approval:} \texttt{PartnerOrderController::validatePaymentForPayment()} (\texttt{partner.payments.validate}) approves/rejects a specific vendor \texttt{Payment}; when all vendor payments for an order are approved the order status moves to \texttt{paid}.
+    \item \textbf{24h SLA messaging} shown at checkout and on the proof-upload screen.
+\end{itemize}
+
+\subsection{3. PayPal UX Hardening (from AUDIT-2026-08-20)}
+
+The deferred PayPal UX findings in \texttt{docs/AUDIT-2026-08-20-full-app-sweep.md} \S2 were addressed (full detail in \texttt{docs/PAYPAL-UX-FIXES-2026-08-25.md}):
+
+\begin{itemize}
+    \item \textbf{Fix A (capture error handling):} \texttt{PaymentController::capture()} now wraps the PayPal capture API call, the DB transaction and the \texttt{PaymentSuccess} receipt mail in a single \texttt{try/catch}. On any exception it logs and redirects with a friendly error instead of a raw 500; the idempotency guard still protects the buyer on retry.
+    \item \textbf{Fix C (duplicate payments):} \texttt{PaymentController::store()} rejects a second \texttt{paypal.store} when a \texttt{pending} PayPal \texttt{Payment} already exists for the order (no external call made). The "Pay with PayPal" button is disabled and relabelled "Redirecting to PayPal…" on submit.
+    \item \textbf{Fix B (surface errors):} \texttt{orders/index.blade.php} now renders a styled \texttt{.checkout-error} banner for \texttt{session('error')} and all \texttt{\$errors} (the documented silent-failure gap). The cart view already rendered errors.
+    \item \textbf{Fix D (donation noise):} removed the leftover "Support Project" PayPal banner from order history (footer/about links were removed earlier but this one remained).
+\end{itemize}
+
+\textbf{Verification:} \texttt{MoneyClusterTest} passes (12 tests, 41 assertions) including a new \texttt{test\_duplicate\_paypal\_checkout\_is\_rejected}. The audit's capture-id match concern was verified already-correct in current code (capture matches \texttt{transaction\_id} against the PayPal order \texttt{token}, not the capture id), so no change was needed there.
+
+\vfill
+\begin{center}
+    \textit{With Phase 8, SmartShop supports a true multi-vendor payment model: platform-mediated PayPal with hardened UX, and direct per-vendor bank transfer with vendor-side validation.}
+\end{center}
+
 \end{document}
