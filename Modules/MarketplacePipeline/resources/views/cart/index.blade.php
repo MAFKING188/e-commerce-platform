@@ -6,10 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const bankTransferRadio = document.getElementById('bank-transfer');
     const paypalRadio = document.getElementById('paypal');
     const vendorBankDetails = document.getElementById('vendor-bank-details');
+    const hiddenPaymentMethod = document.getElementById('hidden-payment-method');
 
     function toggleBankDetails() {
         if (bankTransferRadio && vendorBankDetails) {
             vendorBankDetails.style.display = bankTransferRadio.checked ? 'block' : 'none';
+        }
+        if (hiddenPaymentMethod) {
+            hiddenPaymentMethod.value = bankTransferRadio && bankTransferRadio.checked ? 'bank_transfer' : 'paypal';
         }
     }
 
@@ -20,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
         paypalRadio.addEventListener('change', toggleBankDetails);
     }
 
-    // Initial check
     toggleBankDetails();
 });
 </script>
@@ -166,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <form method="POST" action="{{ route('orders.store') }}" id="checkout-form">
         @csrf
+        <input type="hidden" name="payment_method" id="hidden-payment-method" value="paypal">
         @if ($errors->has('checkout'))
             <div class="form-error checkout-error" role="alert">{{ $errors->first('checkout') }}</div>
         @endif

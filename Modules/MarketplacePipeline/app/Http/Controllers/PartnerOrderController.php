@@ -31,6 +31,7 @@ class PartnerOrderController extends Controller
         $orders = Order::whereHas('items.product.partners', function ($q) use ($partner) {
             $q->where('partners.id', $partner->id);
         })
+            ->with(['items.product', 'payments.partner', 'user'])
             ->when($this->filteredStatus($request), fn ($q, $status) => $q->where('orders.status', $status))
             ->when($this->filteredSearch($request), fn ($q, $search) => $q->where('orders.id', $search))
             ->latest()
