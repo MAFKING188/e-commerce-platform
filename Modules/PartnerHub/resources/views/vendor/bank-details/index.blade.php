@@ -1,4 +1,4 @@
-@extends('partnerhub::layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Bank Details | Vendor Dashboard')
 
@@ -90,4 +90,4 @@
     </div>
 </div>
 @endif
-</section>
+@endsection

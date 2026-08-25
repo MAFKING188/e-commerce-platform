@@ -1,4 +1,4 @@
-@extends('partnerhub::layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Edit Bank Details | Vendor Dashboard')
 
@@ -91,4 +91,4 @@
         <a href="{{ route('partner.bank-details.index') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
-</section>
+@endsection
