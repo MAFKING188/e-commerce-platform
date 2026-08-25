@@ -39,4 +39,9 @@ class Partner extends Model
             $q->where('partners.id', $this->id);
         });
     }
+
+    public function bankDetails()
+    {
+        return $this->hasOne(\Modules\PartnerHub\Models\VendorBankDetail::class, 'partner_id');
+    }
 }

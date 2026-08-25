@@ -43,6 +43,8 @@ class GoogleAuthController extends Controller
                     'avatar' => $googleUser->getAvatar() ?: $user->avatar,
                 ])->save();
             }
+            // Welcome email for existing users on first Google link-up
+            Mail::to($user)->queue(new \Modules\IdentityAccess\Mail\WelcomeMember($user));
         } else {
             $user = User::create([
                 'name' => $googleUser->getName() ?: 'Member',

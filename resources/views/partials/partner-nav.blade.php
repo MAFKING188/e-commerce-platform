@@ -19,6 +19,10 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M15.5 9.5a3.5 3.5 0 0 0-3.5-2.5c-2 0-3.5 1.2-3.5 2.5s1.5 2.5 3.5 2.5 3.5 1.2 3.5 2.5-1.5 2.5-3.5 2.5a3.5 3.5 0 0 1-3.5-2.5"/></svg>
         Earnings
     </a>
+    <a href="{{ route('partner.bank-details.index') }}" class="pc-nav__tab {{ request()->routeIs('partner.bank-details*') ? 'is-active' : '' }}">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 6v6l4 4"/></svg>
+        Bank Details
+    </a>
     <a href="{{ route('partner.profile.edit') }}" class="pc-nav__tab {{ request()->routeIs('partner.profile.edit') ? 'is-active' : '' }}">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
         Profile

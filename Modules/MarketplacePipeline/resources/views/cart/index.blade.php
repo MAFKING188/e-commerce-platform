@@ -1,5 +1,31 @@
 @section('title', 'Shopping Cart | SmartShop')
 
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bankTransferRadio = document.getElementById('bank-transfer');
+    const paypalRadio = document.getElementById('paypal');
+    const vendorBankDetails = document.getElementById('vendor-bank-details');
+
+    function toggleBankDetails() {
+        if (bankTransferRadio && vendorBankDetails) {
+            vendorBankDetails.style.display = bankTransferRadio.checked ? 'block' : 'none';
+        }
+    }
+
+    if (bankTransferRadio) {
+        bankTransferRadio.addEventListener('change', toggleBankDetails);
+    }
+    if (paypalRadio) {
+        paypalRadio.addEventListener('change', toggleBankDetails);
+    }
+
+    // Initial check
+    toggleBankDetails();
+});
+</script>
+@endsection
+
 <x-app-layout>
 
 <div class="cart-header">
@@ -20,6 +46,9 @@
                         <h3>{{ $item->product->name }}</h3>
                         <p>Unit Price: @money($item->product->price)</p>
                         <p>Quantity: {{ $item->quantity }}</p>
+                        @if($item->product->partners->count())
+                            <p class="vendor-badge" style="font-size: 0.75rem; color: #666; margin-top: 0.25rem;">Sold by: {{ $item->product->partners->first()->name }}</p>
+                        @endif
                     </div>
 
                     <div class="cart-item-actions">
@@ -35,7 +64,7 @@
         </div>
 
         <!-- Summary -->
-<div class="summary-card">
+        <div class="summary-card">
             <h2>Order Summary</h2>
             <div class="summary-row">
                 <span>Subtotal</span>
@@ -61,8 +90,69 @@
                 <div class="payment-method-radio">
                     <input type="radio" id="bank-transfer" name="payment_method" value="bank_transfer">
                     <label for="bank-transfer">Bank Transfer</label>
-                    <span class="payment-method-note">Validation within 24 hours</span>
+                    <span class="payment-method-note">Pay each vendor directly</span>
                 </div>
+            </div>
+
+            <!-- Vendor Bank Details (shown when Bank Transfer selected) -->
+            <div id="vendor-bank-details" class="vendor-bank-details" style="display: none; margin-top: 1.5rem;">
+                <h3>Vendor Bank Details</h3>
+                <p class="text-muted small">You will pay each vendor directly. Transfer to each vendor's account and upload proof of payment.</p>
+
+                @php
+                    $vendors = $cart->items->groupBy(function($item) {
+                        return $item->product->partners->first()->id ?? 'unknown';
+                    });
+                @endphp
+
+                @foreach($vendors as $vendorId => $items)
+                    @php
+                        $vendor = $items->first()->product->partners->first();
+                        $bankDetail = $vendor ? $vendor->bankDetails : null;
+                        $vendorTotal = $items->sum(fn($item) => $item->product->price * $item->quantity);
+                    @endphp
+
+                    @if($vendor && $bankDetail && $bankDetail->is_active)
+                    <div class="vendor-bank-card" style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fafafa;">
+                        <h4>{{ $vendor->name }}</h4>
+                        <p class="text-muted small">Amount: <strong>@money($vendorTotal)</strong></p>
+
+                        @if($bankDetail->bank_details_image)
+                            <a href="{{ asset('storage/' . $bankDetail->bank_details_image) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $bankDetail->bank_details_image) }}" alt="Bank Details for {{ $vendor->name }}" style="max-width: 100%; max-height: 200px; border-radius: 4px; margin: 0.5rem 0;">
+                            </a>
+                        @endif
+
+                        <div class="bank-details-text" style="font-size: 0.875rem; line-height: 1.6;">
+                            @if($bankDetail->account_holder)
+                                <strong>Account Holder:</strong> {{ $bankDetail->account_holder }}<br>
+                            @endif
+                            @if($bankDetail->iban)
+                                <strong>IBAN:</strong> {{ $bankDetail->iban }}<br>
+                            @endif
+                            @if($bankDetail->bank_name)
+                                <strong>Bank:</strong> {{ $bankDetail->bank_name }}<br>
+                            @endif
+                            @if($bankDetail->swift_bic)
+                                <strong>SWIFT/BIC:</strong> {{ $bankDetail->swift_bic }}<br>
+                            @endif
+                            @if($bankDetail->additional_info)
+                                <br><strong>Note:</strong> {{ $bankDetail->additional_info }}
+                            @endif
+                        </div>
+
+                        <p class="text-muted small" style="margin-top: 0.5rem;">Reference: <code>ORDER-{{ $cart->id ?? 'XXXX' }}-{{ $vendor->id }}</code></p>
+                    </div>
+                    @elseif($vendor)
+                    <div class="vendor-bank-card" style="border: 1px solid #ffcccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff5f5;">
+                        <h4>{{ $vendor->name }}</h4>
+                        <p class="text-muted small">Amount: <strong>@money($vendorTotal)</strong></p>
+                        <div class="pc-alert pc-alert--warning" style="margin-top: 0.5rem;">
+                            This vendor has not configured bank details yet. Please contact them or use PayPal.
+                        </div>
+                    </div>
+                    @endif
+                @endforeach
             </div>
 
             <button type="submit" class="btn btn-primary btn-checkout" form="checkout-form">

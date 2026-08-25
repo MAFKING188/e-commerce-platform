@@ -60,6 +60,11 @@ class CatalogQueryService
             $query->where('category_id', $request->category);
         }
 
+        // Filter by supplier/partner
+        if ($request->filled('supplier')) {
+            $query->whereHas('partners', fn ($q) => $q->where('partners.id', $request->supplier));
+        }
+
         // Filter by price range
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);

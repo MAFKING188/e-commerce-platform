@@ -8,6 +8,7 @@ use Modules\MarketplacePipeline\Models\OrderItem;
 use Modules\MarketplacePipeline\Models\Cart;
 use Modules\MarketplacePipeline\Models\Payment;
 use Modules\CatalogDelivery\Models\Product;
+use Modules\PartnerHub\Models\Partner;
 use Illuminate\Support\Facades\DB;
 
 class CheckoutService
@@ -74,14 +75,31 @@ class CheckoutService
 
             $cart->items()->delete();
 
-            // Create payment record based on method
+            // Create payment record(s) based on method
             if ($paymentMethod === 'bank_transfer') {
-                Payment::create([
-                    'order_id' => $order->id,
-                    'method' => 'bank_transfer',
-                    'status' => 'pending',
-                    'amount' => $total
-                ]);
+                // Group items by vendor and create separate payment per vendor
+                $itemsByVendor = $cart->items->groupBy(function($item) {
+                    return $item->product->partners->first()->id ?? 'unknown';
+                });
+
+                foreach ($itemsByVendor as $vendorId => $vendorItems) {
+                    $vendor = Partner::find($vendorId);
+                    $vendorTotal = $vendorItems->sum(fn($item) => $item->product->price * $item->quantity);
+
+                    // Check if vendor has bank details
+                    $bankDetail = $vendor ? $vendor->bankDetails : null;
+                    if (!$bankDetail || !$bankDetail->is_active) {
+                        throw new \Exception("Vendor {$vendor->name} has not configured bank details. Please use PayPal or contact the vendor.");
+                    }
+
+                    Payment::create([
+                        'order_id' => $order->id,
+                        'partner_id' => $vendorId,
+                        'method' => 'bank_transfer',
+                        'status' => 'pending',
+                        'amount' => $vendorTotal,
+                    ]);
+                }
             }
 
             return $order;
