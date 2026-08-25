@@ -135,6 +135,30 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'identity-errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/identity-errors.log'),
+            'formatter' => Monolog\Formatter\LineFormatter::class,
+        ],
+
+        'pipeline-errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/pipeline-errors.log'),
+            'formatter' => Monolog\Formatter\LineFormatter::class,
+        ],
+
+        'catalog-errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/catalog-errors.log'),
+            'formatter' => Monolog\Formatter\LineFormatter::class,
+        ],
+
+        'partner-errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/partner-errors.log'),
+            'formatter' => Monolog\Formatter\LineFormatter::class,
+        ],
+
     ],
 
 ];
