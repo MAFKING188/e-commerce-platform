@@ -64,7 +64,7 @@ class PartnerOrderController extends Controller
         
         // Ensure the order actually contains items from this partner
         $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
-        $order->load(['items.product.partners']);
+        $order->load(['items.product.partners', 'payments.partner']);
 
         // Only items supplied by this partner belong to the partner's fulfillment view
         $partnerItems = $order->items->filter(
@@ -72,7 +72,12 @@ class PartnerOrderController extends Controller
         );
         $partnerSubtotal = $partnerItems->sum(fn ($item) => $item->price * $item->quantity);
 
-        return view('marketplacepipeline::partner.orders.show', compact('order', 'partnerItems', 'partnerSubtotal'));
+        // Only payments belonging to this partner
+        $partnerPayments = $order->payments->filter(
+            fn ($p) => $p->partner_id === $partner->id
+        );
+
+        return view('marketplacepipeline::partner.orders.show', compact('order', 'partnerItems', 'partnerSubtotal', 'partnerPayments'));
     }
 
     /**
@@ -124,7 +129,7 @@ class PartnerOrderController extends Controller
     }
 
     /**
-     * Validate bank transfer payment: approve or reject (legacy - order level).
+     * Validate bank transfer payment: approve or reject (order level).
      */
     public function validatePayment($id, Request $request)
     {
@@ -137,29 +142,40 @@ class PartnerOrderController extends Controller
         
         // Ensure the order actually contains items from this partner
         $order = $partner->orders()->where('orders.id', $id)->firstOrFail();
-        $order->load(['items.product.partners', 'payment']);
+        $order->load(['items.product.partners', 'payments.partner']);
 
         if ($order->status !== 'pending_payment') {
             return back()->withErrors('Only pending payment orders can be validated.');
         }
 
-        if ($order->user_id !== auth()->id()) {
-            abort(403);
+        // Find this partner's payment(s)
+        $partnerPayment = $order->payments->first(
+            fn ($p) => $p->partner_id === $partner->id && $p->status === 'pending'
+        );
+
+        if (!$partnerPayment) {
+            return back()->withErrors('No pending payment found for your account on this order.');
         }
 
-        $payment = $order->payment;
-
         if ($request->action === 'approve') {
-            DB::transaction(function () use ($payment, $order) {
-                $payment->update([
+            DB::transaction(function () use ($partnerPayment, $order) {
+                $partnerPayment->update([
                     'status' => 'paid',
                     'validated_at' => now(),
                     'validated_by' => auth()->id(),
                 ]);
-                $order->update(['status' => 'paid']);
+
+                // Check if ALL bank transfer payments for this order are paid
+                $allPaid = $order->payments()
+                    ->where('method', 'bank_transfer')
+                    ->where('status', 'paid')
+                    ->count() === $order->payments()->where('method', 'bank_transfer')->count();
+
+                if ($allPaid) {
+                    $order->update(['status' => 'paid']);
+                }
             });
 
-            // Send email to user
             Mail::to($order->user)->send(new PaymentValidated($order));
 
             return back()->with('status', 'Payment approved — order confirmed.');
@@ -168,15 +184,13 @@ class PartnerOrderController extends Controller
         // Reject action
         $reason = $request->reason;
 
-        DB::transaction(function () use ($payment, $order, $reason) {
-            $payment->update([
+        DB::transaction(function () use ($partnerPayment, $reason) {
+            $partnerPayment->update([
                 'status' => 'rejected',
                 'validation_notes' => $reason,
             ]);
-            // Order status stays pending_payment
         });
 
-        // Send email to user
         Mail::to($order->user)->send(new PaymentRejected($order, $reason));
 
         return back()->with('status', 'Payment rejected. User notified to re-upload proof.');

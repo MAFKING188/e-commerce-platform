@@ -43,6 +43,18 @@ class PaymentController extends Controller
             return back()->withErrors('Order status must be pending to proceed with payment.');
         }
 
+        // 🛡️ Prevent a second PayPal checkout while one is already in progress.
+        // A PayPal payment stays `pending` until the buyer returns from PayPal,
+        // so a double-click or back-forward navigation could otherwise create
+        // duplicate pending payments for the same order.
+        if (Payment::where('order_id', $order->id)
+            ->where('method', 'paypal')
+            ->where('status', 'pending')
+            ->exists()
+        ) {
+            return back()->withErrors('A PayPal payment is already in progress for this order. Please complete it or cancel the order.');
+        }
+
         // Initialize PayPal Provider
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
@@ -121,24 +133,37 @@ class PaymentController extends Controller
                 ->with('status', 'Payment was already completed.');
         }
 
-        $provider = app(PayPalClient::class);
-        $provider->setApiCredentials(config('paypal'));
-        $provider->getAccessToken();
+        try {
+            $provider = app(PayPalClient::class);
+            $provider->setApiCredentials(config('paypal'));
+            $provider->getAccessToken();
 
-        $response = $provider->capturePaymentOrder((string) $request->query('token'));
+            $response = $provider->capturePaymentOrder((string) $request->query('token'));
 
-        if (! isset($response['status']) || $response['status'] !== 'COMPLETED') {
-            Log::error('PayPal Capture Failure', ['payment_id' => $payment->id, 'response' => $response]);
-            return redirect()->route('orders.index')->withErrors('Payment verification failed.');
+            if (! isset($response['status']) || $response['status'] !== 'COMPLETED') {
+                Log::error('PayPal Capture Failure', ['payment_id' => $payment->id, 'response' => $response]);
+                return redirect()->route('orders.index')->withErrors('Payment verification failed. Please try again or contact support.');
+            }
+
+            DB::transaction(function () use ($payment) {
+                $payment->update(['status' => 'paid']);
+                $payment->order->update(['status' => 'paid']);
+            });
+
+            // 📧 Receipt goes to the order owner (not whoever clicked last).
+            Mail::to($payment->order->user)->send(new PaymentSuccess($payment));
+        } catch (\Throwable $e) {
+            Log::error('PayPal Capture Exception', [
+                'payment_id' => $payment->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            // If the capture already succeeded upstream but a post-capture step
+            // (e.g. receipt mail) failed, the idempotency guard above protects
+            // the buyer on retry — the order is confirmed, not lost.
+            return redirect()->route('orders.index')
+                ->withErrors('Something went wrong while finalising your payment. If you were charged, your order will be confirmed shortly — please check your order history.');
         }
-
-        DB::transaction(function () use ($payment) {
-            $payment->update(['status' => 'paid']);
-            $payment->order->update(['status' => 'paid']);
-        });
-
-        // 📧 Receipt goes to the order owner (not whoever clicked last).
-        Mail::to($payment->order->user)->send(new PaymentSuccess($payment));
 
         return redirect()
             ->route('orders.index')

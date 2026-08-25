@@ -12,6 +12,18 @@
     Back to All Orders
 </a>
 
+@if(session('status'))
+    <div class="pc-alert pc-alert--success">{{ session('status') }}</div>
+@endif
+
+@if($errors->any())
+    <div class="pc-alert pc-alert--error">
+        @foreach($errors->all() as $error)
+            <p>{{ $error }}</p>
+        @endforeach
+    </div>
+@endif
+
 <div class="pc-header">
     <div>
         <span class="pc-eyebrow">Order Fulfillment</span>
@@ -29,13 +41,6 @@
         <span class="pc-meta__label">Fulfillment Status</span>
         <div class="pc-meta__value">
             @include('partials.partner.status-badge', ['status' => $order->status])
-            @if($order->status === 'paid')
-                <form action="{{ route('partner.orders.ship', $order->id) }}" method="POST" class="inline-form" data-confirm="Mark this order as shipped? The collector will be notified by email.">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" class="btn btn-primary pc-btn-sm">Mark as Shipped</button>
-                </form>
-            @endif
         </div>
     </div>
     <div class="pc-card pc-meta">
@@ -90,46 +95,89 @@
     </div>
 </div>
 
-<div class="pc-note">
+@foreach($partnerPayments as $payment)
+<div class="pc-card" style="margin-top: 1.5rem;">
+    <div class="pc-card__head">
+        <h2 class="pc-card__title">Payment — ${{ number_format($payment->amount, 2) }}</h2>
+        @if($payment->status === 'paid')
+            <span class="pc-badge pc-badge--success">Validated</span>
+        @elseif($payment->status === 'rejected')
+            <span class="pc-badge pc-badge--error">Rejected</span>
+        @elseif($payment->proof_path)
+            <span class="pc-badge pc-badge--info">Proof Uploaded</span>
+        @else
+            <span class="pc-badge pc-badge--warning">Awaiting Proof</span>
+        @endif
+    </div>
+    <div class="pc-card__body">
+        @if($payment->proof_path)
+            <div style="margin-bottom: 1rem;">
+                <strong>Proof of Payment:</strong>
+                <a href="{{ asset('storage/' . $payment->proof_path) }}" target="_blank" class="pc-btn-sm" style="display: inline-block; margin-left: 0.5rem;">View Screenshot</a>
+            </div>
+        @endif
+
+        @if($payment->validation_notes)
+            <div class="pc-alert pc-alert--error" style="margin-bottom: 1rem;">
+                <strong>Rejection reason:</strong> {{ $payment->validation_notes }}
+            </div>
+        @endif
+
+        @if($payment->status === 'pending' && $order->status === 'pending_payment')
+            @if($payment->proof_path)
+                <p style="margin-bottom: 0.75rem;">The buyer has uploaded proof. Please review and validate.</p>
+                <form action="{{ route('partner.orders.validate-payment', $order->id) }}" method="POST" style="display: inline-flex; gap: 0.5rem;" data-confirm="Validate this payment?">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="btn btn-primary pc-btn-sm">Approve Payment</button>
+                </form>
+                <form action="{{ route('partner.orders.validate-payment', $order->id) }}" method="POST" style="display: inline-flex; gap: 0.5rem; margin-left: 0.5rem;" data-confirm="Reject this payment? The buyer will be asked to re-upload.">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="action" value="reject">
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" name="reason" placeholder="Rejection reason (required)" class="pc-input" style="max-width: 250px;" required>
+                        <button type="submit" class="btn btn-danger pc-btn-sm">Reject</button>
+                    </div>
+                </form>
+            @else
+                <p class="pc-text-muted">Waiting for buyer to upload proof of payment.</p>
+            @endif
+        @elseif($payment->status === 'paid')
+            <p class="pc-text-muted">Payment validated on {{ $payment->validated_at ? $payment->validated_at->format('M d, Y H:i') : 'N/A' }}.</p>
+        @elseif($payment->status === 'rejected')
+            <p class="pc-text-muted">You rejected this payment. The buyer will be asked to re-upload.</p>
+        @endif
+    </div>
+</div>
+@endforeach
+
+<div class="pc-note" style="margin-top: 1.5rem;">
     <h4 class="pc-note__title">Logistics Note</h4>
     <p class="pc-note__text">
         Please ensure all pieces are inspected for quality before dispatch. Once shipped, please update the central logistics hub.
     </p>
 </div>
 
-@if($order->status === 'pending_payment')
-    <div class="pc-card pc-card--warning">
-        <div class="pc-card__head">
-            <h2 class="pc-card__title">Validate Payment</h2>
-        </div>
-        <div class="pc-card__body">
-            <p>Order is pending bank transfer proof validation.</p>
-            <p class="text-muted small">Maximum 24 hours for validation.</p>
-            <form action="{{ route('partner.orders.validate-payment', $order->id) }}" method="POST" class="inline-form" data-confirm="Validate this payment?">
-                @csrf
-                @method('PATCH')
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn btn-primary pc-btn-sm">Approve</button>
-                <button type="submit" name="action" value="reject" class="btn btn-danger pc-btn-sm">Reject</button>
-            </form>
-        </div>
-    </div>
+@if(in_array($order->status, ['pending_payment']))
+    <p class="pc-text-muted" style="margin-top: 1rem;">Validate the payment above to proceed with fulfillment.</p>
+@endif
+
+@if($order->status === 'paid')
+    <form action="{{ route('partner.orders.ship', $order->id) }}" method="POST" style="margin-top: 1rem;" data-confirm="Mark this order as shipped? The collector will be notified by email.">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn btn-primary">Mark as Shipped</button>
+    </form>
 @endif
 
 @if(in_array($order->status, ['paid', 'shipped']))
-    <div class="pc-card pc-card--success">
-        <div class="pc-card__head">
-            <h2 class="pc-card__title">Mark as Completed</h2>
-        </div>
-        <div class="pc-card__body">
-            <p>Once the order has been delivered, mark it as completed to release payment.</p>
-            <form action="{{ route('partner.orders.complete', $order->id) }}" method="POST" class="inline-form" data-confirm="Mark this order as completed?">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="btn btn-primary pc-btn-sm">Mark as Completed</button>
-            </form>
-        </div>
-    </div>
+    <form action="{{ route('partner.orders.complete', $order->id) }}" method="POST" style="margin-top: 1rem;" data-confirm="Mark this order as completed?">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn btn-primary">Mark as Completed</button>
+    </form>
 @endif
 
 </x-app-layout>

@@ -31,8 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/upload-proof', [PaymentController::class, 'handleUploadProof'])->name('handle-upload-proof');
     
     // Per-payment proof upload (for bank transfer)
-    Route::get('/payments/{payment}/upload-proof', [PaymentController::class, 'uploadProof'])->name('payment.upload-proof');
-    Route::post('/payments/{payment}/upload-proof', [PaymentController::class, 'handleUploadProof'])->name('payment.handle-upload-proof');
+    Route::get('/payments/{payment}/upload-proof', [PaymentController::class, 'uploadProofPayment'])->name('payment.upload-proof');
+    Route::post('/payments/{payment}/upload-proof', [PaymentController::class, 'handleUploadProofPayment'])->name('payment.handle-upload-proof');
 });
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
@@ -50,7 +50,7 @@ Route::prefix('partner')->middleware(['auth', 'partner'])->name('partner.')->gro
     Route::patch('/orders/{id}/ship', [PartnerOrderController::class, 'ship'])->name('orders.ship');
     Route::patch('/orders/{id}/complete', [PartnerOrderController::class, 'complete'])->name('orders.complete');
     Route::patch('/orders/{id}/validate-payment', [PartnerOrderController::class, 'validatePayment'])->name('orders.validate-payment');
-    Route::patch('/payments/{payment}/validate', [PartnerOrderController::class, 'validatePayment'])->name('payments.validate');
+    Route::patch('/payments/{payment}/validate', [PartnerOrderController::class, 'validatePaymentForPayment'])->name('payments.validate');
     Route::get('/orders', [PartnerOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [PartnerOrderController::class, 'show'])->name('orders.show');
 
