@@ -117,21 +117,34 @@
                     </div>
                 @elseif($order->status === 'pending_payment')
                     @php
-                        $pendingProof = $order->payments->where('method', 'bank_transfer')->whereNull('proof_path')->first();
+                        $rejected = $order->payments->where('method', 'bank_transfer')->where('status', 'rejected')->first();
+                        $missing = $order->payments->where('method', 'bank_transfer')->whereNull('proof_path')->where('status', 'pending')->first();
                     @endphp
                     <div class="order-actions">
-                        @if($pendingProof)
+                        @if($rejected)
+                            <a href="{{ route('payment.upload-proof', $order->id) }}" style="color:#fff;background:#dc2626;border:none;border-radius:6px;padding:.5rem 1.5rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+                                Re-upload Proof
+                            </a>
+                            <span style="color:#475569;font-size:.8rem;line-height:1.4;">
+                                A vendor rejected your proof{{ $rejected->validation_notes ? ' — ' . $rejected->validation_notes : '' }}.
+                                Upload a new proof using reference <strong>ORDER-{{ $order->id }}-{{ $rejected->partner_id }}</strong>.
+                            </span>
+                        @elseif($missing)
                             <a href="{{ route('payment.upload-proof', $order->id) }}" style="color:#fff;background:#10b981;border:none;border-radius:6px;padding:.5rem 1.5rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
                                 Upload Proof of Payment
                             </a>
                             <span style="color:#475569;font-size:.8rem;line-height:1.4;">
                                 Pay each vendor by bank transfer, then upload your proof here.
-                                Use reference <strong>ORDER-{{ $order->id }}-{{ $pendingProof->partner_id }}</strong>.
+                                Use reference <strong>ORDER-{{ $order->id }}-{{ $missing->partner_id }}</strong>.
                                 Vendors confirm within 24h.
                             </span>
                         @else
-                            <span style="color:#475569;font-size:.8rem;">
+                            <a href="{{ route('payment.upload-proof', $order->id) }}" style="color:#fff;background:#10b981;border:none;border-radius:6px;padding:.5rem 1.5rem;font-size:.85rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+                                View / Re-upload Proof
+                            </a>
+                            <span style="color:#475569;font-size:.8rem;line-height:1.4;">
                                 Proof uploaded for all vendors. Awaiting vendor confirmation (within 24h).
+                                You can replace it here if needed.
                             </span>
                         @endif
                     </div>

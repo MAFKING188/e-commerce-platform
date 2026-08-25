@@ -262,4 +262,75 @@ class BankTransferFlowTest extends TestCase
         $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'completed']);
         Mail::assertQueued(OrderCompleted::class, fn ($m) => $m->order->id === $order->id);
     }
+
+    public function test_buyer_can_reupload_proof_after_rejection(): void
+    {
+        Storage::fake('public');
+        $buyer = User::factory()->create(['email_verified_at' => now()]);
+        [$p1User, $p1] = $this->makePartner('Vendor One');
+        $prod1 = $this->makeProduct($p1, 1000.00);
+        $this->makeCart($buyer, [$prod1]);
+
+        $order = (new CheckoutService)->checkout($buyer, [
+            'recipient_name' => 'X', 'recipient_phone' => '1', 'shipping_line1' => 'a',
+            'shipping_city' => 'c', 'shipping_country' => 'z',
+        ], 'bank_transfer');
+
+        $payment1 = $order->payments->where('partner_id', $p1->id)->first();
+
+        // Buyer uploads proof.
+        $this->actingAs($buyer)->post(
+            route('payment.handle-upload-proof', $payment1->id),
+            ['proof_image' => UploadedFile::fake()->image('proof.jpg')]
+        );
+        // Vendor rejects it.
+        $this->actingAs($p1User)->patch(route('partner.payments.validate', $payment1->id), [
+            'action' => 'reject', 'reason' => 'Blurry screenshot',
+        ]);
+        $payment1->refresh();
+        $this->assertSame('rejected', $payment1->status);
+
+        // Buyer re-uploads -> resets to pending and clears rejection notes.
+        $this->actingAs($buyer)->post(
+            route('payment.handle-upload-proof', $payment1->id),
+            ['proof_image' => UploadedFile::fake()->image('proof2.jpg')]
+        );
+        $payment1->refresh();
+        $this->assertSame('pending', $payment1->status);
+        $this->assertNull($payment1->validated_at);
+        $this->assertNull($payment1->validation_notes);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'pending_payment']);
+
+        // Vendor re-approves -> order paid.
+        $this->actingAs($p1User)->patch(route('partner.payments.validate', $payment1->id), ['action' => 'approve']);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'paid']);
+    }
+
+    public function test_partner_index_shows_ship_for_paid_paypal_order(): void
+    {
+        Storage::fake('public');
+        $buyer = User::factory()->create(['email_verified_at' => now()]);
+        [$p1User, $p1] = $this->makePartner('Vendor One');
+        $prod1 = $this->makeProduct($p1, 1000.00);
+        $this->makeCart($buyer, [$prod1]);
+
+        // Simulate a captured PayPal order (single platform payment, already paid).
+        $order = (new CheckoutService)->checkout($buyer, [
+            'recipient_name' => 'X', 'recipient_phone' => '1', 'shipping_line1' => 'a',
+            'shipping_city' => 'c', 'shipping_country' => 'z',
+        ], 'paypal');
+        Payment::create([
+            'order_id' => $order->id,
+            'method' => 'paypal',
+            'status' => 'paid',
+            'amount' => $order->total_price,
+        ]);
+        $order->update(['status' => 'paid']);
+
+        // Seller can drive fulfillment for ANY paid order, regardless of method.
+        $this->actingAs($p1User)->get(route('partner.orders.index'))
+            ->assertOk()
+            ->assertSee('Mark Shipped')
+            ->assertDontSee('Approve');
+    }
 }

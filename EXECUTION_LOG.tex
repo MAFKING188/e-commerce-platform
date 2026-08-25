@@ -3380,4 +3380,60 @@ always run with \texttt{COMPOSER\_ALLOW\_SUPERUSER=1} so the \texttt{wikimedia/c
     \textit{With Phase 10, partners own the complete fulfillment lifecycle from the order list and buyers receive an email at every status transition (confirmed, shipped, completed).}
 \end{center}
 
+% ==================================================
+\section{Phase 11: Flexible Buyer Re-Upload \& Method-Agnostic Seller Fulfillment}
+
+\subsection{1. Problem}
+
+Two gaps remained versus standard multi-vendor marketplaces:
+\begin{itemize}
+    \item \textbf{Buyer could not resubmit proof.} The upload form was only rendered for \texttt{rejected}
+    payments, but \texttt{PaymentController::handleUploadProofPayment()} rejected any payment not in
+    \texttt{pending} status — so a buyer who \emph{was} rejected could never actually re-upload (the POST
+    was blocked). A buyer who had already uploaded (proof pending) also had no way to \emph{replace} it.
+    \item \textbf{Seller actions felt method-locked.} Fulfillment actions are legitimately gated by
+    \emph{status}, but it had to be confirmed that a seller can drive \textbf{any} order (PayPal or
+    bank transfer) through ship $\rightarrow$ complete, not just bank-transfer ones.
+\end{itemize}
+
+\subsection{2. Fixes}
+
+\begin{itemize}
+    \item \textbf{Buyer re-upload (flexible):} \texttt{handleUploadProofPayment()} and the per-payment
+    \texttt{uploadProofPayment()} now accept \texttt{pending} \textbf{or} \texttt{rejected} bank-transfer
+    payments. On (re)upload the payment is reset to \texttt{pending}, clearing \texttt{validated\_at},
+    \texttt{validated\_by} and \texttt{validation\_notes}; the order is reverted to \texttt{pending\_payment}
+    if not every bank-transfer payment is \texttt{paid}. The legacy order-level \texttt{handleUploadProof()}
+    was aligned the same way.
+    \item \textbf{Upload UI}: \texttt{payments/upload-proof.blade.php} now shows a \emph{Replace Proof} form
+    for a pending (already-uploaded) \textbf{or} rejected payment, previews the current proof, and keeps the
+    rejection reason visible.
+    \item \textbf{Buyer order history}: \texttt{orders/index.blade.php} CTA for \texttt{pending\_payment}
+    orders is now state-aware — \emph{Re-upload Proof} (red, on rejection, showing the reason),
+    \emph{Upload Proof of Payment} (when a vendor still lacks proof), or \emph{View / Re-upload Proof}
+    (awaiting confirmation) — each linking back to the upload screen, so the buyer always has a re-entry.
+    \item \textbf{Seller method-agnostic}: partner order list already keys actions off \emph{status}
+    (\texttt{paid} $\rightarrow$ Mark Shipped, \texttt{shipped} $\rightarrow$ Mark Completed). Verified a
+    paid PayPal order surfaces \emph{Mark Shipped} exactly like a paid bank-transfer order.
+\end{itemize}
+
+\subsection{3. Verification}
+
+\texttt{BankTransferFlowTest} extended to 7 tests (41 assertions), adding:
+\begin{itemize}
+    \item \texttt{test\_buyer\_can\_reupload\_proof\_after\_rejection} — reject $\rightarrow$ re-upload resets
+    payment to \texttt{pending} (notes cleared) and order back to \texttt{pending\_payment}; vendor
+    re-approves $\rightarrow$ \texttt{paid}.
+    \item \texttt{test\_partner\_index\_shows\_ship\_for\_paid\_paypal\_order} — a captured PayPal order shows
+    \emph{Mark Shipped} (no Approve), proving fulfillment is method-agnostic.
+\end{itemize}
+
+\textbf{Deployment note:} no autoloader change (no new classes); deploy is pull + \texttt{migrate --force}
+(no migrations) + cache clears.
+
+\vfill
+\begin{center}
+    \textit{With Phase 11, buyers can upload and freely re-upload proof of payment until a vendor confirms, and sellers can fulfill every order type end-to-end.}
+\end{center}
+
 \end{document}

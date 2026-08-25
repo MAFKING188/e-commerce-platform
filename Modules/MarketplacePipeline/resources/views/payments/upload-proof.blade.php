@@ -105,44 +105,36 @@
             @endif
         @endif
 
-        @if($payment->proof_path)
-            <div class="pc-alert pc-alert--info">
-                <strong>Proof already uploaded</strong>
-                <p style="margin-top: 0.5rem;">Your proof has been received and is pending validation.</p>
-                <img src="{{ asset('storage/' . $payment->proof_path) }}" alt="Proof of payment" style="max-width: 300px; margin-top: 1rem; border-radius: 8px;">
-            </div>
-        @elseif($payment->status === 'rejected')
-            <div class="pc-alert pc-alert--error" style="margin-bottom: 1rem;">
-                <strong>Proof was rejected</strong>
-                @if($payment->validation_notes)
-                    <p style="margin-top: 0.25rem;">Reason: {{ $payment->validation_notes }}</p>
-                @endif
-                <p style="margin-top: 0.25rem;">Please upload a new proof of payment.</p>
-            </div>
-            <form method="POST" action="{{ route('payment.handle-upload-proof', ['payment' => $payment->id]) }}" enctype="multipart/form-data">
-                @csrf
-                <div class="pc-field" style="margin-bottom: 1rem;">
-                    <label for="proof_image_{{ $payment->id }}" class="pc-label">Proof Screenshot</label>
-                    <input type="file" name="proof_image" id="proof_image_{{ $payment->id }}" class="pc-input" accept="image/*" required>
-                    @error('proof_image') <p class="pc-error">{{ $message }}</p> @enderror
-                </div>
-                <button type="submit" class="btn btn-primary">Re-upload Proof</button>
-            </form>
-        @elseif($payment->status !== 'paid')
-            <form method="POST" action="{{ route('payment.handle-upload-proof', ['payment' => $payment->id]) }}" enctype="multipart/form-data">
-                @csrf
-                <div class="pc-field" style="margin-bottom: 1rem;">
-                    <label for="proof_image_{{ $payment->id }}" class="pc-label">Proof Screenshot</label>
-                    <input type="file" name="proof_image" id="proof_image_{{ $payment->id }}" class="pc-input" accept="image/*" required>
-                    @error('proof_image') <p class="pc-error">{{ $message }}</p> @enderror
-                </div>
-                <button type="submit" class="btn btn-primary">Upload Proof</button>
-            </form>
-        @else
+        @if($payment->status === 'paid')
             <div class="pc-alert pc-alert--success">
                 <strong>Payment validated</strong>
                 <p style="margin-top: 0.25rem;">This vendor payment has been confirmed.</p>
             </div>
+        @else
+            @if($payment->status === 'rejected')
+                <div class="pc-alert pc-alert--error" style="margin-bottom: 1rem;">
+                    <strong>Proof was rejected</strong>
+                    @if($payment->validation_notes)
+                        <p style="margin-top: 0.25rem;">Reason: {{ $payment->validation_notes }}</p>
+                    @endif
+                    <p style="margin-top: 0.25rem;">Please upload a new proof of payment below.</p>
+                </div>
+            @elseif($payment->proof_path)
+                <div class="pc-alert pc-alert--info" style="margin-bottom: 1rem;">
+                    <strong>Proof already uploaded</strong>
+                    <p style="margin-top: 0.5rem;">Your proof has been received and is pending validation. You can replace it below if needed.</p>
+                    <img src="{{ asset('storage/' . $payment->proof_path) }}" alt="Proof of payment" style="max-width: 300px; margin-top: 1rem; border-radius: 8px;">
+                </div>
+            @endif
+            <form method="POST" action="{{ route('payment.handle-upload-proof', ['payment' => $payment->id]) }}" enctype="multipart/form-data">
+                @csrf
+                <div class="pc-field" style="margin-bottom: 1rem;">
+                    <label for="proof_image_{{ $payment->id }}" class="pc-label">Proof Screenshot</label>
+                    <input type="file" name="proof_image" id="proof_image_{{ $payment->id }}" class="pc-input" accept="image/*" required>
+                    @error('proof_image') <p class="pc-error">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="btn btn-primary">{{ $payment->proof_path ? 'Replace Proof' : 'Upload Proof' }}</button>
+            </form>
         @endif
     </div>
 </div>

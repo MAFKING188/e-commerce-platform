@@ -46,7 +46,7 @@ class OrderController extends Controller
 
             if ($code === '' || ! \Modules\IdentityAccess\Services\OtpService::check($user, $code)) {
                 \Modules\IdentityAccess\Services\StepUpService::begin($user, $session);
-                return back()->withErrors(['code' => 'Enter the verification code sent to your email. A new code has been sent.']);
+                return back()->withInput()->withErrors(['code' => 'Enter the verification code sent to your email. A new code has been sent.']);
             }
 
             \Modules\IdentityAccess\Services\StepUpService::complete($session);
@@ -71,7 +71,7 @@ class OrderController extends Controller
             // the burned single-use OTP never strands the user mid-checkout.
             \Modules\IdentityAccess\Services\StepUpService::begin($user, $session);
 
-            return back()->withErrors(['checkout' => 'We could not place your order: ' . $e->getMessage() . ' A fresh verification code has been emailed to you — please try again.']);
+            return back()->withInput()->withErrors(['checkout' => 'We could not place your order: ' . $e->getMessage() . ' A fresh verification code has been emailed to you — please try again.']);
         }
     }
 

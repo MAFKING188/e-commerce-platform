@@ -87,11 +87,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="payment-methods">
                 <h3>Payment Method</h3>
                 <div class="payment-method-radio">
-                    <input type="radio" id="paypal" name="payment_method" value="paypal" checked>
+                    <input type="radio" id="paypal" name="payment_method" value="paypal" {{ old('payment_method', 'paypal') === 'paypal' ? 'checked' : '' }}>
                     <label for="paypal">PayPal (recommended)</label>
                 </div>
                 <div class="payment-method-radio">
-                    <input type="radio" id="bank-transfer" name="payment_method" value="bank_transfer">
+                    <input type="radio" id="bank-transfer" name="payment_method" value="bank_transfer" {{ old('payment_method') === 'bank_transfer' ? 'checked' : '' }}>
                     <label for="bank-transfer">Bank Transfer</label>
                     <span class="payment-method-note">Pay each vendor directly</span>
                 </div>

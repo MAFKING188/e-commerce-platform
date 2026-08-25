@@ -250,9 +250,13 @@ class PaymentController extends Controller
 
         $path = $request->file('proof_image')->store('proofs', 'public');
 
-        // Update payment record
+        // (Re)upload resets the payment to pending (clears any prior rejection).
         $order->payment->update([
             'proof_path' => $path,
+            'status' => 'pending',
+            'validated_at' => null,
+            'validated_by' => null,
+            'validation_notes' => null,
         ]);
 
         // Send email to admin notifying new proof
@@ -272,8 +276,8 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        // Only allow for bank transfer payments in pending status
-        if ($payment->method !== 'bank_transfer' || $payment->status !== 'pending') {
+        // Only allow for bank transfer payments not yet validated
+        if ($payment->method !== 'bank_transfer' || ! in_array($payment->status, ['pending', 'rejected'], true)) {
             abort(403);
         }
 
@@ -294,26 +298,33 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        // Only allow for bank transfer payments in pending status
-        if ($payment->method !== 'bank_transfer' || $payment->status !== 'pending') {
+        // Allow (re)upload for pending or rejected bank transfer payments.
+        if ($payment->method !== 'bank_transfer' || ! in_array($payment->status, ['pending', 'rejected'], true)) {
             return back()->withErrors('Invalid payment for proof upload.');
         }
 
         $path = $request->file('proof_image')->store('proofs', 'public');
 
-        // Update payment record
+        // (Re)upload always resets the payment to pending so the vendor re-validates,
+        // clearing any previous rejection.
         $payment->update([
             'proof_path' => $path,
+            'status' => 'pending',
+            'validated_at' => null,
+            'validated_by' => null,
+            'validation_notes' => null,
         ]);
 
-        // Check if all vendor payments for this order have proofs
+        // Recompute order status: if not every bank transfer payment is paid yet,
+        // the order must wait in pending_payment (this also reverts an order that
+        // had been marked paid before a vendor rejected/re-uploaded).
         $order = $payment->order;
-        $allPaymentsHaveProof = $order->payments()
+        $allPaid = $order->payments()
             ->where('method', 'bank_transfer')
-            ->whereNotNull('proof_path')
+            ->where('status', 'paid')
             ->count() === $order->payments()->where('method', 'bank_transfer')->count();
 
-        if ($allPaymentsHaveProof) {
+        if (! $allPaid) {
             $order->update(['status' => 'pending_payment']);
         }
 
