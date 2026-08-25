@@ -9,6 +9,7 @@ use Modules\MarketplacePipeline\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Modules\MarketplacePipeline\Mail\OrderCompleted;
 use Modules\MarketplacePipeline\Mail\OrderShipped;
 use Modules\MarketplacePipeline\Mail\PaymentValidated;
 use Modules\MarketplacePipeline\Mail\PaymentRejected;
@@ -98,9 +99,11 @@ class PartnerOrderController extends Controller
             $order->update(['status' => 'completed']);
         });
 
+        Mail::to($order->user)->queue(new OrderCompleted($order));
+
         (new \Modules\TelemetryPipeline\Services\TelemetryService)->log('partner.orders.completed', ['order_id' => $order->id]);
 
-        return back()->with('status', 'Order marked as completed — payment released to vendor.');
+        return back()->with('status', 'Order marked as completed — the buyer has been notified and payment released to you.');
     }
 
     /**

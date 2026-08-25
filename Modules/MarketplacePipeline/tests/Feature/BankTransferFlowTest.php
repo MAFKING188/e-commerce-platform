@@ -4,10 +4,12 @@ namespace Modules\MarketplacePipeline\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Modules\CatalogDelivery\Models\Category;
 use Modules\CatalogDelivery\Models\Product;
 use Modules\IdentityAccess\Models\User;
+use Modules\MarketplacePipeline\Mail\OrderCompleted;
 use Modules\MarketplacePipeline\Models\Cart;
 use Modules\MarketplacePipeline\Models\CartItem;
 use Modules\MarketplacePipeline\Models\Order;
@@ -200,5 +202,64 @@ class BankTransferFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Approve')
             ->assertSee('View Proof');
+    }
+
+    public function test_partner_index_shows_mark_shipped_for_paid_order(): void
+    {
+        Storage::fake('public');
+        $buyer = User::factory()->create(['email_verified_at' => now()]);
+        [$p1User, $p1] = $this->makePartner('Vendor One');
+        $prod1 = $this->makeProduct($p1, 1000.00);
+        $this->makeCart($buyer, [$prod1]);
+
+        $order = (new CheckoutService)->checkout($buyer, [
+            'recipient_name' => 'X', 'recipient_phone' => '1', 'shipping_line1' => 'a',
+            'shipping_city' => 'c', 'shipping_country' => 'z',
+        ], 'bank_transfer');
+
+        $payment1 = $order->payments->where('partner_id', $p1->id)->first();
+        $this->actingAs($buyer)->post(
+            route('payment.handle-upload-proof', $payment1->id),
+            ['proof_image' => UploadedFile::fake()->image('proof.jpg')]
+        );
+        $this->actingAs($p1User)->patch(route('partner.payments.validate', $payment1->id), ['action' => 'approve']);
+
+        $this->actingAs($p1User)->get(route('partner.orders.index'))
+            ->assertOk()
+            ->assertSee('Mark Shipped')
+            ->assertDontSee('Approve');
+    }
+
+    public function test_partner_index_shows_mark_completed_for_shipped_order_and_emails_buyer(): void
+    {
+        Storage::fake('public');
+        Mail::fake();
+        $buyer = User::factory()->create(['email_verified_at' => now()]);
+        [$p1User, $p1] = $this->makePartner('Vendor One');
+        $prod1 = $this->makeProduct($p1, 1000.00);
+        $this->makeCart($buyer, [$prod1]);
+
+        $order = (new CheckoutService)->checkout($buyer, [
+            'recipient_name' => 'X', 'recipient_phone' => '1', 'shipping_line1' => 'a',
+            'shipping_city' => 'c', 'shipping_country' => 'z',
+        ], 'bank_transfer');
+
+        $payment1 = $order->payments->where('partner_id', $p1->id)->first();
+        $this->actingAs($buyer)->post(
+            route('payment.handle-upload-proof', $payment1->id),
+            ['proof_image' => UploadedFile::fake()->image('proof.jpg')]
+        );
+        $this->actingAs($p1User)->patch(route('partner.payments.validate', $payment1->id), ['action' => 'approve']);
+        $this->actingAs($p1User)->patch(route('partner.orders.ship', $order->id));
+
+        $this->actingAs($p1User)->get(route('partner.orders.index'))
+            ->assertOk()
+            ->assertSee('Mark Completed');
+
+        // Completing notifies the buyer.
+        $this->actingAs($p1User)->patch(route('partner.orders.complete', $order->id))
+            ->assertRedirect();
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'status' => 'completed']);
+        Mail::assertQueued(OrderCompleted::class, fn ($m) => $m->order->id === $order->id);
     }
 }

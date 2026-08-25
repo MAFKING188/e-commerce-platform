@@ -79,16 +79,36 @@
                         @endforeach
                     </td>
                     <td class="is-right">
-                        @foreach($order->payments as $payment)
-                            @if($payment->status === 'pending' && $payment->method === 'bank_transfer' && $payment->partner_id && !$payment->validated_at)
-                                <form action="{{ route('partner.payments.validate', $payment) }}" method="POST" style="display:inline; margin: 0.125rem;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Approve</button>
-                                    <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Reject</button>
-                                </form>
-                            @endif
-                        @endforeach
+                        @if($order->status === 'pending_payment')
+                            @foreach($order->payments as $payment)
+                                @if($payment->status === 'pending' && $payment->method === 'bank_transfer' && $payment->partner_id && !$payment->validated_at)
+                                    <form action="{{ route('partner.payments.validate', $payment) }}" method="POST" style="display:inline; margin: 0.125rem;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" name="action" value="approve" class="pc-btn-sm pc-btn-sm--ok" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Approve</button>
+                                        <button type="submit" name="action" value="reject" class="pc-btn-sm pc-btn-sm--error" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Reject</button>
+                                    </form>
+                                @endif
+                            @endforeach
+                        @elseif($order->status === 'paid')
+                            <form action="{{ route('partner.orders.ship', $order->id) }}" method="POST" style="display:inline; margin: 0.125rem;">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="pc-btn-sm" style="font-size: 0.7rem; padding: 0.25rem 0.5rem; background:#0070ba; color:#fff; border:none; border-radius:4px;">Mark Shipped</button>
+                            </form>
+                        @elseif($order->status === 'shipped')
+                            <form action="{{ route('partner.orders.complete', $order->id) }}" method="POST" style="display:inline; margin: 0.125rem;">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="pc-btn-sm pc-btn-sm--ok" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">Mark Completed</button>
+                            </form>
+                        @elseif($order->status === 'completed')
+                            <span class="pc-text-muted" style="font-size: 0.75rem;">Completed</span>
+                        @elseif($order->status === 'cancelled')
+                            <span class="pc-text-muted" style="font-size: 0.75rem;">Cancelled</span>
+                        @endif
+
+                        <a href="{{ route('partner.orders.show', $order->id) }}" class="pc-btn-sm" style="font-size: 0.7rem; padding: 0.25rem 0.5rem; margin: 0.125rem;">View</a>
                     </td>
                 </tr>
             @empty

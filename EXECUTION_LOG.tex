@@ -3330,4 +3330,54 @@ handling or view namespaces). All payment/marketplace tests pass.
     \textit{With Phase 9, the per-vendor bank-transfer loop is fully functional: buyers can upload and re-upload proof, vendors can validate and advance order status, and the earlier "partners cannot change status" failure is resolved.}
 \end{center}
 
+% ==================================================
+\section{Phase 10: Partner Full-Lifecycle Fulfillment \& Buyer Status Emails}
+
+\subsection{1. Problem}
+
+Partners could validate a bank-transfer proof (approve/reject) but then \textbf{nothing further happened}
+on the orders list: the partner \texttt{index} view only rendered Approve/Reject buttons for pending
+bank-transfer payments. Once an order moved to \texttt{paid}, there was no \emph{Mark Shipped} /
+\emph{Mark Completed} action on the list, so a partner could not drive the order to completion from the
+dashboard they were looking at (the buttons existed only on the per-order \texttt{show} page). Buyers were
+also not notified when an order was completed — \texttt{PartnerOrderController::complete()} only logged
+telemetry and never sent mail.
+
+\subsection{2. Fixes}
+
+\begin{itemize}
+    \item \textbf{Partner order list actions (lifecycle):} \texttt{partner/orders/index.blade.php} Action
+    column is now status-driven:
+    \begin{itemize}
+        \item \texttt{pending\_payment} $\rightarrow$ Approve / Reject per pending bank-transfer payment;
+        \item \texttt{paid} $\rightarrow$ \emph{Mark Shipped} (POST \texttt{partner.orders.ship});
+        \item \texttt{shipped} $\rightarrow$ \emph{Mark Completed} (POST \texttt{partner.orders.complete});
+        \item \texttt{completed} / \texttt{cancelled} $\rightarrow$ static label.
+    \end{itemize}
+    A \emph{View} link is always shown so the partner can drill into any order. This works for both
+    bank-transfer and PayPal orders (a paid PayPal order also exposes Ship/Complete).
+    \item \textbf{Buyer completion email:} added \texttt{Mail\textbackslash OrderCompleted} (queued, mirrors
+    \texttt{OrderShipped}) and \texttt{emails/orders/completed.blade.php}; \texttt{PartnerOrderController::complete()}
+    now \texttt{Mail::to(\$order->user)->queue(new OrderCompleted(\$order))}. Buyers already receive
+    \texttt{PaymentValidated} on approval and \texttt{OrderShipped} on dispatch, so the full
+    paid $\rightarrow$ shipped $\rightarrow$ completed lifecycle is now communicated by email end-to-end.
+\end{itemize}
+
+\subsection{3. Verification}
+
+\texttt{BankTransferFlowTest} extended (5 tests, 32 assertions): the multi-vendor flow plus new assertions
+that (a) a \texttt{paid} order shows \emph{Mark Shipped} (and no Approve) on the partner list, and
+(b) a \texttt{shipped} order shows \emph{Mark Completed} and that completing the order flips status to
+\texttt{completed} \textbf{and} queues the \texttt{OrderCompleted} mail to the buyer.
+
+\textbf{Deployment note:} no \texttt{composer dump-autoload} is required — \texttt{OrderCompleted} lives
+under \texttt{app/Mail/}, already covered by the module PSR-4 root. (A root-only \texttt{dump-autoload}
+had previously dropped merge-plugin module namespaces such as \texttt{EmailCenter}; autoloader regen must
+always run with \texttt{COMPOSER\_ALLOW\_SUPERUSER=1} so the \texttt{wikimedia/composer-merge-plugin} runs.)
+
+\vfill
+\begin{center}
+    \textit{With Phase 10, partners own the complete fulfillment lifecycle from the order list and buyers receive an email at every status transition (confirmed, shipped, completed).}
+\end{center}
+
 \end{document}
