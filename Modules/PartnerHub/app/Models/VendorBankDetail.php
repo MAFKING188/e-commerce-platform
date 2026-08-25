@@ -11,11 +11,6 @@ class VendorBankDetail extends Model
     protected $fillable = [
         'partner_id',
         'bank_details_image',
-        'account_holder',
-        'iban',
-        'bank_name',
-        'swift_bic',
-        'additional_info',
         'is_active',
     ];
 

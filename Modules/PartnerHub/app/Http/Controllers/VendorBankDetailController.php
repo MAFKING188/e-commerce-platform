@@ -29,7 +29,7 @@ class VendorBankDetailController extends Controller
         $bankDetail = $partner->bankDetails;
 
         if ($bankDetail) {
-            return redirect()->route('vendor.bank-details.edit', $bankDetail)
+            return redirect()->route('partner.bank-details.edit', $bankDetail)
                 ->with('status', 'Bank details already exist. You can edit them below.');
         }
 
@@ -41,29 +41,21 @@ class VendorBankDetailController extends Controller
         $partner = $this->getPartner();
 
         if ($partner->bankDetails) {
-            return redirect()->route('vendor.bank-details.edit', $partner->bankDetails)
+            return redirect()->route('partner.bank-details.edit', $partner->bankDetails)
                 ->withErrors('Bank details already exist. Please edit instead.');
         }
 
         $validated = $request->validate([
-            'bank_details_image' => 'nullable|image|max:5000',
-            'account_holder' => 'nullable|string|max:255',
-            'iban' => 'nullable|string|max:255',
-            'bank_name' => 'nullable|string|max:255',
-            'swift_bic' => 'nullable|string|max:255',
-            'additional_info' => 'nullable|string',
+            'bank_details_image' => 'required|image|max:5000',
             'is_active' => 'boolean',
         ]);
 
-        if ($request->hasFile('bank_details_image')) {
-            $validated['bank_details_image'] = $request->file('bank_details_image')->store('vendor-bank-details', 'public');
-        }
-
+        $validated['bank_details_image'] = $request->file('bank_details_image')->store('vendor-bank-details', 'public');
         $validated['partner_id'] = $partner->id;
 
         VendorBankDetail::create($validated);
 
-        return redirect()->route('vendor.bank-details.index')
+        return redirect()->route('partner.bank-details.index')
             ->with('status', 'Bank details saved successfully.');
     }
 
@@ -88,16 +80,10 @@ class VendorBankDetailController extends Controller
 
         $validated = $request->validate([
             'bank_details_image' => 'nullable|image|max:5000',
-            'account_holder' => 'nullable|string|max:255',
-            'iban' => 'nullable|string|max:255',
-            'bank_name' => 'nullable|string|max:255',
-            'swift_bic' => 'nullable|string|max:255',
-            'additional_info' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('bank_details_image')) {
-            // Delete old image
             if ($bankDetail->bank_details_image) {
                 Storage::disk('public')->delete($bankDetail->bank_details_image);
             }
@@ -106,7 +92,7 @@ class VendorBankDetailController extends Controller
 
         $bankDetail->update($validated);
 
-        return redirect()->route('vendor.bank-details.index')
+        return redirect()->route('partner.bank-details.index')
             ->with('status', 'Bank details updated successfully.');
     }
 
@@ -124,7 +110,7 @@ class VendorBankDetailController extends Controller
 
         $bankDetail->delete();
 
-        return redirect()->route('vendor.bank-details.index')
+        return redirect()->route('partner.bank-details.index')
             ->with('status', 'Bank details deleted successfully.');
     }
 }
