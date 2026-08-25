@@ -3276,4 +3276,58 @@ The deferred PayPal UX findings in \texttt{docs/AUDIT-2026-08-20-full-app-sweep.
     \textit{With Phase 8, SmartShop supports a true multi-vendor payment model: platform-mediated PayPal with hardened UX, and direct per-vendor bank transfer with vendor-side validation.}
 \end{center}
 
+% ==================================================
+\section{Phase 9: Bank-Transfer Partner-Validation Bug Fix \& Buyer Return-Path}
+
+\subsection{1. Root-Cause: Partners Could Not Validate Payments (500)}
+
+The bank-transfer flow shipped in commit \texttt{ac28e8f} deployed to production, but partner
+validation of uploaded proofs failed with a 500. Investigation (end-to-end \texttt{BankTransferFlowTest})
+reproduced the failure:
+
+\begin{quote}
+    \texttt{Class "Modules\textbackslash MarketplacePipeline\textbackslash Mail\textbackslash PaymentValidated" not found}
+\end{quote}
+
+Root cause: the three confirmation mailables (\texttt{PaymentValidated}, \texttt{PaymentRejected},
+\texttt{PaymentProofReceived}) had been created in \texttt{Modules/MarketplacePipeline/Mail/}
+whereas the module's PSR-4 root (\texttt{Modules\textbackslash MarketplacePipeline\textbackslash} $\rightarrow$
+\texttt{app/}) only autoloads \texttt{app/Mail/}. The files were therefore never autoloaded, so
+\texttt{PartnerOrderController::validatePaymentForPayment()} threw on the \texttt{new PaymentValidated(\$order)}
+mail send — which is exactly why partners "could not change order status". The feature code itself
+(routes, controllers, per-vendor \texttt{Payment} creation, guard against validating another vendor's
+payment) was correct.
+
+\textbf{Fix:} \texttt{git mv}'d the three mailables into \texttt{Modules/MarketplacePipeline/app/Mail/},
+refreshed the autoloader, and deleted the now-empty \texttt{Mail/} directory.
+
+\subsection{2. Buyer Return-Path Gap}
+
+After placing a bank-transfer order the buyer is redirected to the proof-upload screen, but if they
+navigated away there was \textbf{no way back}: order history only rendered a "Pay with PayPal" CTA for
+\texttt{pending} orders and nothing for \texttt{pending\_payment} (bank-transfer) orders. Closed by adding
+an "Upload Proof of Payment" CTA on \texttt{orders/index.blade.php} for \texttt{pending\_payment} orders,
+linking to \texttt{payment.upload-proof} and showing the per-vendor reference \texttt{ORDER-\{id\}-\{partner\_id\}}
+and the 24h confirmation note. Once all proofs are uploaded the same card shows an "awaiting vendor
+confirmation" state instead.
+
+\subsection{3. Verification}
+
+\texttt{BankTransferFlowTest} (3 tests, 24 assertions) now passes and exercises the full multi-vendor path:
+checkout (bank\_transfer) $\rightarrow$ one \texttt{Payment} per vendor $\rightarrow$ buyer uploads proof per
+payment $\rightarrow$ each vendor validates (approve) $\rightarrow$ order moves \texttt{pending\_payment}
+$\rightarrow$ \texttt{paid} $\rightarrow$ shipped $\rightarrow$ completed; plus a guard asserting a vendor
+gets 403 when trying to validate another vendor's payment, and that the partner list shows an Approve /
+View Proof action once proof is uploaded.
+
+\textbf{Note on test suite:} the full suite shows 20 pre-existing failures confined to the four module
+\texttt{ExceptionHandlerTest} classes ("No hint path defined for [identity]/[partner]/[marketplacepipeline]/
+[catalog]") — a test-environment view-namespace issue unrelated to this change (it touches no exception
+handling or view namespaces). All payment/marketplace tests pass.
+
+\vfill
+\begin{center}
+    \textit{With Phase 9, the per-vendor bank-transfer loop is fully functional: buyers can upload and re-upload proof, vendors can validate and advance order status, and the earlier "partners cannot change status" failure is resolved.}
+\end{center}
+
 \end{document}
