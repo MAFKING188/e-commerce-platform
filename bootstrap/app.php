@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'admin' => \Modules\IdentityAccess\Http\Middleware\AdminMiddleware::class,
         'partner' => \Modules\IdentityAccess\Http\Middleware\PartnerMiddleware::class,
         '2fa.pending' => \Modules\IdentityAccess\Http\Middleware\Ensure2faChallenge::class,
+        'module.exceptions' => \App\Http\Middleware\ModuleExceptionHandler::class,
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
