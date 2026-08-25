@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<form action="{{ route('vendor.bank-details.update', $bankDetail) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('partner.bank-details.update', $bankDetail) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -88,7 +88,7 @@
 
     <div class="pc-actions" style="margin-top: 1.5rem;">
         <button type="submit" class="btn btn-primary">Update Bank Details</button>
-        <a href="{{ route('vendor.bank-details.index') }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ route('partner.bank-details.index') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 </section>

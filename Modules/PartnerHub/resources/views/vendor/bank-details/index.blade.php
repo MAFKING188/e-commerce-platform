@@ -60,8 +60,8 @@
         </div>
 
         <div class="pc-actions" style="margin-top: 1.5rem;">
-            <a href="{{ route('vendor.bank-details.edit', $bankDetail) }}" class="btn btn-primary">Edit Details</a>
-            <form action="{{ route('vendor.bank-details.destroy', $bankDetail) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete these bank details?')">
+            <a href="{{ route('partner.bank-details.edit', $bankDetail) }}" class="btn btn-primary">Edit Details</a>
+            <form action="{{ route('partner.bank-details.destroy', $bankDetail) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete these bank details?')">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger">Delete</button>
@@ -86,7 +86,7 @@
         </svg>
         <h2 style="margin-bottom: 0.5rem;">No Bank Details Configured</h2>
         <p class="pc-text-muted" style="margin-bottom: 1.5rem;">Upload your bank details so customers can pay you directly via bank transfer.</p>
-        <a href="{{ route('vendor.bank-details.create') }}" class="btn btn-primary">Add Bank Details</a>
+        <a href="{{ route('partner.bank-details.create') }}" class="btn btn-primary">Add Bank Details</a>
     </div>
 </div>
 @endif

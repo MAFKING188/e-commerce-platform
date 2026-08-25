@@ -60,6 +60,18 @@
         </div>
 
         <div class="form-group">
+            <label class="shop-field-label">Supplier</label>
+            <select name="supplier" class="filter-input">
+                <option value="">All Suppliers</option>
+                @foreach($suppliers as $supplier)
+                    <option value="{{$supplier->id}}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>
+                        {{$supplier->name}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
             <label class="shop-field-label">Price Range</label>
             <div class="shop-price-range">
                 <input type="number" name="min_price" value="{{ request('min_price') }}" class="filter-input" placeholder="Min">

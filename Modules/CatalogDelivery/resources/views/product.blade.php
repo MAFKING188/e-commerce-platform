@@ -28,6 +28,12 @@
         @if($product->partners->isNotEmpty())
             <span class="product-partner">By {{ $product->partners->first()->name }}</span>
         @endif
+        @if($product->color)
+            <span class="product-color">Color: {{ $product->color }}</span>
+        @endif
+        @if($product->size)
+            <span class="product-size">Size: {{ $product->size }}</span>
+        @endif
         <h1>{{ $product->name }}</h1>
         
         @if($product->stock > 0)

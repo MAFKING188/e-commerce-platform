@@ -18,6 +18,7 @@ class ViewController extends Controller
         return view('catalogdelivery::shop', [
             'products' => $catalog->shop($request),
             'categories' => $catalog->categories(),
+            'suppliers' => \Modules\PartnerHub\Models\Partner::all(),
         ]);
     }
 

@@ -13,6 +13,12 @@
                 @if($product->partners->isNotEmpty())
                     <span class="card-partner">By {{ $product->partners->first()->name }}</span>
                 @endif
+                @if($product->color)
+                    <span class="card-color">{{ $product->color }}</span>
+                @endif
+                @if($product->size)
+                    <span class="card-size">{{ $product->size }}</span>
+                @endif
             </div>
             <h3>{{ $product->name }}</h3>
             <div class="price-tag">@money($product->price)</div>

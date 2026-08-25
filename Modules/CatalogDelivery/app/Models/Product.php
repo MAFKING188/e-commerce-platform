@@ -21,6 +21,8 @@ class Product extends Model
         'image',
         'category_id',
         'is_featured',
+        'color',
+        'size',
     ];
 
     protected static function newFactory(): ProductFactory
