@@ -121,6 +121,66 @@ class CartController extends Controller
         return response()->json(['count' => $this->getCartCount()]);
     }
 
+    /**
+     * Show a shared cart by token. Read-only view of items.
+     */
+    public function showShared(string $token)
+    {
+        $cart = Cart::with('items.product')->where('share_token', $token)->firstOrFail();
+
+        $total = $cart->items->sum(fn ($item) => $item->product->price * $item->quantity);
+
+        return view('marketplacepipeline::cart.shared', compact('cart', 'total'));
+    }
+
+    /**
+     * Clone a shared cart into the authenticated user's cart and redirect to checkout.
+     */
+    public function cloneShared(string $token)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('status', 'Please log in to clone this cart.');
+        }
+
+        $sharedCart = Cart::with('items.product')->where('share_token', $token)->firstOrFail();
+        $user = auth()->user();
+        $myCart = Cart::firstOrCreate(['user_id' => $user->id]);
+
+        $cloned = 0;
+        foreach ($sharedCart->items as $sharedItem) {
+            $product = $sharedItem->product;
+            if (!$product || $product->stock < 1) {
+                continue;
+            }
+
+            $existing = CartItem::where('cart_id', $myCart->id)
+                ->where('product_id', $product->id)
+                ->first();
+
+            if ($existing) {
+                $newQty = $existing->quantity + $sharedItem->quantity;
+                if ($product->stock >= $newQty) {
+                    $existing->update(['quantity' => $newQty]);
+                    $cloned++;
+                }
+            } else {
+                $qty = min($sharedItem->quantity, $product->stock);
+                CartItem::create([
+                    'cart_id' => $myCart->id,
+                    'product_id' => $product->id,
+                    'quantity' => $qty,
+                ]);
+                $cloned++;
+            }
+        }
+
+        $message = $cloned > 0
+            ? "{$cloned} item(s) added to your bag."
+            : 'No items could be added (out of stock).';
+
+        return redirect()->route('cart.index')->with('status', $message);
+    }
+
     private function getCartCount(): int
     {
         $user = auth()->user();

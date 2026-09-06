@@ -9,10 +9,14 @@ use Modules\MarketplacePipeline\Http\Controllers\PartnerOrderController;
 use Modules\MarketplacePipeline\Http\Controllers\PartnerPayoutController;
 use Modules\MarketplacePipeline\Http\Controllers\PaymentController;
 
+// Public: shared cart view (no auth required)
+Route::get('/cart/shared/{token}', [CartController::class, 'showShared'])->name('cart.shared');
+
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clone/{token}', [CartController::class, 'cloneShared'])->name('cart.clone');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');

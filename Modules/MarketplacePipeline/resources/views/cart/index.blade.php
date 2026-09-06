@@ -162,6 +162,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 Confirm & Checkout
             </button>
 
+            @if($cart->share_token ?? false)
+            <button type="button" onclick="shareCart()" style="width: 100%; margin-top: 0.75rem; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-100); color: var(--text-600); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                Share This Bag
+            </button>
+            <span id="cart-share-toast" style="display: none; text-align: center; font-size: 0.8rem; color: #16a34a; font-weight: 600; margin-top: 0.5rem;">Link copied!</span>
+            <script>
+            function shareCart() {
+                const url = '{{ url("/cart/shared/{$cart->share_token}") }}';
+                const text = 'Check out my SmartShop bag — {{ $cart->items->count() }} item(s) worth ${{ number_format($total, 2) }}';
+                if (navigator.share) {
+                    navigator.share({ title: 'My SmartShop Bag', text, url }).catch(() => {});
+                } else {
+                    navigator.clipboard.writeText(url).then(() => {
+                        const toast = document.getElementById('cart-share-toast');
+                        toast.style.display = 'block';
+                        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+                    });
+                }
+            }
+            </script>
+            @endif
+
             <p class="checkout-secure-note">
                 SSL-secured payment · Full refund if your piece does not arrive as described
             </p>
